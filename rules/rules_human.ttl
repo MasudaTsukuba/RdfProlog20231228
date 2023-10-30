@@ -1,9 +1,12 @@
 @prefix PR: <http://example.org/> .
 @prefix VAR: <http://variable.org/> .
 
-PR:rule_human_socrates
+# facts
+PR:fact_human_socrates
     PR:operation PR:human ;
     PR:variable_x PR:socrates .
+
+# rules
 PR:rule_human_mortal
     PR:left_side [
         PR:operation PR:mortal ;
@@ -13,3 +16,7 @@ PR:rule_human_mortal
         PR:child [
             PR:operation PR:human ;
             PR:variable_x VAR:variable_x ] ] .
+
+# procedures
+
+# inferences

@@ -8,5 +8,7 @@ def func(list):
 
 list2_x = func(list_x)
 print(list_x)
+print(list2_x)
 list_x.append(5)
+print(list_x)
 print(list2_x)

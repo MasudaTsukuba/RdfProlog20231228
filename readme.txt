@@ -4,9 +4,9 @@ RDFのクエリ機能を利用してPrologの推論を実行するシステム�
 質問はsparql queryで与える。
 grandfather(jiro, Y).の場合。
 SELECT ?ans WHERE {
-    ?s operation　grandfather .
-    ?s variable_x　jiro .
-    ?s variable_y ?ans . }
+    ?s PR:operation　PR:grandfather .
+    ?s PR:variable_x　PR:jiro .
+    ?s PR:variable_y ?ans . }
 
 事実はRDFで与える。
 father(jiro, taro).は以下のようになる。
@@ -120,7 +120,7 @@ binding[0]で変数対応の辞書を取り出す。
 {'?s': '<http://example.org/subj>', '?x': '<http://example.org/jiro>', '?y': '?ans'}
 
 次に右辺の各項を順番に試す。
-右辺の各項は親のラベルparent_for_righを基にして、find_right_sides()で取り出す。
+右辺の各項は親のラベルparent_for_rightを基にして、find_right_sides()で取り出す。
     results_for_right = find_right_sides(parent_for_right)  # find right hand of the rule
 results_for_rightの各項rightのright_side[0]で右辺の各項のラベルが取得できる。
 

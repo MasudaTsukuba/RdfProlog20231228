@@ -1,6 +1,5 @@
-from RdfProlog import RdfProlog, ClassSparqlQuery
-from PR import PR
-from rdflib import URIRef
+from src.RdfProlog import RdfProlog, ClassSparqlQuery
+from src.PR import PR
 
 
 def test_answer_question1():

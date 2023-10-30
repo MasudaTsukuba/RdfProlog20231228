@@ -1,6 +1,6 @@
 # import numpy as np
-from RdfProlog import RdfProlog, Resolution, ClassSparqlQuery
-from PR import PR
+from src.RdfProlog import RdfProlog, Resolution, ClassSparqlQuery
+from src.PR import PR
 # from rdflib import URIRef
 
 

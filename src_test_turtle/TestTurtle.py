@@ -1,5 +1,10 @@
+"""
+TestTurtle.py
+T. Masuda, 2023/10/30
+"""
+
 from rdflib import Graph, URIRef, BNode
-from PR import PR
+from src.PR import PR
 
 g_temp = Graph()
 g_temp.parse('rules/rules_human.ttl')

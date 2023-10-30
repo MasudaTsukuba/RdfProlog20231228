@@ -1,5 +1,5 @@
-from RdfProlog import RdfProlog, ClassSparqlQuery
-from PR import PR
+from src.RdfProlog import RdfProlog, ClassSparqlQuery
+from src.PR import PR
 import numpy as np
 
 

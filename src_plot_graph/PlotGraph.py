@@ -1,12 +1,15 @@
-from rdflib import Graph, URIRef, BNode
-from PR import PR
-import rdflib
+"""
+PlotGraph.py
+T. Masuda, 2023/10/30
+"""
+
+from rdflib import Graph
 from rdflib.extras.external_graph_libs import rdflib_to_networkx_multidigraph
 import networkx as nx
 import matplotlib.pyplot as plt
 
 g_temp = Graph()
-result = g_temp.parse('rules_human.ttl')
+result = g_temp.parse('rules/rules_human.ttl')
 
 G = rdflib_to_networkx_multidigraph(result)
 

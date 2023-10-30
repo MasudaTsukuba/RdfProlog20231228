@@ -1,8 +1,8 @@
 @prefix PR: <http://example.org/> .
 @prefix VAR: <http://variable.org/> .
 
+# rules
 PR:rule_add_number_x_1_z
-    PR:priority "1" ;
     PR:left_side [
         PR:operation PR:add_number ;
         PR:variable_x VAR:variable_x ;
@@ -16,7 +16,6 @@ PR:rule_add_number_x_1_z
             PR:variable_y VAR:variable_z ] ] .
 
 PR:rule_add_number_x_y_z
-    PR:priority "2" ;
     PR:left_side [
         PR:operation PR:add_number ;
         PR:variable_x VAR:variable_x ;
@@ -41,3 +40,17 @@ PR:rule_add_number_x_y_z
             PR:operation PR:next_number ;
             PR:variable_x VAR:variable_v ;
             PR:variable_y VAR:variable_z ] ] .
+
+#procedures
+PR:rule_add_number_x_1_z
+    PR:priority "1" .
+
+PR:rule_add_number_x_y_z
+    PR:priority "2" .
+
+# inferences
+[]
+    PR:operation PR:add_number ;
+    PR:variable_x PR:two ;
+    PR:variable_y PR:three ;
+    PR:variable_z PR:five .

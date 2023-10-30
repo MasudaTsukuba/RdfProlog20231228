@@ -1,21 +1,22 @@
 @prefix PR: <http://example.org/> .
 @prefix VAR: <http://variable.org/> .
 
-PR:rule_father_jiro_taro
+# facts
+PR:fact_father_jiro_taro
     PR:operation PR:father ;
     PR:variable_x PR:taro ;
     PR:variable_y PR:jiro .
-PR:rule_mother_jiro_hana
+PR:fact_mother_jiro_hana
     PR:operation PR:mother ;
     PR:variable_x PR:taro ;
     PR:variable_y PR:hana .
-PR:rule_father_hana_ichiro
+PR:fact_father_hana_ichiro
     PR:operation PR:father ;
     PR:variable_x PR:hana ;
     PR:variable_y PR:ichiro .
 
+# rules
 PR:grandfather_father_father
-    PR:priority "1" ;
     PR:left_side [
         PR:operation PR:grandfather ;
         PR:variable_x VAR:variable_x ;
@@ -34,7 +35,6 @@ PR:grandfather_father_father
              PR:variable_y VAR:variable_y ] ] .
 
 PR:grandfather_mother_father
-    PR:priority "2" ;
     PR:left_side [
         PR:operation PR:grandfather ;
         PR:variable_x VAR:variable_x ;
@@ -51,3 +51,10 @@ PR:grandfather_mother_father
             PR:operation PR:father ;
             PR:variable_x VAR:variable_u ;
             PR:variable_y VAR:variable_y ] ] .
+
+# procedures
+PR:grandfather_father_father
+    PR:priority "1" .
+
+PR:grandfather_mother_father
+    PR:priority "2" .

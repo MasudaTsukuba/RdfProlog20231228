@@ -1,6 +1,7 @@
 @prefix PR: <http://example.org/> .
 @prefix VAR: <http://variable.org/> .
 
+# facts
 PR:rule_knows_andy_bob
     PR:operation PR:knows_direct ;
     PR:variable_x PR:andy ;
@@ -18,6 +19,7 @@ PR:rule_knows_david_edgar
     PR:variable_x PR:david ;
     PR:variable_y PR:edgar .
 
+# rules
 #PR:rule_knows
 #    PR:priority "1" ;
 #    PR:left_side [
@@ -32,7 +34,6 @@ PR:rule_knows_david_edgar
 #            PR:variable_y VAR:variable_y ] ] .
 
 PR:rule_knows
-    PR:priority "2" ;
     PR:left_side [
         PR:operation PR:knows ;
         PR:variable_x VAR:variable_x ;
@@ -45,7 +46,6 @@ PR:rule_knows
             PR:variable_y VAR:variable_y ] ] .
 
 PR:rule_knows_indirect1
-    PR:priority "1" ;
     PR:left_side [
         PR:operation PR:knows_indirect ;
         PR:variable_x VAR:variable_x ;
@@ -58,7 +58,6 @@ PR:rule_knows_indirect1
             PR:variable_y VAR:variable_y ] ] .
 
 PR:rule_knows_indirect2
-    PR:priority "2" ;
     PR:left_side [
         PR:operation PR:knows_indirect ;
         PR:variable_x VAR:variable_x ;
@@ -75,3 +74,15 @@ PR:rule_knows_indirect2
             PR:operation PR:knows_indirect ;
             PR:variable_x VAR:variable_u ;
             PR:variable_y VAR:variable_y ] ] .
+
+# procedures
+PR:rule_knows
+    PR:priority "2" .
+
+PR:rule_knows_indirect1
+    PR:priority "1" .
+
+PR:rule_knows_indirect2
+    PR:priority "2" .
+
+# inferences
