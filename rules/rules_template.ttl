@@ -1,0 +1,7 @@
+@prefix PR: <http://example.org/> .
+@prefix VAR: <http://variable.org/> .
+
+PR:rule_template
+    PR:left_side [
+        PR:operation PR:rule_template_left ] ;
+    PR:right_side [ ] .

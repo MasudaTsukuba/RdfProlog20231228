@@ -1,0 +1,43 @@
+@prefix PR: <http://example.org/> .
+@prefix VAR: <http://variable.org/> .
+
+PR:rule_add_number_x_1_z
+    PR:priority "1" ;
+    PR:left_side [
+        PR:operation PR:add_number ;
+        PR:variable_x VAR:variable_x ;
+        PR:variable_y PR:one ;
+        PR:variable_z VAR:variable_z ] ;
+    PR:right_side [
+        PR:priority "1" ;
+        PR:child [
+            PR:operation PR:next_number ;
+            PR:variable_x VAR:variable_x ;
+            PR:variable_y VAR:variable_z ] ] .
+
+PR:rule_add_number_x_y_z
+    PR:priority "2" ;
+    PR:left_side [
+        PR:operation PR:add_number ;
+        PR:variable_x VAR:variable_x ;
+        PR:variable_y VAR:variable_y ;
+        PR:variable_z VAR:variable_z ] ;
+    PR:right_side [
+        PR:priority "1" ;
+        PR:child [
+            PR:operation PR:next_number ;
+            PR:variable_x VAR:variable_u ;
+            PR:variable_y VAR:variable_y ] ] ;
+    PR:right_side [
+        PR:priority "2" ;
+        PR:child [
+            PR:operation PR:add_number ;
+            PR:variable_x VAR:variable_x ;
+            PR:variable_y VAR:variable_u ;
+            PR:variable_z VAR:variable_v ] ] ;
+    PR:right_side [
+        PR:priority "3" ;
+        PR:child [
+            PR:operation PR:next_number ;
+            PR:variable_x VAR:variable_v ;
+            PR:variable_y VAR:variable_z ] ] .

@@ -1,0 +1,39 @@
+@prefix PR: <http://example.org/> .
+@prefix VAR: <http://variable.org/> .
+
+PR:next_number_1_2
+    PR:operation PR:next_number ;
+    PR:variable_x PR:one ;
+    PR:variable_y PR:two .
+PR:next_number_2_3
+    PR:operation PR:next_number ;
+    PR:variable_x PR:two ;
+    PR:variable_y PR:three .
+PR:next_number_3_4
+    PR:operation PR:next_number ;
+    PR:variable_x PR:three ;
+    PR:variable_y PR:four .
+PR:next_number_4_5
+    PR:operation PR:next_number ;
+    PR:variable_x PR:four ;
+    PR:variable_y PR:five .
+PR:next_number_5_6
+    PR:operation PR:next_number ;
+    PR:variable_x PR:five ;
+    PR:variable_y PR:six .
+PR:next_number_6_7
+    PR:operation PR:next_number ;
+    PR:variable_x PR:six ;
+    PR:variable_y PR:seven .
+PR:next_number_7_8
+    PR:operation PR:next_number ;
+    PR:variable_x PR:seven ;
+    PR:variable_y PR:eight .
+PR:next_number_8_9
+    PR:operation PR:next_number ;
+    PR:variable_x PR:eight ;
+    PR:variable_y PR:nine .
+PR:next_number_9_10
+    PR:operation PR:next_number ;
+    PR:variable_x PR:nine ;
+    PR:variable_y PR:ten .
