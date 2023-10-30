@@ -1,12 +1,16 @@
 """
 RdfClass.py
+Classes supporting RdfProlog reasoning
 T. Masuda, 2023/10/30
 """
 
 import rdflib
 from rdflib import Graph, URIRef  # , BNode, Variable
-from src.PR import PR
 from src.ConvertQuery import convert_question
+
+
+def uri_ref(key_word: str) -> URIRef:
+    return URIRef(f'http://example.org/{key_word}')
 
 
 class ClassRules:  # list of rules
@@ -20,13 +24,13 @@ class ClassRules:  # list of rules
         """
         self.list_of_rules = []
         query_for_rules = f'SELECT ?s ?o WHERE {{ ' \
-                          f'?s <{PR.left_side}> ?o . ' \
-                          f'OPTIONAL {{ ?s <{PR.priority}> ?priority .}} }}' \
+                          f'?s <{uri_ref("left_side")}> ?o . ' \
+                          f'OPTIONAL {{ ?s <{uri_ref("priority")}> ?priority .}} }}' \
                           f'ORDER BY ?priority '  # query for extracting left side rules
         results_for_rule_left = graph.query(query_for_rules)  # execute query and extract
         for binding_for_left in results_for_rule_left.bindings:
             instance_rule = ClassRule()  # create a rule instance
-            instance_rule.build(graph, binding_for_left['s'], binding_for_left['o'])
+            instance_rule.build(graph, binding_for_left['s'], binding_for_left['o'])  # s: rule id, o: rule pattern
             self.list_of_rules.append(instance_rule)  # append the rule to the list
 
 
@@ -57,8 +61,8 @@ class ClassRule:  # class for individual rule
         self.label = rule_label
         self.rule_left.build(graph, rule_left_label)
         self.rule_right = []
-        query = f'SELECT ?o WHERE {{ <{self.label}> <{PR.right_side}> ?o . ' \
-                f'?o <{PR.priority}> ?priority . }} ORDER BY (?priority) '
+        query = f'SELECT ?o WHERE {{ <{self.label}> <{uri_ref("right_side")}> ?o . ' \
+                f'?o <{uri_ref("priority")}> ?priority . }} ORDER BY (?priority) '
         results = graph.query(query)
         # print('NUMBER OF CHILD RULES: ' + str(len(results)))  # debug
         for result in results:
@@ -168,7 +172,7 @@ class ClassRuleRight:  # right side of a rule
         :return:
         """
         # print('CHILD RULE: ' + str(right_side_for_child[0]))  # debug
-        query_for_child = f'SELECT ?o where {{ <{str(right_side_for_child[0])}> <{PR.child}> ?o .}} '
+        query_for_child = f'SELECT ?o where {{ <{str(right_side_for_child[0])}> <{uri_ref("child")}> ?o .}} '
         results_of_right_side_child = graph.query(query_for_child)  # query by the child name
         self.child.build(graph, results_of_right_side_child.bindings[0])
         return self

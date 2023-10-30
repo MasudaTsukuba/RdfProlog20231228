@@ -1,5 +1,5 @@
 from src.RdfProlog import RdfProlog, ClassSparqlQuery
-from src.PR import PR
+# from src_not_used.PR import PR
 
 
 def test_answer_question1():
@@ -8,13 +8,13 @@ def test_answer_question1():
     # grandfather(taro, ?ans)
     my_question = \
         f'SELECT ?ans WHERE {{' \
-        f'?s <{PR.operation}> <{PR.grandfather}> . ' \
-        f'?s <{PR.variable_x}> <{PR.taro}> . ' \
-        f'?s <{PR.variable_y}> ?ans . ' \
+        f'?s <http://example.org/operation> <http://example.org/grandfather> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/taro> . ' \
+        f'?s <http://example.org/variable_y> ?ans . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
-    assert resolve_bindings[0]['?ans'] == f'<{str(PR.ichiro)}>'
+    assert resolve_bindings[0]['?ans'] == '<http://example.org/ichiro>'
 
 
 def test_answer_question2():
@@ -23,9 +23,9 @@ def test_answer_question2():
     # grandfather(taro, ichiro)
     my_question = \
         f'SELECT ?ans WHERE {{' \
-        f'?s <{PR.operation}> <{PR.grandfather}> . ' \
-        f'?s <{PR.variable_x}> <{PR.taro}> . ' \
-        f'?s <{PR.variable_y}> <{PR.ichiro}> . ' \
+        f'?s <http://example.org/operation> <http://example.org/grandfather> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/taro> . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/ichiro> . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
@@ -38,9 +38,9 @@ def test_answer_question3():
     # grandfather(taro, jiro)
     my_question = \
         f'SELECT ?ans WHERE {{' \
-        f'?s <{PR.operation}> <{PR.grandfather}> . ' \
-        f'?s <{PR.variable_x}> <{PR.taro}> . ' \
-        f'?s <{PR.variable_y}> <{PR.jiro}> . ' \
+        f'?s <http://example.org/operation> <http://example.org/grandfather> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/taro> . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/jiro> . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)

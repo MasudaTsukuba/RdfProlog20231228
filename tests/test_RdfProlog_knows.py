@@ -1,5 +1,5 @@
 from src.RdfProlog import RdfProlog, ClassSparqlQuery
-from src.PR import PR
+# from src_not_used.PR import PR
 import numpy as np
 
 
@@ -9,9 +9,9 @@ def test_answer_question1():
     # knows_direct(andy, bob)
     my_question = \
         f'SELECT ?ans WHERE {{' \
-        f'?s <{PR.operation}> <{PR.knows_direct}> . ' \
-        f'?s <{PR.variable_x}> <{PR.andy}> . ' \
-        f'?s <{PR.variable_y}> <{PR.bob}> . ' \
+        f'?s <http://example.org/operation> <http://example.org/knows_direct> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/andy> . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/bob> . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
@@ -24,9 +24,9 @@ def test_answer_question1b():
     # knows_direct(andy, chris)
     my_question = \
         f'SELECT ?ans WHERE {{' \
-        f'?s <{PR.operation}> <{PR.knows_direct}> . ' \
-        f'?s <{PR.variable_x}> <{PR.andy}> . ' \
-        f'?s <{PR.variable_y}> <{PR.chris}> . ' \
+        f'?s <http://example.org/operation> <http://example.org/knows_direct> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/andy> . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/chris> . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
@@ -39,9 +39,9 @@ def test_answer_question1c():
     # knows_indirect(andy, chris)
     my_question = \
         f'SELECT ?ans WHERE {{' \
-        f'?s <{PR.operation}> <{PR.knows_indirect}> . ' \
-        f'?s <{PR.variable_x}> <{PR.andy}> . ' \
-        f'?s <{PR.variable_y}> <{PR.chris}> . ' \
+        f'?s <http://example.org/operation> <http://example.org/knows_indirect> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/andy> . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/chris> . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
@@ -54,9 +54,9 @@ def test_answer_question1e():
     # knows(andy, chris)
     my_question = \
         f'SELECT ?ans WHERE {{' \
-        f'?s <{PR.operation}> <{PR.knows}> . ' \
-        f'?s <{PR.variable_x}> <{PR.andy}> . ' \
-        f'?s <{PR.variable_y}> <{PR.chris}> . ' \
+        f'?s <http://example.org/operation> <http://example.org/knows> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/andy> . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/chris> . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
@@ -69,16 +69,16 @@ def test_answer_question2():
     # knows_direct(andy, ?ans)
     my_question = \
         f'SELECT ?ans WHERE {{' \
-        f'?s <{PR.operation}> <{PR.knows_direct}> . ' \
-        f'?s <{PR.variable_x}> <{PR.andy}> . ' \
-        f'?s <{PR.variable_y}> ?ans . ' \
+        f'?s <http://example.org/operation> <http://example.org/knows_direct> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/andy> . ' \
+        f'?s <http://example.org/variable_y> ?ans . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
-    assert np.logical_or(resolve_bindings[0]['?ans'] == f'<{str(PR.bob)}>',
-                         resolve_bindings[1]['?ans'] == f'<{str(PR.bob)}>')
-    assert np.logical_or(resolve_bindings[0]['?ans'] == f'<{str(PR.david)}>',
-                         resolve_bindings[1]['?ans'] == f'<{str(PR.david)}>')
+    assert np.logical_or(resolve_bindings[0]['?ans'] == '<http://example.org/bob>',
+                         resolve_bindings[1]['?ans'] == '<http://example.org/bob>')
+    assert np.logical_or(resolve_bindings[0]['?ans'] == '<http://example.org/david>',
+                         resolve_bindings[1]['?ans'] == '<http://example.org/david>')
 
 
 def test_answer_question3():
@@ -87,9 +87,9 @@ def test_answer_question3():
     # knows(andy, ?ans)
     my_question = \
         f'SELECT ?s WHERE {{' \
-        f'?s <{PR.operation}> <{PR.knows}> . ' \
-        f'?s <{PR.variable_x}> <{PR.andy}> . ' \
-        f'?s <{PR.variable_y}> ?ans . ' \
+        f'?s <http://example.org/operation> <http://example.org/knows> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/andy> . ' \
+        f'?s <http://example.org/variable_y> ?ans . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
@@ -102,9 +102,9 @@ def test_answer_question4():
     # knows_indirect(andy, edgar)
     my_question = \
         f'SELECT ?s WHERE {{' \
-        f'?s <{PR.operation}> <{PR.knows_indirect}> . ' \
-        f'?s <{PR.variable_x}> <{PR.andy}> . ' \
-        f'?s <{PR.variable_y}> <{PR.edgar}> . ' \
+        f'?s <http://example.org/operation> <http://example.org/knows_indirect> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/andy> . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/edgar> . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
