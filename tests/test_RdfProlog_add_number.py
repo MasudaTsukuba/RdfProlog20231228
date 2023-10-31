@@ -83,6 +83,22 @@ def test_answer_question4():
     assert resolve_bindings[0]['?ans'] == f'<http://example.org/two>'
 
 
+def test_answer_question4b():
+    rdf_prolog = RdfProlog()
+
+    # add(2, ?ans, 3)
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/two> . ' \
+        f'?s <http://example.org/variable_y> ?ans . ' \
+        f'?s <http://example.org/variable_z> <http://example.org/three> . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
+    assert resolve_bindings[0]['?ans'] == f'<http://example.org/one>'
+
+
 def test_answer_complex_question1():
     rdf_prolog = RdfProlog()
 

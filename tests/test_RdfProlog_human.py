@@ -6,7 +6,7 @@ from src.RdfProlog import RdfProlog, Resolution, ClassSparqlQuery
 
 def test_graph():
     rdf_prolog = RdfProlog()
-    resolution = Resolution(rdf_prolog.g_rules, rdf_prolog.rules)
+    resolution = Resolution(rdf_prolog.g_rules, rdf_prolog.rules, False)
     # assert len(rdf_prolog.g_rules) == 168
     # assert len(rdf_prolog.rules.list_of_rules) == 8
     query = f'SELECT ?s ?o WHERE {{ ?s <http://example.org/operation> <http://example.org/human>. ?s <http://example.org/variable_x> ?o .}}'

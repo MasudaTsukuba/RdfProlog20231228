@@ -11,8 +11,6 @@ from rdflib import Graph, URIRef, BNode, Variable
 # from src.PR import PR
 from src.RdfClass import ClassRule, ClassRules, ClassRuleRight, ClassSparqlQuery, ClassTerm
 
-find_all = False  # stop the search if the first result is obtained.
-# find_all = True  # find all the results using inferences.
 
 
 class RdfProlog:  # Prolog Class, prepare a graph and available rules
@@ -32,17 +30,20 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
                 None
             """
         # print('$$$$$$$$$$ PREPARING $$$$$$$$$$')  # debug
+        self.find_all = False  # stop the search if the first result is obtained.
+        # self.find_all = True  # find all the results using inferences.
+
         self.g_rules = Graph()  # graph for facts and rules
         g_temp = Graph()  # temporary graph for reading RDF files
         files = os.listdir('rules')
-        for file in files:
+        for file in files:  # read all the turtle files in rules folder
             g_temp.parse(f'rules/{file}')
         # g_temp.parse('rules/rules_human.ttl')
         # g_temp.parse('rules/rules_grandfather.ttl')
         # g_temp.parse('rules/rules_next_number.ttl')
         # g_temp.parse('rules/rules_add_number.ttl')
         # g_temp.parse('rules/rules_knows.ttl')
-        results = g_temp.query('SELECT ?s ?p ?o WHERE { ?s ?p ?o . }')
+        results = g_temp.query('SELECT ?s ?p ?o WHERE { ?s ?p ?o . }')  # retrieve all the triples read in
         for result in results:
             ss = result['s']
             pp = result['p']
@@ -52,7 +53,7 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
             if isinstance(oo, BNode):
                 oo = f'http://example.org/{str(oo)}'
             self.g_rules.add((URIRef(ss), URIRef(pp), URIRef(oo)))
-        self.rules = ClassRules(self.g_rules)
+        self.rules = ClassRules(self.g_rules)  # set the rules in ClassRules class
         # print('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')  # debug
         print()  # line feed
 
@@ -78,14 +79,15 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
             print('===================================================================================================')
             return [], []
 
-    def answer_complex_question(self, sparql_query):  # answer a sparql query with multiple clauses
+    def answer_complex_question(self, sparql_query, find_all=False):  # answer a sparql query with multiple clauses
         """answer a sparql query with multiple clauses
             Args:
                 sparql_query
             Returns:
                 None
         """
-        resolution = Resolution(self.g_rules, self.rules)  # left_rules: ClassLeftRules
+        self.find_all = find_all
+        resolution = Resolution(self.g_rules, self.rules, self.find_all)  # left_rules: ClassLeftRules
         resolve_succeeded, resolve_bindings \
             = resolution.resolve_rule(sparql_query.rule)  # execute the resolution
         if resolve_succeeded:
@@ -115,7 +117,7 @@ class Resolution:  # main class for resolution
     """
     resolve_right_recursive_count = 0  # indicate the depth of recursive call.  # for debug
 
-    def __init__(self, graph, rules):
+    def __init__(self, graph, rules, find_all):
         """
         initialize Resolution class
         :param graph:
@@ -123,6 +125,7 @@ class Resolution:  # main class for resolution
         """
         self.graph = graph  # set the knowledge graph
         self.rules = rules  # ClassRules(graph)
+        self.find_all = find_all
         pass
 
     def resolve_recursive(self, right_clauses):  # resolve_bindings_in 辞書の配列
@@ -153,7 +156,7 @@ class Resolution:  # main class for resolution
             print('[', Resolution.resolve_right_recursive_count, '] ENTERING resolve_right_recursive')  # debug
             Resolution.resolve_right_recursive_count += 1  # 再帰呼び出しの深さを更新。debug
             grandchild_rules = right_clauses[0]  # first clauseを取り出す。
-            right_clauses_sub = right_clauses[1:]  # rest clausesは後で処理する。
+            right_clauses_sub = right_clauses[1:]  # rest of clausesは後で処理する。
             built_query = ClassSparqlQuery().set('SELECT ?s ?p ?o WHERE {?s ?p ?o .}')  # dummy query
             built_query.build_query(grandchild_rules)  # resolveを呼び出すためのクエリ
             succeeded, bindings_array = self.resolve_clause(built_query)  # execute resolve
@@ -253,7 +256,8 @@ class Resolution:  # main class for resolution
             print('ARGUMENT BINDINGS: ' + str(argument_bindings_built))
             return argument_bindings_built
 
-        argument_binding = build_argument_bindings_for_left(rule.rule_left.bindings)  # argument_bindingは辞書型
+        # argument_binding = build_argument_bindings_for_left(rule.rule_left.bindings)  # argument_bindingは辞書型
+        argument_binding = build_argument_bindings_for_left(rule.rule_left.forward_bindings)  # argument_bindingは辞書型
         right_clauses_sub_revised = []  # argument_bindingに基づいて右辺を修正する。
         for right_clause in rule.rule_right:  # 右側には複数の節が含まれる可能性がある。
             right_clause_revised = ClassRuleRight().revise(right_clause, argument_binding)  # 新規に節を作り直す。
@@ -285,7 +289,7 @@ class Resolution:  # main class for resolution
         :return:
         """
         print('++++++++++ resolve_clause ++++++++++')  # debug
-        global find_all  # if True, find all the results.
+        # global find_all  # if True, find all the results.
         succeeded = False  # final result of success. first assumed to be failed.
         resolve_bindings_out = []  # initialize bindings to be returned
         direct_search_succeeded, returned_direct_search_bindings \
@@ -295,7 +299,7 @@ class Resolution:  # main class for resolution
             resolve_bindings_out += returned_direct_search_bindings
         if not direct_search_succeeded:
             print('DIRECT ANSWERS WERE NOT FOUND. TRYING TO FIND APPLICABLE RULES. ')  # debug
-        if not find_all:
+        if not self.find_all:
             if direct_search_succeeded:
                 print('======= LEAVING RESOLVE, AFTER FINDING DIRECT ANSWER =======')  # debug
                 print('---------- resolve_clause-1 ---------')  # debug
@@ -307,23 +311,29 @@ class Resolution:  # main class for resolution
             return succeeded, resolve_bindings_out
         print('APPLICABLE RULES WERE FOUND. NUMBER WAS ' + str(len(rules)))  # debug
         for rule_template in rules:
-            rule = ClassRule().build(self.graph, rule_template.label, rule_template.rule_left.label)
+            rule = ClassRule().build(self.graph, rule_template.label, rule_template.rule_left.label)  # copy a rule
             rule.modify_variables()  # x -> x1000, etc.
             rule.rule_left.bindings = rule_template.rule_left.bindings
+            rule.rule_left.forward_bindings = rule_template.rule_left.forward_bindings
+            rule.rule_left.backward_bindings = rule_template.rule_left.backward_bindings
             right_side_succeeded, resolve_bindings_array = self.resolve_rule(rule)
             if right_side_succeeded:
                 succeeded = True  # at least one rule is succeeded.
                 print('==RESOLVE BINDINGS: ', resolve_bindings_array)  # debug
                 print('=======RESOLVE SUCCEEDED=======')  # debug
+                resolve_bindings_array2 = []
+                for resolve_bindings in resolve_bindings_array:
+                    resolve_bindings2 = {**resolve_bindings, **rule.rule_left.backward_bindings}  # merge two dict
+                    resolve_bindings_array2.append(resolve_bindings2)
                 rule_return_bindings = []  # 不要なbindingを削除する。左辺の変数だけを返す。
-                for binding in resolve_bindings_array:
+                for binding in resolve_bindings_array2:
                     return_dict = {}  # 戻り値の要素
                     for var in resolve_query.list_of_variables:  # var: ClassTerm instance
-                        var_temp = var  # 繰り返し置き換える。
+                        var_temp = var.to_var()  # 繰り返し置き換える。
                         try:
-                            value_temp = binding[var_temp.to_var()]  # key -> value (String)
-                            var_temp = ClassTerm().build(value_temp)  # string -> ClassTerm
-                            return_dict[var.to_var()] = var_temp.to_var()  # stringに戻す。辞書に追加。
+                            value_temp = binding[var_temp]  # key -> value (String)
+                            value_temp2 = ClassTerm().build(value_temp)  # string -> ClassTerm
+                            return_dict[var_temp] = value_temp2.to_var()  # stringに戻す。辞書に追加。
                         except KeyError:
                             pass
                         except TypeError:
@@ -331,7 +341,7 @@ class Resolution:  # main class for resolution
                     rule_return_bindings += [return_dict]  # リストに追加
                 if not rule_return_bindings:
                     rule_return_bindings = [{'?dummy_key': 'dummy_value'}]
-                if not find_all:
+                if not self.find_all:
                     print('---------- resolve_clause-3 ---------')  # debug
                     return succeeded, rule_return_bindings
                 else:
@@ -425,6 +435,8 @@ def main():
         f'?s <http://example.org/variable_z> ?ans . ' \
         f'}}'
     # add(3, 1, ?z)
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    # resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=False)
     my_question = \
         f'SELECT ?z WHERE {{' \
         f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
@@ -497,6 +509,17 @@ def main():
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     # resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
     pass
+
+    # add(2, ?ans, 3)
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/two> . ' \
+        f'?s <http://example.org/variable_y> ?ans . ' \
+        f'?s <http://example.org/variable_z> <http://example.org/three> . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    rdf_prolog.answer_complex_question(my_sparql_query)
 
     # add(3, ?ans, 5)
     my_question = \
@@ -607,7 +630,19 @@ def main():
         f'?s <http://example.org/variable_z> ?ans . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    rdf_prolog.answer_complex_question(my_sparql_query)
+    # rdf_prolog.answer_complex_question(my_sparql_query)
+
+    # subtract(3, 2, ?ans)
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/subtract_number> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/three> . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/two> . ' \
+        f'?s <http://example.org/variable_z> ?ans . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    # rdf_prolog.answer_complex_question(my_sparql_query)
+
 
 if __name__ == '__main__':
     main()  # execute the main function

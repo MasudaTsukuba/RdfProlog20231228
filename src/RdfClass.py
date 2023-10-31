@@ -109,10 +109,14 @@ class ClassRuleLeft:  # left side of a rule
         """
         initialize ClassRuleLeft class
         """
-        self.label = None
-        self.content = None
+        self.label = None  # id for the left part of the rule
+        self.content = None  # sparql query for finding applicable rules
         self.bindings = {}
-        self.var_list = []
+        self.var_list = []  # a list of variables in the triple
+        self.const_dict = {}  # dict of constants in object with the correspondent predicate
+        self.predicate_object_dict = {}  # dict for finding object from predicate as a key
+        self.forward_bindings = {}
+        self.backward_bindings = {}
 
     def build(self, graph, rule_left_label):  # executed at the initial stage
         """
@@ -125,30 +129,39 @@ class ClassRuleLeft:  # left side of a rule
         self.content = None
         self.bindings = {}
         self.var_list = []
+        self.const_dict = {}  # dict of constants in object with the correspondent predicate
+        self.predicate_object_dict = {}  # dict for finding object from predicate as a key
+
         # print('DETECTED LEFT RULE: ', rule_left_label)  # left side rule in returned as an object  # debug
         # get the actual rules of the left side
         query_for_left_content = \
             f'SELECT ?p ?o WHERE {{ ' \
             f'<{str(rule_left_label)}> ?p ?o . }}'  # extract content of left side rule from the label
         results_for_left_content = graph.query(query_for_left_content)  # execute a query
-        var_list = '?s '  # build sparql query for left side rule
-        self.var_list.append('?s')
+        var_list_string = '?s '  # build VAR_LIST of sparql query for left side rule
+        # self.var_list.append('?s')  # also store the variables in a list
         sparql_query = f'SELECT VAR_LIST WHERE {{ '  # VAR_LIST will be replaced at the end
         for bindings_for_left_content in results_for_left_content.bindings:
             triple_predicate = bindings_for_left_content['p']  # predicate part of the left side of a rule
-            triple_object = bindings_for_left_content['o']  # object part of the left side of a rule
-            triple_object = f'<{triple_object}>'  # convert object to URI string
+            triple_object0 = bindings_for_left_content['o']  # object part of the left side of a rule
+            triple_object = f'<{triple_object0}>'  # convert object to URI string
+            self.predicate_object_dict[triple_predicate] = triple_object
             try:
                 if triple_object.find('http://variable.org/variable_') >= 0:
                     triple_object = triple_object.replace('<http://variable.org/variable_', '?').replace('>', '')
-                    var_list += str(triple_object) + ' '  # register the variable to a list
-                    self.var_list.append(str(triple_object))
+                    var_list_string += str(triple_object) + ' '  # register the variable to a list
+                    # self.var_list.append(str(triple_object))  # also append the variable to a list
+                else:
+                    self.const_dict[triple_predicate] = triple_object
             except KeyError:
                 pass  # object is not a variable
-            sparql_query += f'?s <{triple_predicate}> {triple_object} . '
+            if triple_predicate.find('http://example.org/operation') >= 0 or triple_object.find('?') >= 0:
+                sparql_query += f'?s <{triple_predicate}> {triple_object} . '
+
         sparql_query += f'}}'  # close the sparql query
-        sparql_query = sparql_query.replace('VAR_LIST', var_list)  # insert variables list
+        sparql_query = sparql_query.replace('VAR_LIST', var_list_string)  # insert variables list
         self.label = str(rule_left_label)
+        self.var_list = var_list_string.strip().split(' ')
         self.content = sparql_query
         self.bindings = results_for_left_content.bindings
         return self
@@ -525,21 +538,72 @@ class ClassSparqlQuery:  # Sparql Query Class
         :param rules:
         :return:
         """
+        list_of_rdfs = convert_question(self.query)  # convert query to a list of triples
+        len_effective_rdfs = 0
         g_temp = Graph()  # temporary graph for storing the query
-        list_of_rdfs = convert_question(self.query)  # convert query to rdfs
-        for clause in list_of_rdfs:  # repeat for the triple
+        g_temp_debug = []
+        predicate_object_dict = {}
+        set_of_variables_in_query = set()
+        for clause in list_of_rdfs:  # repeat for the triples
             if len(clause) == 3:  # clause is indeed a triple
-                g_temp.add((URIRef(clause[0].replace('<', '').replace('>', '')),
-                            URIRef(clause[1].replace('<', '').replace('>', '')),
-                            URIRef(clause[2].replace('<', '').replace('>', ''))))  # store the triple into the graph
-        list_of_applicable_rules = []
+                subj = clause[0].replace('<', '').replace('>', '')
+                pred = clause[1].replace('<', '').replace('>', '')
+                obje = clause[2].replace('<', '').replace('>', '')
+                g_temp.add((URIRef(subj), URIRef(pred), URIRef(obje)))
+                g_temp_debug.append((URIRef(subj), URIRef(pred), URIRef(obje)))
+                predicate_object_dict[pred] = obje
+                len_effective_rdfs += 1
+                if obje.find('http://variable.org/') < 0:  # skip if the object is a variable
+                    # g_temp.add((URIRef(subj), URIRef(pred), URIRef(obje)))
+                    # g_temp_debug.append((URIRef(subj), URIRef(pred), URIRef(obje)))
+                    # len_effective_rdfs += 1
+                    pass
+                else:
+                    set_of_variables_in_query.add((obje.replace('http://variable.org/' ,''), pred))
+                # g_temp.add((URIRef(clause[0].replace('<', '').replace('>', '')),
+                #             URIRef(clause[1].replace('<', '').replace('>', '')),
+                #             URIRef(clause[2].replace('<', '').replace('>', ''))))  # store the triple into the graph
+
+        list_of_applicable_rules = []  # start building a list of applicable rules
         for rule in rules.list_of_rules:  # rules.list_of_rules contains all the rules
             results_for_left = g_temp.query(rule.rule_left.content)  # query against the temporary graph
-            if len(results_for_left) > 0:  # applicable rule exists
-                rule.rule_left.bindings = results_for_left.bindings[0]
+            match = True
+            forward_bindings = {}
+            backward_bindings = {}
+            for rule_predicate, rule_object0 in rule.rule_left.predicate_object_dict.items():
+                rule_object = rule_object0.replace('<','').replace('>','')
+                try:
+                    query_object = predicate_object_dict[str(rule_predicate)]
+                    if rule_object.find('http://example.org') >= 0:  # const
+                        if query_object.find('http://example.org') >= 0:  # const
+                            if rule_object == query_object:
+                                pass
+                            else:
+                                match = False
+                                continue
+                        else:  # object in query is variable
+                            backward_bindings['?'+query_object.replace('http://variable.org/','')] = f'<{rule_object}>'
+                    else:  # rule object is variable
+                        forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/variable_', ''))] = query_object
+                except KeyError:
+                    match = False
+                    continue
+
+            # if len(results_for_left) > 0:  # applicable rule exists
+            #     # if len(results_for_left.bindings[0]) == len_effective_rdfs:
+            #     forward_bindings = results_for_left.bindings[0]
+            #     backward_bindings = {}
+            #     dict_of_rule_left = {}
+            #     for variable in set_of_variables_in_query:
+            #         pred = variable[1]
+            #         obje_in_rule_left = rule.rule_left.predicate_object_dict[URIRef(pred)]
+            #         backward_bindings['?'+variable[0]] = obje_in_rule_left
+            if match:
+                rule.rule_left.forward_bindings = forward_bindings
+                rule.rule_left.backward_bindings = backward_bindings
                 list_of_applicable_rules.append(rule)  # append the found rule
                 print('LIST OF APPLICABLE RULES: ', str(rule.label))  # print the rule on the console
-        return list_of_applicable_rules  # return the applicable rule(s)
+        return list_of_applicable_rules  # return the applicable rules
 
     def build_rule(self):  # build the right side of a rule
         """
