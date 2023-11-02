@@ -23,44 +23,44 @@ PR:rule_knows_david_edgar
 PR:rule_knows
     PR:left_side [
         PR:operation PR:knows ;
-        PR:variable_x VAR:variable_x ;
-        PR:variable_y VAR:variable_y ] ;
+        PR:variable_x VAR:x ;
+        PR:variable_y VAR:y ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:knows_indirect ;
-            PR:variable_x VAR:variable_x ;
-            PR:variable_y VAR:variable_y ] ] .
+            PR:variable_x VAR:x ;
+            PR:variable_y VAR:y ] ] .
 
 PR:rule_knows_indirect1
     PR:left_side [
         PR:operation PR:knows_indirect ;
-        PR:variable_x VAR:variable_x ;
-        PR:variable_y VAR:variable_y ] ;
+        PR:variable_x VAR:x ;
+        PR:variable_y VAR:y ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:knows_direct ;
-            PR:variable_x VAR:variable_x ;
-            PR:variable_y VAR:variable_y ] ] .
+            PR:variable_x VAR:x ;
+            PR:variable_y VAR:y ] ] .
 
 PR:rule_knows_indirect2
     PR:left_side [
         PR:operation PR:knows_indirect ;
-        PR:variable_x VAR:variable_x ;
-        PR:variable_y VAR:variable_y ] ;
+        PR:variable_x VAR:x ;
+        PR:variable_y VAR:y ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:knows_direct ;
-            PR:variable_x VAR:variable_x ;
-            PR:variable_y VAR:variable_u ] ] ;
+            PR:variable_x VAR:x ;
+            PR:variable_y VAR:u ] ] ;
     PR:right_side [
         PR:priority "2" ;
         PR:child [
             PR:operation PR:knows_indirect ;
-            PR:variable_x VAR:variable_u ;
-            PR:variable_y VAR:variable_y ] ] .
+            PR:variable_x VAR:u ;
+            PR:variable_y VAR:y ] ] .
 
 # procedures
 PR:rule_knows

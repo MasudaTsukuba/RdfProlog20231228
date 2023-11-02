@@ -10,12 +10,12 @@ PR:fact_human_socrates
 PR:rule_human_mortal
     PR:left_side [
         PR:operation PR:mortal ;
-        PR:variable_x VAR:variable_x ] ;
+        PR:variable_x VAR:x ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:human ;
-            PR:variable_x VAR:variable_x ] ] .
+            PR:variable_x VAR:x ] ] .
 
 # procedures
 

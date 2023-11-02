@@ -21,6 +21,7 @@ where ?s and ?ans are transformed into <http://variable.org/s> and <http://varia
 """
 
 from lark import Lark, Transformer, Token  # , Tree
+from src.RdfClass import ClassTerm
 
 grammar = """
 sparql : "SELECT " (var)+ where
@@ -39,7 +40,7 @@ HTTP_WORD : CHAR (CHAR | NUMBER | "." | "/" | "_" | "-")*
 """
 
 
-# class MyTransformer(Transformer):
+# class MyTransformer(Transformer):  # Not used
 #     """
 #     MyTransformer
 #     """
@@ -157,25 +158,29 @@ HTTP_WORD : CHAR (CHAR | NUMBER | "." | "/" | "_" | "-")*
 
 class MyTransformer2(Transformer):
     """
-    list_of_rdf_triples (list[list[str]]): a list of triples.
 
-    list_of_each_triple (list[str]): a list of each triple.
+    Attributes:
+        list_of_rdf_triples (list[list[str]]): a list of triples.
+
+        list_of_each_triple (list[str]): a list of each triple.
     """
     def __init__(self):
         """
 
         """
         super().__init__()
-        self.list_of_rdf_triples = []
-        self.list_of_each_triple = []
+        self.list_of_rdf_triples = []  # This is what we actually want to get.
+        self.list_of_each_triple = []  # working variable.
         # self.predicate_object_pair = {}
 
     @staticmethod
     def sparql(tree: list[str]) -> str:
         """
         build a sparql query string
+
         Args:
              tree: a list of lark tree strings
+
         Returns:
              sparql query string (str)
         """
@@ -187,8 +192,12 @@ class MyTransformer2(Transformer):
     def where(tree: list[str]) -> str:
         """
         build where clause of a sparql query string
-        :param tree: lark tree string
-        :return where_string:
+
+        Args:
+            tree: lark tree string
+
+        Returns:
+             str: where_string
         """
         where_string = ''.join(tree)
         return 'WHERE { ' + where_string + '}'
@@ -197,8 +206,11 @@ class MyTransformer2(Transformer):
     def var(tree: list[Token]) -> str:
         """
 
-        :param tree: list of tokens
-        :return token for a variable:
+        Args:
+            tree: list of tokens
+
+        Returns:
+            token for a variable:
         """
         # print('### ', tree[0].type, tree[0].value)
         return f'{tree[0]}'
@@ -206,8 +218,12 @@ class MyTransformer2(Transformer):
     def triple(self, tree: list[str]) -> str:
         """
         build a triple in a sparql query string
-        :param tree:
-        :return:
+
+        Args:
+            tree:
+
+        Returns:
+
         """
         self.list_of_each_triple = []  # initialize the list of a triple
         return_str = ''.join(tree)
@@ -227,7 +243,7 @@ class MyTransformer2(Transformer):
         else:
             ret = tree[0].value  # '<http://example.org/subj> '  # tree[0].value
         self.list_of_each_triple = []  # initialize the list of a triple
-        self.list_of_each_triple.append(ret.strip())  # subject of a triple
+        self.list_of_each_triple.append(ClassTerm().build(ret.strip()))  # subject of a triple
         return ret + ','  # ret is just for debug
 
     def predicate(self, tree: list[Token]) -> str:
@@ -244,7 +260,7 @@ class MyTransformer2(Transformer):
         #     MyTransformer.predicate_is_operation = True
         # else:
         #     MyTransformer.predicate_is_operation = False
-        self.list_of_each_triple.append(ret.strip())  # predicate of a triple
+        self.list_of_each_triple.append(ClassTerm().build(ret.strip()))  # predicate of a triple
         return ret+','
 
     def object(self, tree: list[Token]) -> str:
@@ -257,9 +273,9 @@ class MyTransformer2(Transformer):
         ret = my_value
         if tree[0].type == 'VAR':
             ret = f'<http://variable.org/{my_value.replace("?", "").strip()}>'  # ?ans -> <http://variable.org/ans>
-        self.list_of_each_triple.append(ret.strip())  # element holds a triple as a list # remove unnecessary spaces
+        self.list_of_each_triple.append(ClassTerm().build(ret.strip()))  # element holds a triple as a list # remove unnecessary spaces
         self.list_of_rdf_triples.append(self.list_of_each_triple)  # append the triple to the list
-        return ret
+        return ret  # return value is for debug
 
 
 # def convert_query(query):
@@ -287,8 +303,10 @@ class MyTransformer2(Transformer):
 def convert_question(question: str) -> list[str]:
     """
     convert a sparql query string into a list of triples
+
     Args:
         question(str): sparql query string
+
     Returns:
         list[str]: a list of triples
     """
@@ -304,7 +322,7 @@ def convert_question(question: str) -> list[str]:
     return my_transformer2.list_of_rdf_triples
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # for a test purpose
     # my_query = 'SELECT ?ss WHERE { ?ss <http://example.org/operation> <http://example.org/add_number> . ' + \
     #            '?s <http://example.org/PP> ?o . }'
     # conv_query, var_dict, predicate_object_pair = convert_query(my_query)

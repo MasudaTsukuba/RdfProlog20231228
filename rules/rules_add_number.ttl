@@ -5,41 +5,41 @@
 PR:rule_add_number_x_1_z
     PR:left_side [
         PR:operation PR:add_number ;
-        PR:variable_x VAR:variable_x ;
+        PR:variable_x VAR:x ;
         PR:variable_y PR:one ;
-        PR:variable_z VAR:variable_z ] ;
+        PR:variable_z VAR:z ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:next_number ;
-            PR:variable_x VAR:variable_x ;
-            PR:variable_y VAR:variable_z ] ] .
+            PR:variable_x VAR:x ;
+            PR:variable_y VAR:z ] ] .
 
 PR:rule_add_number_x_y_z
     PR:left_side [
         PR:operation PR:add_number ;
-        PR:variable_x VAR:variable_x ;
-        PR:variable_y VAR:variable_y ;
-        PR:variable_z VAR:variable_z ] ;
+        PR:variable_x VAR:x ;
+        PR:variable_y VAR:y ;
+        PR:variable_z VAR:z ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:next_number ;
-            PR:variable_x VAR:variable_u ;
-            PR:variable_y VAR:variable_y ] ] ;
+            PR:variable_x VAR:u ;
+            PR:variable_y VAR:y ] ] ;
     PR:right_side [
         PR:priority "2" ;
         PR:child [
             PR:operation PR:add_number ;
-            PR:variable_x VAR:variable_x ;
-            PR:variable_y VAR:variable_u ;
-            PR:variable_z VAR:variable_v ] ] ;
+            PR:variable_x VAR:x ;
+            PR:variable_y VAR:u ;
+            PR:variable_z VAR:v ] ] ;
     PR:right_side [
         PR:priority "3" ;
         PR:child [
             PR:operation PR:next_number ;
-            PR:variable_x VAR:variable_v ;
-            PR:variable_y VAR:variable_z ] ] .
+            PR:variable_x VAR:v ;
+            PR:variable_y VAR:z ] ] .
 
 #procedures
 PR:rule_add_number_x_1_z

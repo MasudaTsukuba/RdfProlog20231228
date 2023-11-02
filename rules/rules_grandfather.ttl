@@ -19,38 +19,38 @@ PR:fact_father_hana_ichiro
 PR:grandfather_father_father
     PR:left_side [
         PR:operation PR:grandfather ;
-        PR:variable_x VAR:variable_x ;
-        PR:variable_y VAR:variable_y ] ;
+        PR:variable_x VAR:x ;
+        PR:variable_y VAR:y ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:father ;
-            PR:variable_x VAR:variable_x ;
-            PR:variable_y VAR:variable_u ] ] ;
+            PR:variable_x VAR:x ;
+            PR:variable_y VAR:u ] ] ;
     PR:right_side [
         PR:priority "2" ;
         PR:child [
              PR:operation PR:father ;
-             PR:variable_x VAR:variable_u ;
-             PR:variable_y VAR:variable_y ] ] .
+             PR:variable_x VAR:u ;
+             PR:variable_y VAR:y ] ] .
 
 PR:grandfather_mother_father
     PR:left_side [
         PR:operation PR:grandfather ;
-        PR:variable_x VAR:variable_x ;
-        PR:variable_y VAR:variable_y ] ;
+        PR:variable_x VAR:x ;
+        PR:variable_y VAR:y ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:mother ;
-            PR:variable_x VAR:variable_x ;
-            PR:variable_y VAR:variable_u ] ] ;
+            PR:variable_x VAR:x ;
+            PR:variable_y VAR:u ] ] ;
     PR:right_side [
         PR:priority "2" ;
         PR:child [
             PR:operation PR:father ;
-            PR:variable_x VAR:variable_u ;
-            PR:variable_y VAR:variable_y ] ] .
+            PR:variable_x VAR:u ;
+            PR:variable_y VAR:y ] ] .
 
 # procedures
 PR:grandfather_father_father

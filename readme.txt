@@ -20,20 +20,20 @@ grandfather(X, Y) :- father(X, U), father(U, Y).は次のようになる。
 PR:grandfather_father_father
     PR:left_side [
         PR:operation PR:grandfather ;
-        PR:variable_x VAR:variable_x ;
-        PR:variable_y VAR:variable_y ] ;
+        PR:variable_x VAR:x ;
+        PR:variable_y VAR:y ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:father ;
-            PR:variable_x VAR:variable_x ;
-            PR:variable_y VAR:variable_u ] ] ;
+            PR:variable_x VAR:x ;
+            PR:variable_y VAR:u ] ] ;
     PR:right_side [
         PR:priority "2" ;
         PR:child [
              PR:operation PR:father ;
-             PR:variable_x VAR:variable_u ;
-             PR:variable_y VAR:variable_y ] ] .
+             PR:variable_x VAR:u ;
+             PR:variable_y VAR:y ] ] .
 
 ＜実行手順＞
 [answer_question]

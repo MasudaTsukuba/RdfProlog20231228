@@ -6,7 +6,8 @@ T. Masuda, 2023/10/30
 
 import rdflib
 from rdflib import Graph, URIRef  # , BNode, Variable
-from src.ConvertQuery import convert_question
+# from src.ConvertQuery import convert_question
+from lark import Lark, Transformer, Token  # , Tree
 
 
 def uri_ref(key_word: str) -> URIRef:
@@ -15,7 +16,10 @@ def uri_ref(key_word: str) -> URIRef:
 
 class ClassRules:  # list of rules
     """
-    list of rules
+    Holds a list of all rules
+
+    Attributes:
+        list_of_rules (list[ClassRule]): List of rule instances
     """
     def __init__(self, graph):
         """
@@ -26,7 +30,7 @@ class ClassRules:  # list of rules
         query_for_rules = f'SELECT ?s ?o WHERE {{ ' \
                           f'?s <{uri_ref("left_side")}> ?o . ' \
                           f'OPTIONAL {{ ?s <{uri_ref("priority")}> ?priority .}} }}' \
-                          f'ORDER BY ?priority '  # query for extracting left side rules
+                          f'ORDER BY ?priority '  # query for extracting left side rules. Use the priority values to order the rules.
         results_for_rule_left = graph.query(query_for_rules)  # execute query and extract
         for binding_for_left in results_for_rule_left.bindings:
             instance_rule = ClassRule()  # create a rule instance
@@ -36,7 +40,13 @@ class ClassRules:  # list of rules
 
 class ClassRule:  # class for individual rule
     """
-    class for individual rule
+    class for an individual rule
+
+    Attributes:
+        label (str): label of the rule
+        rule_left (ClassRuleLeft): left part of the rule
+        rule_right (list[ClassRuleRight]): right part of the class consisting of a list of ClassRuleRight
+        variables_list (list[str]): list of the variables in the rule
     """
     serial_number = 1000  # a variable to convert variables: x -> x1000
 
@@ -51,59 +61,77 @@ class ClassRule:  # class for individual rule
 
     def build(self, graph, rule_label, rule_left_label):
         """
-        build
-        :param graph:
-        :param rule_label:
-        :param rule_left_label:
-        :return:
+        build a rule from rule label and rule left label.
+
+        Args:
+            graph: RDF graph holding all info of rules
+            rule_label: label of this rule
+            rule_left_label: label of the left part of the rule
+
+        Returns:
+            ClassRule: return the self as a ClassRule
         """
         # print('DETECTED RULE: ', rule_label)  # left side rule returned as an object  # debug
         self.label = rule_label
-        self.rule_left.build(graph, rule_left_label)
+        self.rule_left.build(graph, rule_left_label)  # build the left parts of the rule from the left label.
         self.rule_right = []
+        # get the right parts of the rule while considering the priorities to apply the sub goal.
         query = f'SELECT ?o WHERE {{ <{self.label}> <{uri_ref("right_side")}> ?o . ' \
                 f'?o <{uri_ref("priority")}> ?priority . }} ORDER BY (?priority) '
         results = graph.query(query)
         # print('NUMBER OF CHILD RULES: ' + str(len(results)))  # debug
         for result in results:
-            rr = ClassRuleRight().build(graph, result)
-            self.rule_right.append(rr)
+            right_clause = ClassRuleRight().build(graph, result)  # build the right side part of the rule
+            self.rule_right.append(right_clause)  # save into a list
         return self
 
     def modify_variables(self):  # x -> x1000, etc.
         """
         x -> x1000, etc.
-        :return:
+        This function is used to avoid confusion between classes that have variables with the same name.
+
+        Returns:
+            None: This function just modifies the internal variables.
         """
-        self.variables_dict = {}
+        self.variables_dict = {}  # The variables are held in this list.
         for var in self.rule_left.var_list:
             self.variables_dict[var] = var + str(ClassRule.serial_number)  # x -> x1000
-        for rule in self.rule_right:
-            for grand_child in rule.child.grandchildren:
+        for right_clause in self.rule_right:
+            for grand_child in right_clause.child.grandchildren:
                 triple = grand_child.triple
                 if triple.subject.is_variable:  # subject
-                    var = triple.subject.to_var()
+                    var = triple.subject.to_var_string()  # rdflib.term.Variable -> ?x
                     try:
-                        value = self.variables_dict[var]
+                        value = self.variables_dict[var]  # already registered
                         triple.subject.build(value)
                     except KeyError:
                         self.variables_dict[var] = var + str(ClassRule.serial_number)  # convert free variable
                         triple.subject.build(self.variables_dict[var])
                 if triple.object.is_variable:  # object
-                    var = triple.object.to_var()
+                    var = triple.object.to_var_string()
                     try:
-                        value = self.variables_dict[var]
+                        value = self.variables_dict[var]  # already registered
                         triple.object.build(value)
                     except KeyError:
                         self.variables_dict[var] = var + str(ClassRule.serial_number)  # convert free variable
                         triple.object.build(self.variables_dict[var])
-        ClassRule.serial_number += 1  # prepare for the next conversion
+        ClassRule.serial_number += 1  # update the serial number to prepare for the next conversion
         pass
 
 
 class ClassRuleLeft:  # left side of a rule
     """
     left side of a rule
+
+    Attributes:
+        label: id for the left part of the rule
+        content: sparql query for finding applicable rules
+        bindings:
+        var_list: a list of variables in the triple
+        const_dict: dict of constants in object with the correspondent predicate
+        predicate_object_dict: dict for finding object from predicate as a key
+        forward_bindings:
+        backward_bindings:
     """
     def __init__(self):
         """
@@ -120,6 +148,7 @@ class ClassRuleLeft:  # left side of a rule
 
     def build(self, graph, rule_left_label):  # executed at the initial stage
         """
+        Build the left side part of a rule
         executed at the initial stage
         :param graph:
         :param rule_left_label:
@@ -138,17 +167,18 @@ class ClassRuleLeft:  # left side of a rule
             f'SELECT ?p ?o WHERE {{ ' \
             f'<{str(rule_left_label)}> ?p ?o . }}'  # extract content of left side rule from the label
         results_for_left_content = graph.query(query_for_left_content)  # execute a query
+
         var_list_string = '?s '  # build VAR_LIST of sparql query for left side rule
         # self.var_list.append('?s')  # also store the variables in a list
         sparql_query = f'SELECT VAR_LIST WHERE {{ '  # VAR_LIST will be replaced at the end
-        for bindings_for_left_content in results_for_left_content.bindings:
+        for bindings_for_left_content in results_for_left_content.bindings:  # analyze the query results
             triple_predicate = bindings_for_left_content['p']  # predicate part of the left side of a rule
             triple_object0 = bindings_for_left_content['o']  # object part of the left side of a rule
             triple_object = f'<{triple_object0}>'  # convert object to URI string
             self.predicate_object_dict[triple_predicate] = triple_object
             try:
-                if triple_object.find('http://variable.org/variable_') >= 0:
-                    triple_object = triple_object.replace('<http://variable.org/variable_', '?').replace('>', '')
+                if triple_object.find('http://variable.org/') >= 0:
+                    triple_object = triple_object.replace('<http://variable.org/', '?').replace('>', '')
                     var_list_string += str(triple_object) + ' '  # register the variable to a list
                     # self.var_list.append(str(triple_object))  # also append the variable to a list
                 else:
@@ -170,24 +200,32 @@ class ClassRuleLeft:  # left side of a rule
 class ClassRuleRight:  # right side of a rule
     """
     right side of a rule
+
+    Attributes:
+        child (ClassRuleRightChild): child of the right side clause
     """
     def __init__(self):
         """
         initialize ClassRuleRight class
         """
-        self.child = ClassRuleRightChild()  # right side has one child, which in turn has one or more grandchild
+        self.child = ClassRuleRightChild()  # right side clause has one child, which in turn has one or more grandchild
 
     def build(self, graph, right_side_for_child):  # executed at the initial stage
         """
+        Build the right side clause of a rule
         executed at the initial stage
-        :param graph:
-        :param right_side_for_child:
-        :return:
+
+        Args:
+            graph:
+            right_side_for_child:
+
+        Returns:
         """
         # print('CHILD RULE: ' + str(right_side_for_child[0]))  # debug
         query_for_child = f'SELECT ?o where {{ <{str(right_side_for_child[0])}> <{uri_ref("child")}> ?o .}} '
         results_of_right_side_child = graph.query(query_for_child)  # query by the child name
-        self.child.build(graph, results_of_right_side_child.bindings[0])
+
+        self.child.build(graph, results_of_right_side_child.bindings[0])  # build a child from the query results
         return self
 
     def revise(self, right_clauses, bindings):  # bindingsは辞書型
@@ -212,6 +250,9 @@ class ClassRuleRight:  # right side of a rule
 class ClassRuleRightChild:  # right side child of a rule
     """
     right side child of a rule
+
+    Attributes:
+        grandchildren:
     """
     def __init__(self):  # child has grandchildren
         """
@@ -222,9 +263,13 @@ class ClassRuleRightChild:  # right side child of a rule
     def build(self, graph, result_for_grandchild):  # build the right side of a rule
         """
         build the right side of a rule
-        :param graph:
-        :param result_for_grandchild:
-        :return:
+
+        Args:
+            graph:
+            result_for_grandchild:
+
+        Returns:
+            self:
         """
         self.grandchildren = []
         query_for_grandchild = f'SELECT ?s ?p ?o WHERE ' \
@@ -237,16 +282,20 @@ class ClassRuleRightChild:  # right side child of a rule
             #       + str(triple_for_grandchild['p']) + ' '
             #       + str(triple_for_grandchild['o']))  # debug
             triple = {'s': result_for_grandchild["o"], 'p': triple_for_grandchild['p'], 'o': triple_for_grandchild['o']}
-            gc = ClassRightGrandChild().build(triple)  # build a grandchild from the triple
-            self.grandchildren.append(gc)  # append the grandchild to the grandchildren
+            grandchild = ClassRightGrandChild().build(triple)  # build a grandchild from the triple
+            self.grandchildren.append(grandchild)  # append the grandchild to the grandchildren
         return self
 
     def revise(self, clause, bindings):  # revise the right side of a rule
         """
         revise the right side of a rule
-        :param clause:
-        :param bindings:
-        :return:
+
+        Args:
+            clause:
+            bindings:
+
+        Returns:
+            self:
         """
         for grandchild in clause.child.grandchildren:
             grandchild_revised = ClassRightGrandChild()  # create a new grandchild
@@ -260,40 +309,56 @@ class ClassRuleRightChild:  # right side child of a rule
 class ClassRightGrandChild:  # grandchild of a rule having one triple
     """
     grandchild of a rule having one triple
+
+    Attributes:
+        triple: grandchild is an RF triple
     """
     def __init__(self):
         """
         triple: empty ClassTriple()
         """
-        self.triple = ClassTriple()
+        self.triple = ClassTriple()  # create an empty triple
 
     def build(self, triple_for_grandchild):
         """
         build a grandchild of a rule
-        :param triple_for_grandchild:
-        :return:
+
+        Args:
+            triple_for_grandchild:
+
+        Returns:
+            self:
         """
-        self.triple.build(triple_for_grandchild)
+        self.triple.build(triple_for_grandchild)  # build a triple
         return self
 
 
 class ClassTriple:  # triple class
     """
     triple class
+
+    Attributes:
+        subject (ClassTerm)
+        predicate = (ClassTerm)
+        object = (ClassTerm)
     """
     def __init__(self):  # triple has subject, predicate and object
         """
         triple has subject, predicate and object
         """
-        self.subject = ClassTerm()
+        self.subject = ClassTerm()  # create an empty terms
         self.predicate = ClassTerm()
         self.object = ClassTerm()
 
     def build(self, triple):  # triple is a dict
         """
         build a triple
-        :param triple:
-        :return:
+
+        Args:
+            triple:
+
+        Returns:
+            None
         """
         self.subject.build(triple['s'])
         self.predicate.build(triple['p'])
@@ -303,6 +368,10 @@ class ClassTriple:  # triple class
 class ClassTerm:  # term is either subject, predicate or object
     """
     term is either subject, predicate or object
+
+    Attributes:
+        term_text (str): string name of this term, such as 'ans'
+        is_variable (bool): True if this term represents a variable
     """
     def __init__(self):  # initialize
         """
@@ -314,15 +383,20 @@ class ClassTerm:  # term is either subject, predicate or object
     def build(self, term_text):  # extract text element
         """
         build a term from term text
-        :param term_text:
-        :return:
+        <http://variable.org/x> -> x
+
+        Args:
+            term_text:
+
+        Returns:
+            self:
         """
         self.term_text = str(term_text).replace(' ', '').replace('<', '').replace('>', '')
         self.is_variable = False
-        if self.term_text.find('http://variable.org/') >= 0:  # <http://variable.org/variable_x> -> x
+        if self.term_text.find('http://variable.org/') >= 0:  # <http://variable.org/x> -> x
             self.is_variable = True
             self.term_text = self.term_text.replace('<', '').replace('>', ''). \
-                replace('http://variable.org/', '').replace('variable_', '')
+                replace('http://variable.org/', '')  # .replace('variable_', '')
         if self.term_text.find('?') >= 0:  # ?x -> x
             self.is_variable = True
             self.term_text = self.term_text.replace('?', '')
@@ -330,26 +404,37 @@ class ClassTerm:  # term is either subject, predicate or object
 
     def to_uriref(self) -> URIRef:
         """
+        Service function to produce URIRef from ClassTerm.
+        'x' -> 'rdflib.term.URIRef('http://variable.org/x')
 
-        :return uri_ref: URIRef
+        Returns:
+             uri_ref (URIRef)
         """
-        return URIRef('http://variable.org/variable_' + self.term_text)
+        return URIRef('http://variable.org/' + self.term_text)
 
-    def to_uri(self) -> str:
+    def to_uri(self, drop=False) -> str:
         """
-
-        :return
-            uri_string: str
+        x -> <http://variable.org/x> for a variable
+        http://example.org/andy -> <http://example.org/andy> for a constant
+        Returns:
+            str: uri_string
         """
         if self.is_variable:
-            return '<http://variable.org/variable_' + self.term_text + '>'  # x -> <http://variable.org/variable_x>
+            term_str = 'http://variable.org/' + self.term_text + ''  # x -> <http://variable.org/x>
         else:
-            return '<' + self.term_text + '>'  # http://example.org/andy -> <http://example.org/andy>
+            term_str = '' + self.term_text + ''  # http://example.org/andy -> <http://example.org/andy>
+        if drop:
+            return term_str
+        else:
+            return f'<{term_str}>'
 
-    def to_var(self) -> str:
+    def to_var_string(self) -> str:
         """
+        http://variable.org/x -> ?x for a variable
+        http://example.org/andy -> <http://example.org/andy> for a constant
 
-        :return:
+        Returns:
+            str:
         """
         if self.is_variable:
             return '?' + self.term_text  # http://variable.org/x -> ?x
@@ -358,30 +443,36 @@ class ClassTerm:  # term is either subject, predicate or object
 
     def force_to_var(self) -> str:
         """
+        http://example.org/x -> ?x
 
-        :return:
+        Returns:
+            str:
         """
         return '?' + self.term_text.replace('http://example.org/', '')  # http://example.org/x -> ?x
 
     def revise(self, bindings):  # bindings: dict
         """
+        Revise a term based on the bindings
 
-        :param bindings:
-        :return:
+        Args:
+            bindings dict():
+
+        Returns:
+
         """
-        term_text = self.to_var()  # if VAR x -> ?x, else http://example.org/andy -> <http://example.org/andy>
+        term_text = self.to_var_string()  # if VAR x -> ?x, else http://example.org/andy -> <http://example.org/andy>
         try:
-            if len(bindings) > 0:
+            if len(bindings) > 0:  # if bindings contains maps
                 try:
                     term_text2 = bindings[term_text]
                     return term_text2  # return the value in the dict
-                except KeyError:
+                except KeyError:  # term_text is not registered in the bindings
                     pass
-                except Exception as e:
-                    print(e)
+                except Exception as e:  # unexpected error
+                    print('In ClassTerm/revise, unexpected error', e)
                     pass
-        except Exception as e:
-            print(e)
+        except Exception as e:  # unexpected error
+            print('In ClassTerm/revise, unexpected error', e)
             pass
         return term_text  # if not in bindings, return as is
 
@@ -389,6 +480,12 @@ class ClassTerm:  # term is either subject, predicate or object
 class ClassSparqlQuery:  # Sparql Query Class
     """
     sparql query class
+
+    Attributes:
+        query:
+        list_of_rdfs: rdfs is an array of clauses
+        list_of_variables: list of variables
+        rule (ClassRule): empty rule
     """
     def __init__(self):  # initialize the sparql query class instance
         """
@@ -396,29 +493,33 @@ class ClassSparqlQuery:  # Sparql Query Class
         """
         self.query = None
         self.list_of_rdfs = []  # rdfs is an array of clauses
-        self.list_of_variables = []  # list of variables
+        self.list_of_variables = []  # list of variables in this query
         self.rule = ClassRule()  # empty rule
 
-    def set(self, sparql_query):  # convert from sparql query string
+    def set(self, sparql_query: str):  # convert from sparql query string to a sparql query class instance
         """
-        convert from sparql query string
-        :param sparql_query:
-        :return:
+        convert from sparql query string to a sparql query class instance
+
+        Args:
+            sparql_query (str):
+
+        Returns:
+            list[list[ClassTriple]]
         """
         self.query = sparql_query  # sparql_query is a string
         self.list_of_rdfs = []  # rdfs is an array of clauses
-        self.build_variable_list()
-        list_of_rdfs_temp = convert_question(self.query)
+        self.build_variable_list()  # list of variables in this query
+        list_of_rdfs_temp: list[list[ClassTerm]] = convert_question(self.query)  # query string to a list of triples
         list_of_clauses = []  # clause is an array of triples that have the same subject
         previous_subject = None
         first = True  # switch indicating the initial processing
-        for rdf in list_of_rdfs_temp:  # rdf is an array of [s, p, o]
+        for rdf in list_of_rdfs_temp:  # rdf is an array of triples [s, p, o]
             # dummy = {'s': 'Dummy', 'p': 'Dummy', 'o': 'Dummy'}  # dummy dict
-            triple = ClassTriple()  # instance of Triple Class
+            triple = ClassTriple()  # an instance of an empty Triple Class
             if len(rdf) == 3:  # is indeed a triple
-                triple.subject.build(rdf[0])  # assign into triple  # subject
-                triple.predicate.build(rdf[1])  # predicate
-                triple.object.build(rdf[2])  # object
+                triple.subject.build(rdf[0].to_var_string())  # assign into triple  # subject
+                triple.predicate.build(rdf[1].to_var_string())  # predicate
+                triple.object.build(rdf[2].to_var_string())  # object
                 if triple.subject.to_uri() == previous_subject:  # has the same subject
                     list_of_clauses += [triple]  # append to the clause list
                 else:
@@ -434,7 +535,9 @@ class ClassSparqlQuery:  # Sparql Query Class
     def build_variable_list(self):  # create a list of variables
         """
         create a list of variables
-        :return:
+
+        Returns:
+            None: Just modify the internal state.
         """
         variable_str = self.query.replace('SELECT ', '')  # extract a string between 'SELECT' and 'WHERE'
         variable_str = variable_str[:variable_str.find(' WHERE')]
@@ -445,25 +548,29 @@ class ClassSparqlQuery:  # Sparql Query Class
     def build_query(self, results_for_build_query):  # build a query string
         """
         build a query string
-        :param results_for_build_query:
-        :return:
+
+        Args:
+            results_for_build_query:
+
+        Returns:
+
         """
         try:
             var_list = ''  # variables list for replacing $VAR_LIST
-            query_for_resolve = f'SELECT $VAR_LIST WHERE {{ '  # start the query string
+            query_for_resolve = f'SELECT $VAR_LIST WHERE {{ '  # start the query string. $VAR_LIST will be replaced at the end.
             term_subject = None  # for suppressing the warning of not defined before assignment
             for triple_for_build_query in results_for_build_query.child.grandchildren:  # extract each triple of a rule
                 term_subject = ClassTerm().build(triple_for_build_query.triple.subject.force_to_var())  # subject
                 term_predicate = ClassTerm().build(triple_for_build_query.triple.predicate.to_uri())  # predicate
-                term_object = ClassTerm().build(triple_for_build_query.triple.object.to_var())  # object
-                print('PREDICATE AND OBJECT: ' + str(term_predicate.to_uri()) + ' ' + str(term_object.to_var()))  # debug
+                term_object = ClassTerm().build(triple_for_build_query.triple.object.to_var_string())  # object
+                print('PREDICATE AND OBJECT: ' + str(term_predicate.to_uri()) + ' ' + str(term_object.to_var_string()))  # debug
                 # term_value1 = term_object
                 if term_object.is_variable:  # object is a variable
-                    print('OBJECT WAS A VARIABLE: ' + str(term_object.to_var()))  # debug
+                    print('OBJECT WAS A VARIABLE: ' + str(term_object.to_var_string()))  # debug
                     key1 = term_object.to_uri()  # convert the object to uri
                     try:
-                        if key1.find('<http://variable.org/variable_') >= 0:
-                            key1 = key1.replace('<http://variable.org/variable_', '?').replace('>', '')  # to ?var form
+                        if key1.find('<http://variable.org/') >= 0:
+                            key1 = key1.replace('<http://variable.org/', '?').replace('>', '')  # to ?var form
                             term_value1 = ClassTerm().build(key1)  # new object term
                             print('(1)OBJECT VARIABLE WAS CONVERTED TO: ' + str(term_value1.to_uri()))  # debug
                     except KeyError:
@@ -475,15 +582,16 @@ class ClassSparqlQuery:  # Sparql Query Class
                 # my_var = term_value1
 
                 if temp_obj.is_variable:
-                    var_list += temp_obj.to_var() + ' '  # append to the variables list (string)
-                ss = term_subject.to_var()
+                    var_list += temp_obj.to_var_string() + ' '  # append to the variables list (string)
+                ss = term_subject.to_var_string()
                 pp = term_predicate.to_uri()
-                oo = temp_obj.to_var()
+                oo = temp_obj.to_var_string()
                 str1 = f'{ss} {pp} {oo} . '
                 query_for_resolve += str1  # append the converted triple
             query_for_resolve += f'}}'  # terminate the query string
+
             if term_subject.is_variable:  # such as ?s
-                var_list += term_subject.to_var()  # last element  # to enable yes/no question
+                var_list += term_subject.to_var_string()  # last element  # to enable yes/no question
             query_for_resolve = query_for_resolve.replace('$VAR_LIST', var_list)
             print('CONVERTED QUERY FOR THE GRAND CHILD: ' + query_for_resolve)  # sub goal
             self.query = query_for_resolve  # set the query string in instance variable
@@ -492,11 +600,17 @@ class ClassSparqlQuery:  # Sparql Query Class
             print('Something has happened in ClassSparqlQuery.build_query(). ', e)
             pass
 
-    def direct_search(self, graph):  # find a triple in the graph that directly matches the query
+    def direct_search(self, graph: Graph):  # find a triple in the graph that directly matches the query
         """
         find a triple in the graph that directly matches the query
-        :param graph:
-        :return:
+
+        Args:
+            graph: an RDF graph holding all the info of facts and rules.
+
+        Returns:
+            bool:
+            list[]:
+
         """
         results = graph.query(self.query)  # execute a query
         if len(results) > 0:  # direct search detected candidates. results.bindings are list of dict
@@ -530,7 +644,7 @@ class ClassSparqlQuery:  # Sparql Query Class
             succeeded, bindings = build_bindings(results.bindings)  # create bindings to be returned
             return succeeded, bindings
         else:
-            return False, []  # no direct match was found
+            return False, []  # no direct match was found. return False (Not Found) and an empty list
 
     def find_applicable_rules(self, rules):  # find rules applicable to this query
         """
@@ -538,28 +652,31 @@ class ClassSparqlQuery:  # Sparql Query Class
         :param rules:
         :return:
         """
-        list_of_rdfs = convert_question(self.query)  # convert query to a list of triples
+        list_of_rdfs: list[list[ClassTerm]] = convert_question(self.query)  # convert query to a list of triples
         len_effective_rdfs = 0
-        g_temp = Graph()  # temporary graph for storing the query
-        g_temp_debug = []
-        predicate_object_dict = {}
-        set_of_variables_in_query = set()
+        g_temp: Graph = Graph()  # temporary graph for storing the query
+        g_temp_debug: list[tuple[URIRef, URIRef, URIRef]] = []
+        predicate_object_dict: dict[str, str] = {}
+        set_of_variables_in_query: set[tuple[str, str]] = set()
         for clause in list_of_rdfs:  # repeat for the triples
             if len(clause) == 3:  # clause is indeed a triple
-                subj = clause[0].replace('<', '').replace('>', '')
-                pred = clause[1].replace('<', '').replace('>', '')
-                obje = clause[2].replace('<', '').replace('>', '')
-                g_temp.add((URIRef(subj), URIRef(pred), URIRef(obje)))
-                g_temp_debug.append((URIRef(subj), URIRef(pred), URIRef(obje)))
-                predicate_object_dict[pred] = obje
+                subj = clause[0]  # .to_uri(drop=True)  # clause[0].replace('<', '').replace('>', '')
+                pred = clause[1]  # .to_uri(drop=True)  # clause[1].replace('<', '').replace('>', '')
+                obje = clause[2]  # .to_uri(drop=True)  # clause[2].replace('<', '').replace('>', '')
+                subj_uri = subj.to_uri(drop=True)
+                pred_uri = pred.to_uri(drop=True)
+                obje_uri = obje.to_uri(drop=True)
+                g_temp.add((URIRef(subj_uri), URIRef(pred_uri), URIRef(obje_uri)))
+                g_temp_debug.append((URIRef(subj_uri), URIRef(pred_uri), URIRef(obje_uri)))
+                predicate_object_dict[pred_uri] = obje_uri
                 len_effective_rdfs += 1
-                if obje.find('http://variable.org/') < 0:  # skip if the object is a variable
+                if not obje.is_variable:  # .find('http://variable.org/') < 0:  # skip if the object is a variable
                     # g_temp.add((URIRef(subj), URIRef(pred), URIRef(obje)))
                     # g_temp_debug.append((URIRef(subj), URIRef(pred), URIRef(obje)))
                     # len_effective_rdfs += 1
                     pass
                 else:
-                    set_of_variables_in_query.add((obje.replace('http://variable.org/' ,''), pred))
+                    set_of_variables_in_query.add((obje_uri, pred_uri))
                 # g_temp.add((URIRef(clause[0].replace('<', '').replace('>', '')),
                 #             URIRef(clause[1].replace('<', '').replace('>', '')),
                 #             URIRef(clause[2].replace('<', '').replace('>', ''))))  # store the triple into the graph
@@ -571,7 +688,7 @@ class ClassSparqlQuery:  # Sparql Query Class
             forward_bindings = {}
             backward_bindings = {}
             for rule_predicate, rule_object0 in rule.rule_left.predicate_object_dict.items():
-                rule_object = rule_object0.replace('<','').replace('>','')
+                rule_object = rule_object0.replace('<', '').replace('>','')
                 try:
                     query_object = predicate_object_dict[str(rule_predicate)]
                     if rule_object.find('http://example.org') >= 0:  # const
@@ -582,9 +699,9 @@ class ClassSparqlQuery:  # Sparql Query Class
                                 match = False
                                 continue
                         else:  # object in query is variable
-                            backward_bindings['?'+query_object.replace('http://variable.org/','')] = f'<{rule_object}>'
+                            backward_bindings['?'+query_object.replace('http://variable.org/', '')] = f'<{rule_object}>'
                     else:  # rule object is variable
-                        forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/variable_', ''))] = query_object
+                        forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/', ''))] = query_object
                 except KeyError:
                     match = False
                     continue
@@ -622,3 +739,201 @@ class ClassSparqlQuery:  # Sparql Query Class
                 rule_right.child.grandchildren += [gc]  # append to the grandchildren
             self.rule.rule_right += [rule_right]  # append to the right side
         return self
+
+"""
+ConvertQuery.py
+T. Masuda, 2023/10/30
+
+convert a sparql query into a list of rdf triples
+
+For example, if the input sparql query is
+SELECT ?ans WHERE {
+?s <http://example.org/operation> <http://example.org/add_number> .
+?s <http://example.org/variable_x> <http://example.org/three> .
+?s <http://example.org/variable_y> <http://example.org/two> .
+?s <http://example.org/variable_z> ?ans . }'
+
+The return list is
+[['<http://variable.org/s>', '<http://example.org/operation>', '<http://example.org/add_number>'],
+['<http://variable.org/s>', '<http://example.org/variable_x>', '<http://example.org/three>'],
+['<http://variable.org/s>', '<http://example.org/variable_y>', '<http://example.org/two>'],
+['<http://variable.org/s>', '<http://example.org/variable_z>', '<http://variable.org/ans>']]
+
+where ?s and ?ans are transformed into <http://variable.org/s> and <http://variable.org/ans>, respectively.
+"""
+
+
+grammar = """
+sparql : "SELECT " (var)+ where
+where : "WHERE {" (" ")* (triple)+ "}" (" ")* 
+var : VAR
+VAR : "?" WORD (" ")+
+triple : subject predicate object "." (" ")* 
+WORD : CHAR (CHAR | NUMBER)*
+CHAR : "a".."z" | "A".."Z"
+NUMBER : "0".."9"
+subject   : (VAR | HTTP) 
+predicate : (VAR | HTTP)
+object    : (VAR | HTTP)
+HTTP : "<http://" HTTP_WORD ">" (" ")* 
+HTTP_WORD : CHAR (CHAR | NUMBER | "." | "/" | "_" | "-")*
+"""
+
+
+class MyTransformer2(Transformer):
+    """
+
+    Attributes:
+        list_of_rdf_triples (list[list[str]]): a list of triples.
+
+        list_of_each_triple (list[str]): a list of each triple.
+    """
+    def __init__(self):
+        """
+
+        """
+        super().__init__()
+        self.list_of_rdf_triples = []  # This is what we actually want to get.
+        self.list_of_each_triple = []  # working variable.
+        # self.predicate_object_pair = {}
+
+    @staticmethod
+    def sparql(tree: list[str]) -> str:
+        """
+        build a sparql query string
+
+        Args:
+             tree: a list of lark tree strings
+
+        Returns:
+             sparql query string (str)
+        """
+        sparql_string = 'SELECT '
+        sparql_string += ''.join(tree)
+        return sparql_string
+
+    @staticmethod
+    def where(tree: list[str]) -> str:
+        """
+        build where clause of a sparql query string
+
+        Args:
+            tree: lark tree string
+
+        Returns:
+             str: where_string
+        """
+        where_string = ''.join(tree)
+        return 'WHERE { ' + where_string + '}'
+
+    @staticmethod
+    def var(tree: list[Token]) -> str:
+        """
+
+        Args:
+            tree: list of tokens
+
+        Returns:
+            token for a variable:
+        """
+        # print('### ', tree[0].type, tree[0].value)
+        return f'{tree[0]}'
+
+    def triple(self, tree: list[str]) -> str:
+        """
+        build a triple in a sparql query string
+
+        Args:
+            tree:
+
+        Returns:
+
+        """
+        self.list_of_each_triple = []  # initialize the list of a triple
+        return_str = ''.join(tree)
+        # self.predicate_object_pair[tree[1]] = tree[2]
+        return return_str + '. '
+
+    def subject(self, tree: list[Token]) -> str:
+        """
+        build a subject of a triple in a sparql query string
+        :param tree: list of Tokens
+        :return:
+        """
+        # print('¥¥¥ ', tree)  # debug
+        if tree[0].type == 'VAR':
+            ret = f'<http://variable.org/{tree[0].value.replace("?", "").strip()}>'
+            # ret = tree[0].value  # '<http://example.org/subj> '
+        else:
+            ret = tree[0].value  # '<http://example.org/subj> '  # tree[0].value
+        self.list_of_each_triple = []  # initialize the list of a triple
+        self.list_of_each_triple.append(ClassTerm().build(ret.strip()))  # subject of a triple
+        return ret + ','  # ret is just for debug
+
+    def predicate(self, tree: list[Token]) -> str:
+        """
+        build a predicate of a triple in a sparql query string
+        :param tree:
+        :return:
+        """
+        if tree[0].type == 'VAR':
+            ret = tree[0].value  # TODO
+        else:
+            ret = tree[0].value
+        # if tree[0].value == '<http://example.org/operation> ':
+        #     MyTransformer.predicate_is_operation = True
+        # else:
+        #     MyTransformer.predicate_is_operation = False
+        self.list_of_each_triple.append(ClassTerm().build(ret.strip()))  # predicate of a triple
+        return ret+','
+
+    def object(self, tree: list[Token]) -> str:
+        """
+        build an object part of a triple in a sparql query string
+        :param tree:
+        :return:
+        """
+        my_value = tree[0].value
+        ret = my_value
+        if tree[0].type == 'VAR':
+            ret = f'<http://variable.org/{my_value.replace("?", "").strip()}>'  # ?ans -> <http://variable.org/ans>
+        self.list_of_each_triple.append(ClassTerm().build(ret.strip()))  # element holds a triple as a list # remove unnecessary spaces
+        self.list_of_rdf_triples.append(self.list_of_each_triple)  # append the triple to the list
+        return ret  # return value is for debug
+
+
+def convert_question(question: str) -> list[list[ClassTerm]]:
+    """
+    convert a sparql query string into a list of triples
+
+    Args:
+        question(str): sparql query string
+
+    Returns:
+        list[str]: a list of triples
+    """
+    parser = Lark(grammar, start='sparql')  # create a Lark parser with 'sparql' as a root
+    my_tree = parser.parse(question)  # convert the input sparql query into a lark tree
+    # print(my_tree)  # debug
+    my_transformer2 = MyTransformer2()  # create an instance of MyTransformer2
+    my_transformer2.list_of_rdfs = []  # initialize the list of rdfs
+    # trans =
+    my_transformer2.transform(my_tree)  # transform a lark tree to a list of rdf triples
+    # print(trans)  # debug
+    # print(my_transformer2.list_of_rdfs)  # debug
+    return my_transformer2.list_of_rdf_triples  # list[list[ClassTerm]]
+
+
+if __name__ == '__main__':  # for a test purpose
+    # my_query = 'SELECT ?ss WHERE { ?ss <http://example.org/operation> <http://example.org/add_number> . ' + \
+    #            '?s <http://example.org/PP> ?o . }'
+    # conv_query, var_dict, predicate_object_pair = convert_query(my_query)
+
+    my_question = f'SELECT ?ans WHERE {{ ?s <http://example.org/operation> <http://example.org/add_number> . ' \
+                  f'?s <http://example.org/variable_x> <http://example.org/three> . ' \
+                  f'?s <http://example.org/variable_y> <http://example.org/two> . ' \
+                  f'?s <http://example.org/variable_z> ?ans . ' \
+                  f'}}'
+    list_of_rdf_triples = convert_question(my_question)
+    print(list_of_rdf_triples)
+

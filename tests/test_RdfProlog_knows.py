@@ -92,8 +92,8 @@ def test_answer_question3():
         f'?s <http://example.org/variable_y> ?ans . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
-    assert len(resolve_bindings) > 0
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, True)
+    assert len(resolve_bindings) == 4  # > 0
 
 
 def test_answer_question4():
