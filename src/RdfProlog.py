@@ -1,7 +1,8 @@
 """
 RdfProlog
 Executing Prolog on RDF query system
-2022/12/20, 2023/3/16, 2023/10/30
+main function
+2022/12/20, 2023/3/16, 2023/10/30, 2023/11/6
 T. Masuda
 """
 
