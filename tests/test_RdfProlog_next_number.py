@@ -78,3 +78,18 @@ def test_answer_question5():
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
     assert resolve_bindings[0]['?x'] == '<http://example.org/three>'
+
+
+def test_answer_next_x_y():
+    rdf_prolog = RdfProlog()
+
+    # next(?x, ?y)
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/next_number> . ' \
+        f'?s <http://example.org/variable_x> ?x . ' \
+        f'?s <http://example.org/variable_y> ?y . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
+    assert len(resolve_bindings) == 9

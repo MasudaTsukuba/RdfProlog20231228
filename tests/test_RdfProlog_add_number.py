@@ -123,7 +123,6 @@ def test_answer_complex_question2():
 
     # add(3, 2, ?z), add(?z, 2, ?ans)
     my_question = \
-        my_question = \
         f'SELECT ?ans WHERE {{' \
         f'?s1 <http://example.org/operation> <http://example.org/add_number> . ' \
         f'?s1 <http://example.org/variable_x> <http://example.org/three> . ' \
@@ -137,3 +136,96 @@ def test_answer_complex_question2():
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)  # ###################
     assert resolve_bindings[0]['?ans'] == f'<http://example.org/seven>'
+
+
+def test_add_1_y_z():
+    rdf_prolog = RdfProlog()
+    # add(1, ?y, ?z)
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/one> . ' \
+        f'?s <http://example.org/variable_y> ?y . ' \
+        f'?s <http://example.org/variable_z> ?z . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=True)
+    assert len(resolve_bindings) == 9
+
+
+def test_add_9_y_z():
+    rdf_prolog = RdfProlog()
+    # add(9, ?y, ?z)
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/nine> . ' \
+        f'?s <http://example.org/variable_y> ?y . ' \
+        f'?s <http://example.org/variable_z> ?z . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=True)
+    assert resolve_bindings[0]['?y'] == f'<http://example.org/one>'
+    assert resolve_bindings[0]['?z'] == f'<http://example.org/ten>'
+
+
+def test_add_x_1_z():
+    rdf_prolog = RdfProlog()
+    # add(?x, 1, ?z)
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        f'?s <http://example.org/variable_x> ?x . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/one> . ' \
+        f'?s <http://example.org/variable_z> ?z . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=True)
+    assert len(resolve_bindings) == 9
+
+
+def test_add_x_9_z():
+    rdf_prolog = RdfProlog()
+    # add(?x, 9, ?z)
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        f'?s <http://example.org/variable_x> ?x . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/nine> . ' \
+        f'?s <http://example.org/variable_z> ?z . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=True)
+    assert resolve_bindings[0]['?x'] == '<http://example.org/one>'
+    assert resolve_bindings[0]['?z'] == '<http://example.org/ten>'
+
+
+def test_add_x_y_2():
+    rdf_prolog = RdfProlog()
+    # add(?x, ?y, 2)
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        f'?s <http://example.org/variable_x> ?x . ' \
+        f'?s <http://example.org/variable_y> ?y . ' \
+        f'?s <http://example.org/variable_z> <http://example.org/two> . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=True)
+    assert resolve_bindings[0]['?x'] == '<http://example.org/one>'
+    assert resolve_bindings[0]['?y'] == '<http://example.org/one>'
+
+
+def test_add_x_y_3():
+    rdf_prolog = RdfProlog()
+    # add(?x, ?y, 3)
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        f'?s <http://example.org/variable_x> ?x . ' \
+        f'?s <http://example.org/variable_y> ?y . ' \
+        f'?s <http://example.org/variable_z> <http://example.org/three> . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=True)
+    assert len(resolve_bindings) == 2
