@@ -80,19 +80,20 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
     #         print('===================================================================================================')
     #         return [], []
 
-    def answer_complex_question(self, sparql_query, find_all=False):  # answer a sparql query with multiple clauses
+    def answer_complex_question(self, sparql_query, find_all=False, max_depth: int = 100):  # answer a sparql query with multiple clauses
         """
         answer a sparql query with multiple clauses
 
         Args:
             sparql_query
             find_all (bool): if true, find all the possible answers
+            max_depth (int): maximum depth of resolution
 
         Returns:
             None
         """
         self.find_all = find_all  # if true, find all the possible answers
-        resolution = Resolution(self.g_rules, self.rules, self.find_all)  # create an instance of Resolution class, left_rules: ClassLeftRules
+        resolution = Resolution(self.g_rules, self.rules, self.find_all, max_depth)  # create an instance of Resolution class, left_rules: ClassLeftRules
         resolve_succeeded, resolve_bindings \
             = resolution.resolve_rule(sparql_query.rule)  # execute the resolution / resolve rule
         if resolve_succeeded:
@@ -127,7 +128,7 @@ class Resolution:  # main class for resolution
     """
     resolve_right_recursive_count = 0  # indicate the depth of recursive call.  # for debug
 
-    def __init__(self, graph, rules, find_all):
+    def __init__(self, graph, rules, find_all: bool, max_depth: int):
         """
         initialize Resolution class
 
@@ -135,6 +136,7 @@ class Resolution:  # main class for resolution
         self.graph = graph  # set the knowledge graph
         self.rules = rules  # ClassRules(graph)
         self.find_all = find_all  # find all possible answers
+        self.max_depth = max_depth  # maximum depth of resolution
         pass
 
     def resolve_recursive(self, right_clauses: list[ClassRuleRight]) -> (bool, list[dict[str, str]]):  # resolve_bindings_in 辞書の配列
@@ -174,6 +176,9 @@ class Resolution:  # main class for resolution
         else:  # 右側にまだclauseがある時。
             print('[', Resolution.resolve_right_recursive_count, '] ENTERING resolve_recursive')  # debug
             Resolution.resolve_right_recursive_count += 1  # 再帰呼び出しの深さをup。debug
+            if Resolution.resolve_right_recursive_count > self.max_depth:  # exceeds max_depth of resolution  # 2023/11/7
+                Resolution.resolve_right_recursive_count -= 1
+                return False, []
             grandchild_rules: ClassRuleRight = right_clauses[0]  # first clauseを取り出す。
             right_clauses_sub: list[ClassRuleRight] = right_clauses[1:]  # rest of clausesは後で処理する。
             built_query = ClassSparqlQuery().set('SELECT ?s ?p ?o WHERE {?s ?p ?o .}')  # dummy query

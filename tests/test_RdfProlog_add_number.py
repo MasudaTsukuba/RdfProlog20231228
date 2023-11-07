@@ -215,3 +215,36 @@ def test_add_x_y_3():
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=True)
     assert len(resolve_bindings) == 2
+
+
+def test_max_depth_add_3_1_ans():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
+
+    # add(3, 1, ?ans) max_depth=0
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/three> . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/one> . ' \
+        f'?s <http://example.org/variable_z> ?ans . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=False, max_depth=1)
+    assert len(resolve_bindings) == 0
+
+
+def test_max_depth_add_3_1_ans_2():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
+
+    # add(3, 1, ?ans) max_depth=1
+    my_question = \
+        f'SELECT ?ans WHERE {{' \
+        f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        f'?s <http://example.org/variable_x> <http://example.org/three> . ' \
+        f'?s <http://example.org/variable_y> <http://example.org/one> . ' \
+        f'?s <http://example.org/variable_z> ?ans . ' \
+        f'}}'
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=False, max_depth=2)
+    assert len(resolve_bindings) == 1
+    assert resolve_bindings[0]['?ans'] == '<http://example.org/four>'
