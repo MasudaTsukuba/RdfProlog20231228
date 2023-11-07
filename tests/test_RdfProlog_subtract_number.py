@@ -6,8 +6,8 @@ T. Masuda, 2023/10/30
 from src.RdfProlog import RdfProlog, ClassSparqlQuery
 
 
-def test_answer_question1():
-    rdf_prolog = RdfProlog()
+def test_answer_question1_3_minus_1():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(3, 1, ?ans)
     my_question = \
@@ -22,8 +22,8 @@ def test_answer_question1():
     assert resolve_bindings[0]['?ans'] == f'<http://example.org/two>'
 
 
-def test_answer_question2():
-    rdf_prolog = RdfProlog()
+def test_answer_question2_4_minus_2():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(4, 2, ?ans)
     my_question = \
@@ -37,8 +37,8 @@ def test_answer_question2():
     assert resolve_bindings[0]['?ans'] == f'<http://example.org/two>'
 
 
-def test_answer_question3():
-    rdf_prolog = RdfProlog()
+def test_answer_question3_3_minus_2():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # # subtract(3, 2, ?ans)
     my_question = \
@@ -53,8 +53,8 @@ def test_answer_question3():
     assert resolve_bindings[0]['?ans'] == f'<http://example.org/one>'
 
 
-def test_answer_question3b():
-    rdf_prolog = RdfProlog()
+def test_answer_question3b_next_of_5_minus_2():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(5, 2, ?z), next(?z, ?ans)
     my_question = \
@@ -72,8 +72,8 @@ def test_answer_question3b():
     assert resolve_bindings[0]['?ans'] == f'<http://example.org/four>'
 
 
-def test_answer_question4():
-    rdf_prolog = RdfProlog()
+def test_answer_question_5_minus_ans_equals_2():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(5, ?ans, 2)
     my_question = \
@@ -88,8 +88,8 @@ def test_answer_question4():
     assert resolve_bindings[0]['?ans'] == f'<http://example.org/three>'
 
 
-def test_answer_complex_question1():
-    rdf_prolog = RdfProlog()
+def test_answer_complex_question_5_minus_2_next():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(5, 2, ?z), next(?z, ?ans)
     my_question = \
@@ -107,8 +107,8 @@ def test_answer_complex_question1():
     assert resolve_bindings[0]['?ans'] == f'<http://example.org/four>'
 
 
-def test_answer_complex_question2():
-    rdf_prolog = RdfProlog()
+def test_answer_complex_question_3_minus_2_plus_2():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(3, 2, ?z), add(?z, 2, ?ans)
     my_question = \

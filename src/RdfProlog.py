@@ -11,8 +11,10 @@ T. Masuda
 # import rdflib
 # from rdflib import Graph, URIRef, BNode, Variable
 # from src.PR import PR
-from src.RdfClass import ClassRule, ClassRules, ClassRuleRight, ClassSparqlQuery, ClassTerm
-from src.RdfResolution import RdfProlog, Resolution
+# from src.RdfClass import ClassRule, ClassRules, ClassRuleRight, ClassSparqlQuery, ClassTerm
+# from src.RdfResolution import RdfProlog, Resolution
+from src.RdfClass import ClassSparqlQuery
+from src.RdfResolution import RdfProlog
 
 
 # class RdfProlog:  # Prolog Class, prepare a graph and available rules
@@ -403,10 +405,10 @@ def main():
     main function for RdfProlog
     :return:
     """
-    rdf_prolog = RdfProlog()
 
     # add
     if True:  # next
+        rdf_prolog = RdfProlog(rules_folder='rules_number')
         # next(1, ?ans)
         my_question = \
             f'SELECT ?ans WHERE {{' \
@@ -452,15 +454,15 @@ def main():
         pass
 
         # next(1, ?z),next(?z, ?ans)
-        my_question = \
-            f'SELECT ?ans WHERE {{' \
-            f'?s1 <http://example.org/operation> <http://example.org/next_number> . ' \
-            f'?s1 <http://example.org/variable_x> <http://example.org/one> . ' \
-            f'?s1 <http://example.org/variable_y> ?z . ' \
-            f'?s2 <http://example.org/operation> <http://example.org/next_number> . ' \
-            f'?s2 <http://example.org/variable_x> ?z . ' \
-            f'?s2 <http://example.org/variable_y> ?ans . ' \
-            f'}}'
+        # my_question = \
+        #     f'SELECT ?ans WHERE {{' \
+        #     f'?s1 <http://example.org/operation> <http://example.org/next_number> . ' \
+        #     f'?s1 <http://example.org/variable_x> <http://example.org/one> . ' \
+        #     f'?s1 <http://example.org/variable_y> ?z . ' \
+        #     f'?s2 <http://example.org/operation> <http://example.org/next_number> . ' \
+        #     f'?s2 <http://example.org/variable_x> ?z . ' \
+        #     f'?s2 <http://example.org/variable_y> ?ans . ' \
+        #     f'}}'
         # next(1, ?z),next(?z, ?x)
         my_question = \
             f'SELECT ?x WHERE {{' \
@@ -488,6 +490,7 @@ def main():
 
     # add
     if True:
+        rdf_prolog = RdfProlog(rules_folder='rules_number')
         # add(3, 1, ?ans)
         my_question = \
             f'SELECT ?ans WHERE {{' \
@@ -523,13 +526,13 @@ def main():
         # pass
 
         # add(3, 2, ?ans)
-        my_question = \
-            f'SELECT ?ans WHERE {{' \
-            f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
-            f'?s <http://example.org/variable_x> <http://example.org/three> . ' \
-            f'?s <http://example.org/variable_y> <http://example.org/two> . ' \
-            f'?s <http://example.org/variable_z> ?ans . ' \
-            f'}}'
+        # my_question = \
+        #     f'SELECT ?ans WHERE {{' \
+        #     f'?s <http://example.org/operation> <http://example.org/add_number> . ' \
+        #     f'?s <http://example.org/variable_x> <http://example.org/three> . ' \
+        #     f'?s <http://example.org/variable_y> <http://example.org/two> . ' \
+        #     f'?s <http://example.org/variable_z> ?ans . ' \
+        #     f'}}'
 
         # add(3, 2, ?z)
         my_question = \
@@ -668,8 +671,34 @@ def main():
         resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=True)
         pass
 
+    # subtract
+    if True:
+        rdf_prolog = RdfProlog(rules_folder='rules_number')
+        # subtract(5, 3, ?ans)
+        my_question = \
+            f'SELECT ?ans WHERE {{' \
+            f'?s <http://example.org/operation> <http://example.org/subtract_number> . ' \
+            f'?s <http://example.org/variable_x> <http://example.org/five> . ' \
+            f'?s <http://example.org/variable_y> <http://example.org/three> . ' \
+            f'?s <http://example.org/variable_z> ?ans . ' \
+            f'}}'
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # rdf_prolog.answer_complex_question(my_sparql_query)
+
+        # subtract(3, 2, ?ans)
+        my_question = \
+            f'SELECT ?ans WHERE {{' \
+            f'?s <http://example.org/operation> <http://example.org/subtract_number> . ' \
+            f'?s <http://example.org/variable_x> <http://example.org/three> . ' \
+            f'?s <http://example.org/variable_y> <http://example.org/two> . ' \
+            f'?s <http://example.org/variable_z> ?ans . ' \
+            f'}}'
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # rdf_prolog.answer_complex_question(my_sparql_query)
+
     # family
     if True:
+        rdf_prolog = RdfProlog()
         # grandfather(taro, ?ans)
         my_question = \
             f'SELECT ?ans WHERE {{' \
@@ -682,6 +711,7 @@ def main():
 
     # mortal
     if True:
+        rdf_prolog = RdfProlog()
         # mortal(?ans)
         my_question = \
             f'SELECT ?ans WHERE {{' \
@@ -693,6 +723,7 @@ def main():
 
     # knows
     if True:
+        rdf_prolog = RdfProlog()
         # knows(andy, bob)
         my_question = \
             f'SELECT ?s WHERE {{' \
@@ -759,30 +790,6 @@ def main():
             f'?s <http://example.org/operation> <http://example.org/knows> . ' \
             f'?s <http://example.org/variable_x> <http://example.org/andy> . ' \
             f'?s <http://example.org/variable_y> ?ans . ' \
-            f'}}'
-        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # rdf_prolog.answer_complex_question(my_sparql_query)
-
-    # subtract
-    if True:
-        # subtract(5, 3, ?ans)
-        my_question = \
-            f'SELECT ?ans WHERE {{' \
-            f'?s <http://example.org/operation> <http://example.org/subtract_number> . ' \
-            f'?s <http://example.org/variable_x> <http://example.org/five> . ' \
-            f'?s <http://example.org/variable_y> <http://example.org/three> . ' \
-            f'?s <http://example.org/variable_z> ?ans . ' \
-            f'}}'
-        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # rdf_prolog.answer_complex_question(my_sparql_query)
-
-        # subtract(3, 2, ?ans)
-        my_question = \
-            f'SELECT ?ans WHERE {{' \
-            f'?s <http://example.org/operation> <http://example.org/subtract_number> . ' \
-            f'?s <http://example.org/variable_x> <http://example.org/three> . ' \
-            f'?s <http://example.org/variable_y> <http://example.org/two> . ' \
-            f'?s <http://example.org/variable_z> ?ans . ' \
             f'}}'
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # rdf_prolog.answer_complex_question(my_sparql_query)

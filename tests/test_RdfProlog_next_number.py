@@ -2,10 +2,10 @@ from src.RdfProlog import RdfProlog, ClassSparqlQuery
 # from src_not_used.PR import PR
 
 
-def test_answer_question1():
-    rdf_prolog = RdfProlog()
+def test_answer_question1_next_1_ans():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
-    # next(1, ?ans)
+    # next(1, ?ans) = 2
     my_question = \
         f'SELECT ?ans WHERE {{' \
         f'?s <http://example.org/operation> <http://example.org/next_number> . ' \
@@ -17,10 +17,10 @@ def test_answer_question1():
     assert resolve_bindings[0]['?ans'] == '<http://example.org/two>'
 
 
-def test_answer_question2():
-    rdf_prolog = RdfProlog()
+def test_answer_question2_next_ans_3():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
-    # next(?ans, 3)
+    # next(?ans, 3) = 2
     my_question = \
         f'SELECT ?ans WHERE {{' \
         f'?s <http://example.org/operation> <http://example.org/next_number> . ' \
@@ -32,10 +32,10 @@ def test_answer_question2():
     assert resolve_bindings[0]['?ans'] == '<http://example.org/two>'
 
 
-def test_answer_question3():
-    rdf_prolog = RdfProlog()
+def test_answer_question3_next_1_2():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
-    # next(1, 2)
+    # next(1, 2) = True
     my_question = \
         f'SELECT ?s WHERE {{' \
         f'?s <http://example.org/operation> <http://example.org/next_number> . ' \
@@ -47,10 +47,10 @@ def test_answer_question3():
     assert len(resolve_bindings) == 1
 
 
-def test_answer_question4():
-    rdf_prolog = RdfProlog()
+def test_answer_question4_next_1_3():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
-    # next(1, 3)
+    # next(1, 3) = False
     my_question = \
         f'SELECT ?s WHERE {{' \
         f'?s <http://example.org/operation> <http://example.org/next_number> . ' \
@@ -62,10 +62,10 @@ def test_answer_question4():
     assert len(resolve_bindings) == 0
 
 
-def test_answer_question5():
-    rdf_prolog = RdfProlog()
+def test_answer_question5_next_1_z_next_z_x():
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
-    # next(1, ?z),next(?z, ?x)
+    # next(1, ?z),next(?z, ?x)->z:2, x:3
     my_question = \
         f'SELECT ?x WHERE {{' \
         f'?s1 <http://example.org/operation> <http://example.org/next_number> . ' \
@@ -81,9 +81,9 @@ def test_answer_question5():
 
 
 def test_answer_next_x_y():
-    rdf_prolog = RdfProlog()
+    rdf_prolog = RdfProlog(rules_folder='rules_number')
 
-    # next(?x, ?y)
+    # next(?x, ?y)->(1,2), (2,3), ..., (9,10)
     my_question = \
         f'SELECT ?ans WHERE {{' \
         f'?s <http://example.org/operation> <http://example.org/next_number> . ' \

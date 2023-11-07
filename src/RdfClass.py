@@ -6,8 +6,8 @@ T. Masuda, 2023/10/30
 
 import rdflib
 from rdflib import Graph, URIRef  # , BNode, Variable
-# from src.ConvertQuery import convert_question
 from lark import Lark, Transformer, Token  # , Tree
+# from src.ConvertQuery import convert_question
 
 
 def uri_ref(key_word: str) -> URIRef:
@@ -46,7 +46,7 @@ class ClassRule:  # class for individual rule
         label (str): label of the rule
         rule_left (ClassRuleLeft): left part of the rule
         rule_right (list[ClassRuleRight]): right part of the class consisting of a list of ClassRuleRight
-        variables_list (list[str]): list of the variables in the rule
+        variables_dict (dict[str, str]): dict of the variables in the rule
     """
     serial_number = 1000  # a variable to convert variables: x -> x1000
 
@@ -683,12 +683,12 @@ class ClassSparqlQuery:  # Sparql Query Class
 
         list_of_applicable_rules = []  # start building a list of applicable rules
         for rule in rules.list_of_rules:  # rules.list_of_rules contains all the rules
-            results_for_left = g_temp.query(rule.rule_left.content)  # query against the temporary graph
+            # results_for_left = g_temp.query(rule.rule_left.content)  # query against the temporary graph
             match = True
             forward_bindings = {}
             backward_bindings = {}
             for rule_predicate, rule_object0 in rule.rule_left.predicate_object_dict.items():
-                rule_object = rule_object0.replace('<', '').replace('>','')
+                rule_object = rule_object0.replace('<', '').replace('>', '')
                 try:
                     query_object = predicate_object_dict[str(rule_predicate)]
                     if rule_object.find('http://example.org') >= 0:  # const
@@ -739,6 +739,7 @@ class ClassSparqlQuery:  # Sparql Query Class
                 rule_right.child.grandchildren += [gc]  # append to the grandchildren
             self.rule.rule_right += [rule_right]  # append to the right side
         return self
+
 
 """
 ConvertQuery.py
@@ -936,4 +937,3 @@ if __name__ == '__main__':  # for a test purpose
                   f'}}'
     list_of_rdf_triples = convert_question(my_question)
     print(list_of_rdf_triples)
-

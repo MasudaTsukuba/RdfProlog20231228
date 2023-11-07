@@ -1,24 +1,23 @@
 """
 RdfResolution
-Executing Prolog on RDF query system
+Execute Prolog on RDF query system
 2022/12/20, 2023/3/16, 2023/10/30, 2023/11/6
 T. Masuda
 """
 import os
 
-import rdflib.term
 # import rdflib
+import rdflib.term
 from rdflib import Graph, URIRef, BNode, Variable
 # from src.PR import PR
 from src.RdfClass import ClassRule, ClassRules, ClassRuleRight, ClassSparqlQuery, ClassTerm
-
 
 
 class RdfProlog:  # Prolog Class, prepare a graph and available rules
     """
     Prolog Class, prepare a graph and available rules
     """
-    def __init__(self):
+    def __init__(self, rules_folder='rules'):
         """initialize the RdfProlog class
 
             create a Graph g_rules for storing facts and rules
@@ -33,12 +32,13 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
         # print('$$$$$$$$$$ PREPARING $$$$$$$$$$')  # debug
         self.find_all = False  # stop the search if the first result is obtained.
         # self.find_all = True  # find all the results using inferences.
+        self.rules_folder: str = rules_folder
 
         self.g_rules = Graph()  # graph for facts and rules
         g_temp = Graph()  # temporary graph for reading RDF files
-        files = os.listdir('rules')
+        files = os.listdir(self.rules_folder)
         for file in files:  # read all the turtle files in rules folder
-            g_temp.parse(f'rules/{file}')
+            g_temp.parse(f'{self.rules_folder}/{file}')
         # g_temp.parse('rules/rules_human.ttl')
         # g_temp.parse('rules/rules_grandfather.ttl')
         # g_temp.parse('rules/rules_next_number.ttl')
@@ -324,7 +324,7 @@ class Resolution:  # main class for resolution
         First, try to find a direct match in the graph.
         Next, search for applicable rules and appy them to the clause using 'resolve_rule'.
         If find_all is false and direct search is successful, return the results.
-        Also if there are no applicable rules, return without results.
+        Also, if there are no applicable rules, return without results.
         Lastly if 'resolve_rule' is succeeded, return the results of 'resolve_rule'.
 
         Args:
@@ -398,7 +398,7 @@ class Resolution:  # main class for resolution
         print('---------- resolve_clause-4 ---------')  # debug
         for bindings in resolve_bindings_out:
             try:
-                xxx = bindings['?v1007']
+                # xxx = bindings['?v1007']  # debug
                 pass
             except KeyError:
                 pass
