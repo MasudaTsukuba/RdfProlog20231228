@@ -25,6 +25,7 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
             prepare applicable rules from the left sides of the rules
 
             Args:
+                rules_folder (str): Folder where the RDFs describing rules exist.
 
             Returns:
                 None
@@ -32,18 +33,15 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
         # print('$$$$$$$$$$ PREPARING $$$$$$$$$$')  # debug
         self.find_all = False  # stop the search if the first result is obtained.
         # self.find_all = True  # find all the results using inferences.
-        self.rules_folder: str = rules_folder
+        self.rules_folder: str = rules_folder  # folder where the RDFs describing rules exist.
 
         self.g_rules = Graph()  # graph for facts and rules
         g_temp = Graph()  # temporary graph for reading RDF files
         files = os.listdir(self.rules_folder)
+        # files = os.listdir('rules')
         for file in files:  # read all the turtle files in rules folder
             g_temp.parse(f'{self.rules_folder}/{file}')
-        # g_temp.parse('rules/rules_human.ttl')
-        # g_temp.parse('rules/rules_grandfather.ttl')
-        # g_temp.parse('rules/rules_next_number.ttl')
-        # g_temp.parse('rules/rules_add_number.ttl')
-        # g_temp.parse('rules/rules_knows.ttl')
+
         results = g_temp.query('SELECT ?s ?p ?o WHERE { ?s ?p ?o . }')  # retrieve all the triples read in
         for result in results:
             ss = result['s']
@@ -345,8 +343,7 @@ class Resolution:  # main class for resolution
         # global find_all  # if True, find all the results.
         succeeded = False  # final result of success. firstly assumed to be failed.
         resolve_bindings_out: list[dict[str, str]] = []  # initialize bindings to be returned
-        direct_search_succeeded, returned_direct_search_bindings \
-            = resolve_query.direct_search(self.graph)  # direct search
+        direct_search_succeeded, returned_direct_search_bindings = resolve_query.direct_search(self.graph)  # direct search
         if direct_search_succeeded:
             succeeded = True  # final result is also set succeeded.
             resolve_bindings_out += returned_direct_search_bindings

@@ -4,8 +4,11 @@ from src.RdfResolution import ClassSparqlQuery
 import numpy as np
 
 
+rdf_prolog = RdfProlog()
+
+
 def test_answer_question1():
-    rdf_prolog = RdfProlog()
+    # rdf_prolog = RdfProlog()
 
     # knows_direct(andy, bob)
     my_question = \
@@ -20,7 +23,7 @@ def test_answer_question1():
 
 
 def test_answer_question1b():
-    rdf_prolog = RdfProlog()
+    # rdf_prolog = RdfProlog()
 
     # knows_direct(andy, chris)
     my_question = \
@@ -35,7 +38,7 @@ def test_answer_question1b():
 
 
 def test_answer_question1c():
-    rdf_prolog = RdfProlog()
+    # rdf_prolog = RdfProlog()
 
     # knows_indirect(andy, chris)
     my_question = \
@@ -50,7 +53,7 @@ def test_answer_question1c():
 
 
 def test_answer_question1e():
-    rdf_prolog = RdfProlog()
+    # rdf_prolog = RdfProlog()
 
     # knows(andy, chris)
     my_question = \
@@ -65,7 +68,7 @@ def test_answer_question1e():
 
 
 def test_answer_question2():
-    rdf_prolog = RdfProlog()
+    # rdf_prolog = RdfProlog()
 
     # knows_direct(andy, ?ans)
     my_question = \
@@ -83,7 +86,7 @@ def test_answer_question2():
 
 
 def test_answer_question3():
-    rdf_prolog = RdfProlog()
+    # rdf_prolog = RdfProlog()
 
     # knows(andy, ?ans)
     my_question = \
@@ -98,7 +101,7 @@ def test_answer_question3():
 
 
 def test_answer_question4():
-    rdf_prolog = RdfProlog()
+    # rdf_prolog = RdfProlog()
 
     # knows_indirect(andy, edgar)
     my_question = \

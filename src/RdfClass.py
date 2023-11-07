@@ -3,6 +3,7 @@ RdfClass.py
 Classes supporting RdfProlog reasoning
 T. Masuda, 2023/10/30
 """
+import sys
 
 import rdflib
 from rdflib import Graph, URIRef  # , BNode, Variable
@@ -20,6 +21,7 @@ class ClassRules:  # list of rules
 
     Attributes:
         list_of_rules (list[ClassRule]): List of rule instances
+        dict_of_rules (dict[str, set[ClassRule]]): dict of rule instances
     """
     def __init__(self, graph):
         """
@@ -27,15 +29,34 @@ class ClassRules:  # list of rules
         :param graph:
         """
         self.list_of_rules = []
-        query_for_rules = f'SELECT ?s ?o WHERE {{ ' \
-                          f'?s <{uri_ref("left_side")}> ?o . ' \
+        # query_for_rules = f'SELECT ?s ?left WHERE {{ ' \
+        #                   f'?s <{uri_ref("left_side")}> ?left . ' \
+        #                   f'OPTIONAL {{ ?s <{uri_ref("priority")}> ?priority .}} }}' \
+        #                   f'ORDER BY ?priority '  # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
+        # results_for_rule_left = graph.query(query_for_rules)  # execute query and extract
+        # for binding_for_left in results_for_rule_left.bindings:
+        #     instance_rule = ClassRule()  # create a rule instance
+        #     instance_rule.build(graph, binding_for_left['s'], binding_for_left['left'])  # s: rule id, o: rule pattern
+        #     self.list_of_rules.append(instance_rule)  # append the rule to the list
+
+        self.dict_of_rules = {}  # dict of rules. operation name as a key
+        query_for_rules = f'SELECT ?s ?left ?operation_name  WHERE {{ ' \
+                          f'?s <{uri_ref("left_side")}> ?left . ' \
+                          f'?left <{uri_ref("operation")}> ?operation_name . ' \
                           f'OPTIONAL {{ ?s <{uri_ref("priority")}> ?priority .}} }}' \
-                          f'ORDER BY ?priority '  # query for extracting left side rules. Use the priority values to order the rules.
+                          f'ORDER BY ?priority '  # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
         results_for_rule_left = graph.query(query_for_rules)  # execute query and extract
         for binding_for_left in results_for_rule_left.bindings:
             instance_rule = ClassRule()  # create a rule instance
-            instance_rule.build(graph, binding_for_left['s'], binding_for_left['o'])  # s: rule id, o: rule pattern
-            self.list_of_rules.append(instance_rule)  # append the rule to the list
+            instance_rule.build(graph, binding_for_left['s'], binding_for_left['left'])  # s: rule id, o: rule pattern
+            operation_name = binding_for_left['operation_name']
+            try:
+                self.dict_of_rules[operation_name].append(instance_rule)
+            except KeyError:
+                # new_set = set()
+                # new_set.add(instance_rule)
+                self.dict_of_rules[operation_name] = [instance_rule]
+        pass
 
 
 class ClassRule:  # class for individual rule
@@ -605,15 +626,15 @@ class ClassSparqlQuery:  # Sparql Query Class
         find a triple in the graph that directly matches the query
 
         Args:
-            graph: an RDF graph holding all the info of facts and rules.
+            graph (Graph): an RDF graph holding all the info of facts and rules.
 
         Returns:
-            bool:
-            list[]:
+            bool: True, if search is successful.
+            list[]:  a list of bindings.
 
         """
         results = graph.query(self.query)  # execute a query
-        if len(results) > 0:  # direct search detected candidates. results.bindings are list of dict
+        if len(results) > 0:  # direct search detected candidates. results.bindings are a list of dict
             def build_bindings(bindings_of_direct_search):
                 print('BINDINGS OF DIRECT SEARCH: ', str(bindings_of_direct_search))  # debug
                 success = False  # assume a failure
@@ -649,8 +670,12 @@ class ClassSparqlQuery:  # Sparql Query Class
     def find_applicable_rules(self, rules):  # find rules applicable to this query
         """
         find rules applicable to this query
-        :param rules:
-        :return:
+
+        Args:
+            rules (ClassRules): a class holding info of rules.
+
+        Returns:
+
         """
         list_of_rdfs: list[list[ClassTerm]] = convert_question(self.query)  # convert query to a list of triples
         len_effective_rdfs = 0
@@ -658,6 +683,8 @@ class ClassSparqlQuery:  # Sparql Query Class
         g_temp_debug: list[tuple[URIRef, URIRef, URIRef]] = []
         predicate_object_dict: dict[str, str] = {}
         set_of_variables_in_query: set[tuple[str, str]] = set()
+        operation_name_uri: str = ''
+
         for clause in list_of_rdfs:  # repeat for the triples
             if len(clause) == 3:  # clause is indeed a triple
                 subj = clause[0]  # .to_uri(drop=True)  # clause[0].replace('<', '').replace('>', '')
@@ -680,47 +707,95 @@ class ClassSparqlQuery:  # Sparql Query Class
                 # g_temp.add((URIRef(clause[0].replace('<', '').replace('>', '')),
                 #             URIRef(clause[1].replace('<', '').replace('>', '')),
                 #             URIRef(clause[2].replace('<', '').replace('>', ''))))  # store the triple into the graph
+                if pred_uri == 'http://example.org/operation':
+                    operation_name = obje_uri.replace('http://example.org/', '')
+                    operation_name_uri = uri_ref(operation_name)
 
-        list_of_applicable_rules = []  # start building a list of applicable rules
-        for rule in rules.list_of_rules:  # rules.list_of_rules contains all the rules
-            # results_for_left = g_temp.query(rule.rule_left.content)  # query against the temporary graph
-            match = True
-            forward_bindings = {}
-            backward_bindings = {}
-            for rule_predicate, rule_object0 in rule.rule_left.predicate_object_dict.items():
-                rule_object = rule_object0.replace('<', '').replace('>', '')
-                try:
-                    query_object = predicate_object_dict[str(rule_predicate)]
-                    if rule_object.find('http://example.org') >= 0:  # const
-                        if query_object.find('http://example.org') >= 0:  # const
-                            if rule_object == query_object:
-                                pass
-                            else:
-                                match = False
-                                continue
-                        else:  # object in query is variable
-                            backward_bindings['?'+query_object.replace('http://variable.org/', '')] = f'<{rule_object}>'
-                    else:  # rule object is variable
-                        forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/', ''))] = query_object
-                except KeyError:
-                    match = False
-                    continue
+        # list_of_applicable_rules = []  # start building a list of applicable rules
+        # for rule in rules.list_of_rules:  # rules.list_of_rules contains all the rules
+        #     # results_for_left = g_temp.query(rule.rule_left.content)  # query against the temporary graph
+        #     match = True
+        #     forward_bindings = {}
+        #     backward_bindings = {}
+        #     for rule_predicate, rule_object0 in rule.rule_left.predicate_object_dict.items():
+        #         rule_object = rule_object0.replace('<', '').replace('>', '')
+        #         try:
+        #             query_object = predicate_object_dict[str(rule_predicate)]
+        #             if rule_object.find('http://example.org') >= 0:  # const
+        #                 if query_object.find('http://example.org') >= 0:  # const
+        #                     if rule_object == query_object:
+        #                         pass
+        #                     else:
+        #                         match = False
+        #                         continue
+        #                 else:  # object in query is variable
+        #                     backward_bindings['?'+query_object.replace('http://variable.org/', '')] = f'<{rule_object}>'
+        #             else:  # rule object is variable
+        #                 forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/', ''))] = query_object
+        #         except KeyError:
+        #             match = False
+        #             continue
+        #
+        #     # if len(results_for_left) > 0:  # applicable rule exists
+        #     #     # if len(results_for_left.bindings[0]) == len_effective_rdfs:
+        #     #     forward_bindings = results_for_left.bindings[0]
+        #     #     backward_bindings = {}
+        #     #     dict_of_rule_left = {}
+        #     #     for variable in set_of_variables_in_query:
+        #     #         pred = variable[1]
+        #     #         obje_in_rule_left = rule.rule_left.predicate_object_dict[URIRef(pred)]
+        #     #         backward_bindings['?'+variable[0]] = obje_in_rule_left
+        #     if match:
+        #         rule.rule_left.forward_bindings = forward_bindings
+        #         rule.rule_left.backward_bindings = backward_bindings
+        #         list_of_applicable_rules.append(rule)  # append the found rule
+        #         print('LIST OF APPLICABLE RULES: ', str(rule.label))  # print the rule on the console
 
-            # if len(results_for_left) > 0:  # applicable rule exists
-            #     # if len(results_for_left.bindings[0]) == len_effective_rdfs:
-            #     forward_bindings = results_for_left.bindings[0]
-            #     backward_bindings = {}
-            #     dict_of_rule_left = {}
-            #     for variable in set_of_variables_in_query:
-            #         pred = variable[1]
-            #         obje_in_rule_left = rule.rule_left.predicate_object_dict[URIRef(pred)]
-            #         backward_bindings['?'+variable[0]] = obje_in_rule_left
-            if match:
-                rule.rule_left.forward_bindings = forward_bindings
-                rule.rule_left.backward_bindings = backward_bindings
-                list_of_applicable_rules.append(rule)  # append the found rule
-                print('LIST OF APPLICABLE RULES: ', str(rule.label))  # print the rule on the console
-        return list_of_applicable_rules  # return the applicable rules
+        # THe code below causes error in pytest. The reason is unknown. 2023/11/7.
+        list_of_applicable_rules2 = []  # start building a list of applicable rules
+        try:
+            set_of_rules = rules.dict_of_rules[operation_name_uri]
+            for rule in list(set_of_rules):  # rules.list_of_rules contains all the rules
+                # results_for_left = g_temp.query(rule.rule_left.content)  # query against the temporary graph
+                match = True
+                forward_bindings = {}
+                backward_bindings = {}
+                for rule_predicate, rule_object0 in rule.rule_left.predicate_object_dict.items():
+                    rule_object = rule_object0.replace('<', '').replace('>', '')
+                    try:
+                        query_object = predicate_object_dict[str(rule_predicate)]
+                        if rule_object.find('http://example.org') >= 0:  # const
+                            if query_object.find('http://example.org') >= 0:  # const
+                                if rule_object == query_object:
+                                    pass
+                                else:
+                                    match = False
+                                    continue
+                            else:  # object in query is variable
+                                backward_bindings['?'+query_object.replace('http://variable.org/', '')] = f'<{rule_object}>'
+                        else:  # rule object is variable
+                            forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/', ''))] = query_object
+                    except KeyError:
+                        match = False
+                        continue
+                if match:
+                    rule.rule_left.forward_bindings = forward_bindings
+                    rule.rule_left.backward_bindings = backward_bindings
+                    list_of_applicable_rules2.append(rule)  # append the found rule
+                    print('LIST OF APPLICABLE RULES: ', str(rule.label))  # print the rule on the console
+        except KeyError:
+            pass  # operation_name not found in dict_of_rules
+        # if len(list_of_applicable_rules) != len(list_of_applicable_rules2):
+        #     print(list_of_applicable_rules, list_of_applicable_rules2)
+        #     pass  # debug
+        #     sys.exit(-1)
+        # else:
+        #     for rule1, rule2 in zip(list_of_applicable_rules, list_of_applicable_rules2):
+        #         if rule1.label != rule2.label:
+        #             print(rule1.label, rule2.label)
+        #             pass  # debug
+        #             sys.exit(-2)
+        return list_of_applicable_rules2  # return the applicable rules
 
     def build_rule(self):  # build the right side of a rule
         """

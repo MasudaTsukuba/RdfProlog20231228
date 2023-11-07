@@ -6,8 +6,11 @@ T. Masuda, 2023/10/30
 from src.RdfProlog import RdfProlog, ClassSparqlQuery
 
 
+rdf_prolog = RdfProlog(rules_folder='rules_number')
+
+
 def test_answer_question1_3_minus_1():
-    rdf_prolog = RdfProlog(rules_folder='rules_number')
+    # rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(3, 1, ?ans)
     my_question = \
@@ -23,7 +26,7 @@ def test_answer_question1_3_minus_1():
 
 
 def test_answer_question2_4_minus_2():
-    rdf_prolog = RdfProlog(rules_folder='rules_number')
+    # rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(4, 2, ?ans)
     my_question = \
@@ -38,7 +41,7 @@ def test_answer_question2_4_minus_2():
 
 
 def test_answer_question3_3_minus_2():
-    rdf_prolog = RdfProlog(rules_folder='rules_number')
+    # rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # # subtract(3, 2, ?ans)
     my_question = \
@@ -49,12 +52,12 @@ def test_answer_question3_3_minus_2():
         f'?s <http://example.org/variable_z> ?ans . ' \
         f'}}'
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
+    resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=False, max_depth=10)
     assert resolve_bindings[0]['?ans'] == f'<http://example.org/one>'
 
 
 def test_answer_question3b_next_of_5_minus_2():
-    rdf_prolog = RdfProlog(rules_folder='rules_number')
+    # rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(5, 2, ?z), next(?z, ?ans)
     my_question = \
@@ -73,7 +76,7 @@ def test_answer_question3b_next_of_5_minus_2():
 
 
 def test_answer_question_5_minus_ans_equals_2():
-    rdf_prolog = RdfProlog(rules_folder='rules_number')
+    # rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(5, ?ans, 2)
     my_question = \
@@ -89,7 +92,7 @@ def test_answer_question_5_minus_ans_equals_2():
 
 
 def test_answer_complex_question_5_minus_2_next():
-    rdf_prolog = RdfProlog(rules_folder='rules_number')
+    # rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(5, 2, ?z), next(?z, ?ans)
     my_question = \
@@ -108,11 +111,10 @@ def test_answer_complex_question_5_minus_2_next():
 
 
 def test_answer_complex_question_3_minus_2_plus_2():
-    rdf_prolog = RdfProlog(rules_folder='rules_number')
+    # rdf_prolog = RdfProlog(rules_folder='rules_number')
 
     # subtract(3, 2, ?z), add(?z, 2, ?ans)
     my_question = \
-        my_question = \
         f'SELECT ?ans WHERE {{' \
         f'?s1 <http://example.org/operation> <http://example.org/subtract_number> . ' \
         f'?s1 <http://example.org/variable_x> <http://example.org/three> . ' \

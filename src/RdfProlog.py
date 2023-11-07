@@ -681,7 +681,7 @@ def main():
             f'?s <http://example.org/variable_z> ?ans . ' \
             f'}}'
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=False, max_depth=1)
+        # resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=False, max_depth=1)
 
         # add(3, 1, ?ans) max_depth=1
         my_question = \
@@ -692,7 +692,7 @@ def main():
             f'?s <http://example.org/variable_z> ?ans . ' \
             f'}}'
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=False, max_depth=2)
+        # resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=False, max_depth=2)
 
     # subtract
     if True:
@@ -719,7 +719,23 @@ def main():
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # rdf_prolog.answer_complex_question(my_sparql_query)
 
-    # family
+        # subtract(3, 2, ?z), add(?z, 2, ?ans)
+        my_question = \
+            f'SELECT ?ans WHERE {{' \
+            f'?s1 <http://example.org/operation> <http://example.org/subtract_number> . ' \
+            f'?s1 <http://example.org/variable_x> <http://example.org/three> . ' \
+            f'?s1 <http://example.org/variable_y> <http://example.org/two> . ' \
+            f'?s1 <http://example.org/variable_z> ?z . ' \
+            f'?s2 <http://example.org/operation> <http://example.org/add_number> . ' \
+            f'?s2 <http://example.org/variable_x> ?z . ' \
+            f'?s2 <http://example.org/variable_y> <http://example.org/two> . ' \
+            f'?s2 <http://example.org/variable_z> ?ans . ' \
+            f'}}'
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
+        pass
+
+        # family
     if True:
         rdf_prolog = RdfProlog()
         # grandfather(taro, ?ans)
