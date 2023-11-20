@@ -8,7 +8,6 @@ import sys
 import rdflib
 from rdflib import Graph, URIRef  # , BNode, Variable
 from lark import Lark, Transformer, Token  # , Tree
-# from src.ConvertQuery import convert_question
 
 
 def uri_ref(key_word: str) -> URIRef:
@@ -28,6 +27,7 @@ class ClassRules:  # list of rules
         initialize ClassRules class
         :param graph:
         """
+        ClassRules.graph = graph
         self.list_of_rules = []
         # query_for_rules = f'SELECT ?s ?left WHERE {{ ' \
         #                   f'?s <{uri_ref("left_side")}> ?left . ' \
@@ -431,7 +431,10 @@ class ClassTerm:  # term is either subject, predicate or object
         Returns:
              uri_ref (URIRef)
         """
-        return URIRef('http://variable.org/' + self.term_text)
+        if self.is_variable:
+            return URIRef('http://variable.org/' + self.term_text)
+        else:
+            return URIRef(self.term_text)
 
     def to_uri(self, drop=False) -> str:
         """
@@ -508,14 +511,18 @@ class ClassSparqlQuery:  # Sparql Query Class
         list_of_variables: list of variables
         rule (ClassRule): empty rule
     """
+    cons_number = 10000
+
     def __init__(self):  # initialize the sparql query class instance
         """
         initialize the sparql query class instance
         """
-        self.query = None
+
+        self.query = None  # sparql query string
         self.list_of_rdfs = []  # rdfs is an array of clauses
         self.list_of_variables = []  # list of variables in this query
         self.rule = ClassRule()  # empty rule
+
 
     def set(self, sparql_query: str):  # convert from sparql query string to a sparql query class instance
         """
@@ -580,6 +587,7 @@ class ClassSparqlQuery:  # Sparql Query Class
             var_list = ''  # variables list for replacing $VAR_LIST
             query_for_resolve = f'SELECT $VAR_LIST WHERE {{ '  # start the query string. $VAR_LIST will be replaced at the end.
             term_subject = None  # for suppressing the warning of not defined before assignment
+            self.list_of_rdfs = []  # reset
             for triple_for_build_query in results_for_build_query.child.grandchildren:  # extract each triple of a rule
                 term_subject = ClassTerm().build(triple_for_build_query.triple.subject.force_to_var())  # subject
                 term_predicate = ClassTerm().build(triple_for_build_query.triple.predicate.to_uri())  # predicate
@@ -609,6 +617,11 @@ class ClassSparqlQuery:  # Sparql Query Class
                 oo = temp_obj.to_var_string()
                 str1 = f'{ss} {pp} {oo} . '
                 query_for_resolve += str1  # append the converted triple
+                temp_triple = ClassTriple()
+                temp_triple.subject = term_subject
+                temp_triple.predicate = term_predicate
+                temp_triple.object = term_object
+                self.list_of_rdfs.append(temp_triple)
             query_for_resolve += f'}}'  # terminate the query string
 
             if term_subject.is_variable:  # such as ?s
@@ -621,7 +634,7 @@ class ClassSparqlQuery:  # Sparql Query Class
             print('Something has happened in ClassSparqlQuery.build_query(). ', e)
             pass
 
-    def direct_search(self, graph: Graph):  # find a triple in the graph that directly matches the query
+    def direct_search(self):  # find a triple in the graph that directly matches the query
         """
         find a triple in the graph that directly matches the query
 
@@ -633,7 +646,8 @@ class ClassSparqlQuery:  # Sparql Query Class
             list[]:  a list of bindings.
 
         """
-        results = graph.query(self.query)  # execute a query
+
+        results = ClassRules.graph.query(self.query)  # execute a query
         if len(results) > 0:  # direct search detected candidates. results.bindings are a list of dict
             def build_bindings(bindings_of_direct_search):
                 print('BINDINGS OF DIRECT SEARCH: ', str(bindings_of_direct_search))  # debug
@@ -665,6 +679,45 @@ class ClassSparqlQuery:  # Sparql Query Class
             succeeded, bindings = build_bindings(results.bindings)  # create bindings to be returned
             return succeeded, bindings
         else:
+            found_cons = True  # try creating cons node  # 2023/11/10
+            var_x = None
+            var_y = None
+            var_z = None
+            for rdf in self.list_of_rdfs:
+                if rdf.predicate.term_text == 'http://example.org/operation':
+                    if rdf.object.term_text != 'http://example.org/cons':
+                        found_cons = False
+                        break
+                if rdf.predicate.term_text == 'http://example.org/variable_x':
+                    if rdf.object.is_variable:
+                        found_cons = False
+                        break
+                    else:
+                        var_x = rdf.object.to_uriref()
+                if rdf.predicate.term_text == 'http://example.org/variable_y':
+                    if rdf.object.is_variable:
+                        found_cons = False
+                        break
+                    else:
+                        var_y = rdf.object.to_uriref()
+                if rdf.predicate.term_text == 'http://example.org/variable_z':
+                    if not rdf.object.is_variable:
+                        found_cons = False
+                        break
+                    else:
+                        var_z = rdf.object.to_var_string()
+            if found_cons:
+
+                cons_node = URIRef(f'http://example.org/cons_node{ClassSparqlQuery.cons_number}')
+                cons_list = URIRef(f'http://example.org/cons_list{ClassSparqlQuery.cons_number}')
+                ClassSparqlQuery.cons_number += 1
+
+                ClassRules.graph.add((cons_node, URIRef('http://example.org/operation'), URIRef('http://example.org/cons')))
+                ClassRules.graph.add((cons_node, URIRef('http://example.org/variable_x'), var_x))
+                ClassRules.graph.add((cons_node, URIRef('http://example.org/variable_y'), var_y))
+                ClassRules.graph.add((cons_node, URIRef('http://example.org/variable_z'), cons_list))
+                return True, [{var_z: f'<{str(cons_list)}>'}]
+
             return False, []  # no direct match was found. return False (Not Found) and an empty list
 
     def find_applicable_rules(self, rules):  # find rules applicable to this query
@@ -845,7 +898,7 @@ where : "WHERE {" (" ")* (triple)+ "}" (" ")*
 var : VAR
 VAR : "?" WORD (" ")+
 triple : subject predicate object "." (" ")* 
-WORD : CHAR (CHAR | NUMBER)*
+WORD : CHAR (CHAR | NUMBER | "_")*
 CHAR : "a".."z" | "A".."Z"
 NUMBER : "0".."9"
 subject   : (VAR | HTTP) 

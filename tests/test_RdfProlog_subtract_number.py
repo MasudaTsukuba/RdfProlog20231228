@@ -3,7 +3,7 @@ test_RdfProlog_subtract_number.py
 T. Masuda, 2023/10/30
 """
 
-from src.RdfProlog import RdfProlog, ClassSparqlQuery
+from src.RdfPrologMain import RdfProlog, ClassSparqlQuery
 
 
 rdf_prolog = RdfProlog(rules_folder='rules_number')

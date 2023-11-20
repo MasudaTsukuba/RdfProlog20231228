@@ -1,4 +1,4 @@
-from src.RdfProlog import RdfProlog, ClassSparqlQuery
+from src.RdfPrologMain import RdfProlog, ClassSparqlQuery
 
 
 rdf_prolog = RdfProlog(rules_folder='rules_number')

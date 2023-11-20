@@ -1,4 +1,4 @@
-from src.RdfProlog import RdfProlog, ClassSparqlQuery
+from src.RdfPrologMain import RdfProlog, ClassSparqlQuery
 # from src_not_used.PR import PR
 
 

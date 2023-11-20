@@ -35,7 +35,7 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
         # self.find_all = True  # find all the results using inferences.
         self.rules_folder: str = rules_folder  # folder where the RDFs describing rules exist.
 
-        self.g_rules = Graph()  # graph for facts and rules
+        g_rules = Graph()  # graph for facts and rules
         g_temp = Graph()  # temporary graph for reading RDF files
         files = os.listdir(self.rules_folder)
         # files = os.listdir('rules')
@@ -51,8 +51,8 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
                 ss = f'http://example.org/{str(ss)}'
             if isinstance(oo, BNode):
                 oo = f'http://example.org/{str(oo)}'
-            self.g_rules.add((URIRef(ss), URIRef(pp), URIRef(oo)))
-        self.rules = ClassRules(self.g_rules)  # set the rules in ClassRules class
+            g_rules.add((URIRef(ss), URIRef(pp), URIRef(oo)))
+        self.rules = ClassRules(g_rules)  # set the rules in ClassRules class
         # print('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')  # debug
         print()  # line feed
 
@@ -91,7 +91,7 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
             None
         """
         self.find_all = find_all  # if true, find all the possible answers
-        resolution = Resolution(self.g_rules, self.rules, self.find_all, max_depth)  # create an instance of Resolution class, left_rules: ClassLeftRules
+        resolution = Resolution(self.rules, self.find_all, max_depth)  # create an instance of Resolution class, left_rules: ClassLeftRules
         resolve_succeeded, resolve_bindings \
             = resolution.resolve_rule(sparql_query.rule)  # execute the resolution / resolve rule
         if resolve_succeeded:
@@ -126,12 +126,12 @@ class Resolution:  # main class for resolution
     """
     resolve_right_recursive_count = 0  # indicate the depth of recursive call.  # for debug
 
-    def __init__(self, graph, rules, find_all: bool, max_depth: int):
+    def __init__(self, rules, find_all: bool, max_depth: int):
         """
         initialize Resolution class
 
         """
-        self.graph = graph  # set the knowledge graph
+        # self.graph = graph  # set the knowledge graph
         self.rules = rules  # ClassRules(graph)
         self.find_all = find_all  # find all possible answers
         self.max_depth = max_depth  # maximum depth of resolution
@@ -343,7 +343,7 @@ class Resolution:  # main class for resolution
         # global find_all  # if True, find all the results.
         succeeded = False  # final result of success. firstly assumed to be failed.
         resolve_bindings_out: list[dict[str, str]] = []  # initialize bindings to be returned
-        direct_search_succeeded, returned_direct_search_bindings = resolve_query.direct_search(self.graph)  # direct search
+        direct_search_succeeded, returned_direct_search_bindings = resolve_query.direct_search()  # direct search
         if direct_search_succeeded:
             succeeded = True  # final result is also set succeeded.
             resolve_bindings_out += returned_direct_search_bindings
@@ -361,7 +361,7 @@ class Resolution:  # main class for resolution
             return succeeded, resolve_bindings_out
         print('APPLICABLE RULES WERE FOUND. NUMBER WAS ' + str(len(rules)))  # debug
         for rule_template in rules:
-            rule = ClassRule().build(self.graph, rule_template.label, rule_template.rule_left.label)  # copy a rule
+            rule = ClassRule().build(ClassRules.graph, rule_template.label, rule_template.rule_left.label)  # copy a rule
             rule.modify_variables()  # x -> x1000, etc.
             rule.rule_left.bindings = rule_template.rule_left.bindings
             rule.rule_left.forward_bindings = rule_template.rule_left.forward_bindings
@@ -712,7 +712,7 @@ def main():
         f'?s <http://example.org/variable_x> <http://example.org/andy> . ' \
         f'?s <http://example.org/variable_y> ?ans . ' \
         f'}}'
-    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    my_sparql_query = ClassSparqlQuery(rdf_prolog.g_rules).set(my_question).build_rule()
     # rdf_prolog.answer_complex_question(my_sparql_query)
 
     # subtract(5, 3, ?ans)
@@ -723,7 +723,7 @@ def main():
         f'?s <http://example.org/variable_y> <http://example.org/three> . ' \
         f'?s <http://example.org/variable_z> ?ans . ' \
         f'}}'
-    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    my_sparql_query = ClassSparqlQuery(rdf_prolog.g_rules).set(my_question).build_rule()
     # rdf_prolog.answer_complex_question(my_sparql_query)
 
     # subtract(3, 2, ?ans)
@@ -734,7 +734,7 @@ def main():
         f'?s <http://example.org/variable_y> <http://example.org/two> . ' \
         f'?s <http://example.org/variable_z> ?ans . ' \
         f'}}'
-    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    my_sparql_query = ClassSparqlQuery(rdf_prolog.g_rules).set(my_question).build_rule()
     # rdf_prolog.answer_complex_question(my_sparql_query)
 
 

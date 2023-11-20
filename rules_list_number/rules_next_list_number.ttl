@@ -1,0 +1,129 @@
+@prefix PR: <http://example.org/> .
+@prefix VAR: <http://variable.org/> .
+
+################################################################################
+# facts
+PR:node_one
+    PR:operation PR:cons ;
+    PR:variable_x PR:one ;
+    PR:variable_y PR:nil ;
+    PR:variable_z PR:list_one .
+
+################################################################################
+# rules
+PR:rule_list_next
+    PR:left_side [
+        PR:operation PR:next_list_number ;
+        PR:variable_x VAR:x ;
+        PR:variable_y VAR:y ] ;
+    PR:right_side [
+        PR:priority "1" ;
+        PR:child [
+            PR:operation PR:cons ;
+            PR:variable_x VAR:car_x ;
+            PR:variable_y VAR:cdr_x ;
+            PR:variable_z VAR:x ] ] ;
+    PR:right_side [
+        PR:priority "2" ;
+        PR:child [
+            PR:operation PR:next_number ;
+            PR:variable_x VAR:car_x ;
+            PR:variable_y VAR:car_next ] ] ;
+    PR:right_side [
+        PR:priority "3" ;
+        PR:child [
+            PR:operation PR:cons ;
+            PR:variable_x VAR:car_next ;
+            PR:variable_y VAR:cdr_x ;
+            PR:variable_z VAR:u ] ] ;
+    PR:right_side [
+        PR:priority "4" ;
+        PR:child [
+            PR:operation PR:carry_up ;
+            PR:variable_x VAR:u ;
+            PR:variable_y VAR:y ] ] .
+
+PR:rule_carry_up_nil
+    PR:left_side [
+        PR:operation PR:carry_up ;
+        PR:variable_x PR:nil ;
+        PR:variable_y VAR:y ] ;
+    PR:right_side [
+        PR:priority "1" ;
+        PR:child [
+            PR:operation PR:cons ;
+            PR:variable_x PR:one ;
+            PR:variable_y PR:nil ;
+            PR:variable_z VAR:y ] ] .
+
+PR:rule_carry_up
+    PR:left_side [
+        PR:operation PR:carry_up ;
+        PR:variable_x VAR:x ;
+        PR:variable_y VAR:y ] ;
+    PR:right_side [
+        PR:priority "1" ;
+        PR:child [
+            PR:operation PR:cons ;
+            PR:variable_x VAR:car_x ;
+            PR:variable_y VAR:cdr_x ;
+            PR:variable_z VAR:x ] ] ;
+    PR:right_side [
+        PR:priority "2" ;
+        PR:child [
+            PR:operation PR:carry_up2 ;
+            PR:variable_x VAR:car_x ;
+            PR:variable_y VAR:cdr_x ;
+            PR:variable_z VAR:y ] ] .
+
+PR:rule_carry_up2_10_y_z
+    PR:left_side [
+        PR:operation PR:carry_up2 ;
+        PR:variable_x PR:ten ;
+        PR:variable_y VAR:y ;
+        PR:variable_z VAR:z ] ;
+    PR:right_side [
+        PR:priority "1" ;
+        PR:child [
+            PR:operation PR:carry_up ;
+            PR:variable_x VAR:y ;
+            PR:variable_y VAR:u ] ] ;
+    PR:right_side [
+        PR:priority "2" ;
+        PR:child [
+            PR:operation PR:cons ;
+            PR:variable_x PR:zero ;
+            PR:variable_y VAR:u ;
+            PR:variable_z VAR:z ] ] .
+
+PR:rule_carry_up2_x_y_z
+    PR:left_side [
+        PR:operation PR:carry_up2 ;
+        PR:variable_x VAR:x ;
+        PR:variable_y VAR:y ;
+        PR:variable_z VAR:z ] ;
+    PR:right_side [
+        PR:priority "1" ;
+        PR:child [
+            PR:operation PR:cons ;
+            PR:variable_x VAR:x ;
+            PR:variable_y VAR:y ;
+            PR:variable_z VAR:z ] ] .
+
+################################################################################
+#procedures
+PR:rule_carry_up_nil
+    PR:priority "1" .
+
+PR:rule_carry_up
+    PR:priority "2" .
+
+PR:rule_carry_up2_10_y_z
+    PR:priority "1" .
+
+PR:rule_carry_up2_x_y_z
+    PR:priority "2" .
+
+################################################################################
+# inferences
+
