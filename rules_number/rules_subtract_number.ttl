@@ -1,29 +1,58 @@
 @prefix PR: <http://example.org/> .
 @prefix VAR: <http://variable.org/> .
 
+##################################################################
 # facts
-[]
-    PR:operation PR:add_number ;
-    PR:variable_x PR:three ;
-    PR:variable_y PR:two ;
-    PR:variable_z PR:five .
+#[]
+#    PR:type PR:fact ;
+#    PR:operation PR:add_number ;
+#    PR:variable_x PR:three ;
+#    PR:variable_y PR:two ;
+#    PR:variable_z PR:five .
 
+##################################################################
 # rules
 PR:rule_subtract_number_x_y_z
+    PR:type PR:rule ;
     PR:left_side [
         PR:operation PR:subtract_number ;
-        PR:variable_x VAR:x ;
-        PR:variable_y VAR:y ;
-        PR:variable_z VAR:z ] ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ;
+        PR:variable_z VAR:_z ] ;
     PR:right_side [
-        PR:priority "2" ;
         PR:child [
             PR:operation PR:add_number ;
-            PR:variable_x VAR:y ;
-            PR:variable_y VAR:z ;
-            PR:variable_z VAR:x ] ].
+            PR:variable_x VAR:_y ;
+            PR:variable_y VAR:_z ;
+            PR:variable_z VAR:_x ] ].
 
-#procedures
+##################################################################
+# controls
+PR:control_subtract_number_x_y_z
+    PR:type PR:control ;
+    PR:left_side [
+        PR:operation PR:subtract_number ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ;
+        PR:variable_z VAR:_z ] ;
+    PR:right_side [
+        PR:child [
+            PR:operation PR:add_number ;
+            PR:variable_x VAR:_y ;
+            PR:variable_y VAR:_z ;
+            PR:variable_z VAR:_x ] ].
 
+##################################################################
+# applications
+PR:application_subtract_number_x_y_z
+    PR:type PR:application ;
+    PR:program PR:false ;
+    PR:pattern [
+        PR:operation PR:subtract_number ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ;
+        PR:variable_z VAR:_z ] ;
+    PR:use [
+        PR:control PR:control_subtract_number_x_y_z ] .
+##################################################################
 # inferences
-

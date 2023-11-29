@@ -1,7 +1,8 @@
-# from rdflib import URIRef
-#
-#
-# class PR:
+from rdflib import URIRef
+
+
+class PR:
+    pass
 #     url = 'http://example.org/'
 #     priority = URIRef(url + 'priority')
 #     left_side = URIRef(url + 'left_side')

@@ -11,10 +11,73 @@ PR:node_one
     PR:variable_y PR:nil ;
     PR:variable_z PR:list_one .
 
+PR:node_two
+    PR:type PR:fact ;
+    PR:operation PR:cons ;
+    PR:variable_x PR:two ;
+    PR:variable_y PR:nil ;
+    PR:variable_z PR:list_two .
+
+PR:node_three
+    PR:type PR:fact ;
+    PR:operation PR:cons ;
+    PR:variable_x PR:three ;
+    PR:variable_y PR:nil ;
+    PR:variable_z PR:list_three .
+
+PR:node_four
+    PR:type PR:fact ;
+    PR:operation PR:cons ;
+    PR:variable_x PR:four ;
+    PR:variable_y PR:nil ;
+    PR:variable_z PR:list_four .
+
+PR:node_five
+    PR:type PR:fact ;
+    PR:operation PR:cons ;
+    PR:variable_x PR:five ;
+    PR:variable_y PR:nil ;
+    PR:variable_z PR:list_five .
+
+PR:node_six
+    PR:type PR:fact ;
+    PR:operation PR:cons ;
+    PR:variable_x PR:six ;
+    PR:variable_y PR:nil ;
+    PR:variable_z PR:list_six .
+
+PR:node_seven
+    PR:type PR:fact ;
+    PR:operation PR:cons ;
+    PR:variable_x PR:seven ;
+    PR:variable_y PR:nil ;
+    PR:variable_z PR:list_seven .
+
+PR:node_eight
+    PR:type PR:fact ;
+    PR:operation PR:cons ;
+    PR:variable_x PR:eight ;
+    PR:variable_y PR:nil ;
+    PR:variable_z PR:list_eight .
+
+PR:node_nine
+    PR:type PR:fact ;
+    PR:operation PR:cons ;
+    PR:variable_x PR:nine ;
+    PR:variable_y PR:nil ;
+    PR:variable_z PR:list_nine .
+
+PR:node_ten
+    PR:type PR:fact ;
+    PR:operation PR:cons ;
+    PR:variable_x PR:zero ;
+    PR:variable_y PR:list_one ;
+    PR:variable_z PR:list_ten .
+
 ################################################################################
 # rules
 
-PR:rule_next_list_number
+PR:rule_next_list_number_x_y
     PR:type PR:rule ;
     PR:left_side [
         PR:operation PR:next_list_number ;
@@ -43,7 +106,7 @@ PR:rule_next_list_number
             PR:variable_x VAR:_u ;
             PR:variable_y VAR:_y ] ] .
 
-PR:rule_carry_up_nil
+PR:rule_carry_up_nil_y
     PR:type PR:rule ;
     PR:left_side [
         PR:operation PR:carry_up ;
@@ -56,13 +119,14 @@ PR:rule_carry_up_nil
             PR:variable_y PR:nil ;
             PR:variable_z VAR:_y ] ] .
 
-PR:rule_carry_up
+PR:rule_carry_up_x_y
     PR:type PR:rule ;
     PR:left_side [
         PR:operation PR:carry_up ;
         PR:variable_x VAR:_x ;
         PR:variable_y VAR:_y ] ;
     PR:right_side [
+        PR:priority "1" ;
         PR:child [
             PR:operation PR:cons ;
             PR:variable_x VAR:_car_x ;
@@ -107,6 +171,43 @@ PR:rule_carry_up2_x_y_z
             PR:variable_x VAR:_x ;
             PR:variable_y VAR:_y ;
             PR:variable_z VAR:_z ] ] .
+
+PR:rule_list_number_add_x_1_z
+    PR:type PR:rule ;
+    PR:left_side [
+        PR:operation PR:list_add ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y PR:list_one ;
+        PR:variable_z VAR:_z ] ;
+    PR:right_side [
+        PR:child [
+            PR:operation PR:next_list_number ;
+            PR:variable_x VAR:_x ;
+            PR:variable_y VAR:_z ] ] .
+
+PR:rule_list_number_add_x_y_z
+    PR:type PR:rule ;
+    PR:left_side [
+        PR:operation PR:list_add ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ;
+        PR:variable_z VAR:_z ] ;
+    PR:right_side [
+        PR:child [
+            PR:operation PR:next_list_number ;
+            PR:variable_x VAR:_u ;
+            PR:variable_y VAR:_y ] ] ;
+    PR:right_side [
+        PR:child [
+            PR:operation PR:list_add ;
+            PR:variable_x VAR:_x ;
+            PR:variable_y VAR:_u ;
+            PR:variable_z VAR:_v ] ] ;
+    PR:right_side [
+        PR:child [
+            PR:operation PR:next_list_number ;
+            PR:variable_x VAR:_v ;
+            PR:variable_y VAR:_z ] ] .
 
 ################################################################################
 # controls
@@ -215,6 +316,47 @@ PR:control_carry_up2_x_y_z
             PR:variable_y VAR:_y ;
             PR:variable_z VAR:_z ] ] .
 
+PR:control_list_number_add_x_1_z
+    PR:type PR:control ;
+    PR:left_side [
+        PR:operation PR:list_add ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y PR:list_one ;
+        PR:variable_z VAR:_z ] ;
+    PR:right_side [
+        PR:priority "1" ;
+        PR:child [
+            PR:operation PR:next_list_number ;
+            PR:variable_x VAR:_x ;
+            PR:variable_y VAR:_z ] ] .
+
+PR:control_list_number_add_x_y_z
+    PR:type PR:control ;
+    PR:left_side [
+        PR:operation PR:list_add ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ;
+        PR:variable_z VAR:_z ] ;
+    PR:right_side [
+        PR:priority "1" ;
+        PR:child [
+            PR:operation PR:next_list_number ;
+            PR:variable_x VAR:_u ;
+            PR:variable_y VAR:_y ] ] ;
+    PR:right_side [
+        PR:priority "2" ;
+        PR:child [
+            PR:operation PR:list_add ;
+            PR:variable_x VAR:_x ;
+            PR:variable_y VAR:_u ;
+            PR:variable_z VAR:_v ] ] ;
+    PR:right_side [
+        PR:priority "3" ;
+        PR:child [
+            PR:operation PR:next_list_number ;
+            PR:variable_x VAR:_v ;
+            PR:variable_y VAR:_z ] ] .
+
 ##################################################################
 # applications
 
@@ -258,5 +400,21 @@ PR:application_carry_up2_x_y
         PR:priority "1" ] ;
     PR:use [
         PR:control PR:control_carry_up2_x_y_z ;
+        PR:priority "2" ] ;
+    PR:priority "1" .
+
+PR:application_list_add_x_y_z
+    PR:type PR:application ;
+    PR:program PR:false ;
+    PR:pattern [
+        PR:operation PR:list_add ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ;
+        PR:variable_z VAR:_z ] ;
+    PR:use [
+        PR:control PR:control_list_number_add_x_1_z ;
+        PR:priority "1" ] ;
+    PR:use [
+        PR:control PR:control_list_number_add_x_y_z ;
         PR:priority "2" ] ;
     PR:priority "1" .

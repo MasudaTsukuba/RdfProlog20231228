@@ -1,60 +1,117 @@
 @prefix PR: <http://example.org/> .
 @prefix VAR: <http://variable.org/> .
 
+##################################################################
 # facts
+
 PR:fact_father_jiro_taro
+    PR:type PR:fact ;
     PR:operation PR:father ;
     PR:variable_x PR:taro ;
     PR:variable_y PR:jiro .
 PR:fact_mother_jiro_hana
+    PR:type PR:fact ;
     PR:operation PR:mother ;
     PR:variable_x PR:taro ;
     PR:variable_y PR:hana .
 PR:fact_father_hana_ichiro
+    PR:type PR:fact ;
     PR:operation PR:father ;
     PR:variable_x PR:hana ;
     PR:variable_y PR:ichiro .
 
+##################################################################
 # rules
-PR:grandfather_father_father
+
+PR:rule_grandfather_father_father
+    PR:type PR:rule ;
     PR:left_side [
         PR:operation PR:grandfather ;
-        PR:variable_x VAR:x ;
-        PR:variable_y VAR:y ] ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ] ;
+    PR:right_side [
+        PR:child [
+            PR:operation PR:father ;
+            PR:variable_x VAR:_x ;
+            PR:variable_y VAR:_u ] ] ;
+    PR:right_side [
+        PR:child [
+             PR:operation PR:father ;
+             PR:variable_x VAR:_u ;
+             PR:variable_y VAR:_y ] ] .
+
+PR:rule_grandfather_mother_father
+    PR:type PR:rule ;
+    PR:left_side [
+        PR:operation PR:grandfather ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ] ;
+    PR:right_side [
+        PR:child [
+            PR:operation PR:mother ;
+            PR:variable_x VAR:_x ;
+            PR:variable_y VAR:_u ] ] ;
+    PR:right_side [
+        PR:child [
+            PR:operation PR:father ;
+            PR:variable_x VAR:_u ;
+            PR:variable_y VAR:_y ] ] .
+
+##################################################################
+# controls
+
+PR:control_grandfather_father_father
+    PR:type PR:control ;
+    PR:left_side [
+        PR:operation PR:grandfather ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:father ;
-            PR:variable_x VAR:x ;
-            PR:variable_y VAR:u ] ] ;
+            PR:variable_x VAR:_x ;
+            PR:variable_y VAR:_u ] ] ;
     PR:right_side [
         PR:priority "2" ;
         PR:child [
              PR:operation PR:father ;
-             PR:variable_x VAR:u ;
-             PR:variable_y VAR:y ] ] .
+             PR:variable_x VAR:_u ;
+             PR:variable_y VAR:_y ] ] .
 
-PR:grandfather_mother_father
+PR:control_grandfather_mother_father
+    PR:type PR:control ;
     PR:left_side [
         PR:operation PR:grandfather ;
-        PR:variable_x VAR:x ;
-        PR:variable_y VAR:y ] ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ] ;
     PR:right_side [
         PR:priority "1" ;
         PR:child [
             PR:operation PR:mother ;
-            PR:variable_x VAR:x ;
-            PR:variable_y VAR:u ] ] ;
+            PR:variable_x VAR:_x ;
+            PR:variable_y VAR:_u ] ] ;
     PR:right_side [
         PR:priority "2" ;
         PR:child [
             PR:operation PR:father ;
-            PR:variable_x VAR:u ;
-            PR:variable_y VAR:y ] ] .
+            PR:variable_x VAR:_u ;
+            PR:variable_y VAR:_y ] ] .
 
-# procedures
-PR:grandfather_father_father
+##################################################################
+# applications
+
+PR:application_grandfather_x_y
+    PR:type PR:application ;
+    PR:program PR:false ;
+    PR:pattern [
+        PR:operation PR:grandfather ;
+        PR:variable_x VAR:_x ;
+        PR:variable_y VAR:_y ] ;
+    PR:use [
+        PR:control PR:control_grandfather_father_father ;
+        PR:priority "1" ] ;
+    PR:use [
+        PR:control PR:control_grandfather_mother_father ;
+        PR:priority "2" ] ;
     PR:priority "1" .
-
-PR:grandfather_mother_father
-    PR:priority "2" .

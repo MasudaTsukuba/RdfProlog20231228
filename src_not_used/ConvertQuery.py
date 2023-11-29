@@ -327,11 +327,11 @@ if __name__ == '__main__':  # for a test purpose
     #            '?s <http://example.org/PP> ?o . }'
     # conv_query, var_dict, predicate_object_pair = convert_query(my_query)
 
-    # my_question = f'SELECT ?ans WHERE {{ ?s <http://example.org/operation> <http://example.org/add_number> . ' \
-    #               f'?s <http://example.org/variable_x> <http://example.org/three> . ' \
-    #               f'?s <http://example.org/variable_y> <http://example.org/two> . ' \
-    #               f'?s <http://example.org/variable_z> ?ans . ' \
-    #               f'}}'
+    # my_question = SELECT ?ans WHERE {{ ?s <http://example.org/operation> <http://example.org/add_number> . ' \
+    #               ?s <http://example.org/variable_x> <http://example.org/three> . ' \
+    #               ?s <http://example.org/variable_y> <http://example.org/two> . ' \
+    #               ?s <http://example.org/variable_z> ?ans . ' \
+    #               }}"""
     my_question = """SELECT ?ans ?nbe3d2cbfffc7494887c35a0e8df8cfd9b9 WHERE { ?nbe3d2cbfffc7494887c35a0e8df8cfd9b9 <http://example.org/variable_x> <http://example.org/cons_node10000> . ?nbe3d2cbfffc7494887c35a0e8df8cfd9b9 <http://example.org/operation> <http://example.org/carry_up> . ?nbe3d2cbfffc7494887c35a0e8df8cfd9b9 <http://example.org/variable_y> ?ans . }"""
     list_of_rdf_triples = convert_question(my_question)
     print(list_of_rdf_triples)
