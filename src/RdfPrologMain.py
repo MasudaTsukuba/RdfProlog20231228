@@ -416,7 +416,7 @@ def main():
            ?s <http://value.org/variable_z> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
         # xxx = resolve_bindings[0]['?ans']
         pass
 
@@ -433,7 +433,21 @@ def main():
         # xxx = resolve_bindings[0]['?ans']
         pass
 
-    # family
+        # divide(?ans, 2, 3)
+        my_question = f"""
+            SELECT ?ans WHERE {{
+            ?s <http://value.org/operation> <http://value.org/divide_number> .
+            ?s <http://value.org/variable_x> ?ans .
+            ?s <http://value.org/variable_y> <http://value.org/2> .
+            ?s <http://value.org/variable_z> <http://value.org/3> .
+            }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+        # xxx = resolve_bindings[0]['?ans']
+        pass
+
+
+# family
     # if True:
     #     rdf_prolog = RdfProlog(rules_folder='../rules/rules_human')
     #     # grandfather(taro, ?ans)

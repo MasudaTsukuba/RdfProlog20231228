@@ -1,7 +1,7 @@
 """
-test_056_RdfProlog_multiply_number_100.py
-tests for multiply uri numbers
-T. Masuda, 2023/12/11
+test_057_RdfProlog_divide_number_100.py
+tests for divide uri numbers
+T. Masuda, 2023/12/14
 """
 
 from src.RdfPrologMain import RdfProlog, ClassSparqlQuery
@@ -10,11 +10,11 @@ from src.RdfPrologMain import RdfProlog, ClassSparqlQuery
 rdf_prolog = RdfProlog(rules_folder='../rules/rules_number_100')
 
 
-def test_answer_question1_multiply_1_1_ans():
-    # multiply(1, 1, ?ans) = 1
+def test_answer_question1_divide_1_1_ans():
+    # divide(1, 1, ?ans) = 1
     my_question = f"""
         SELECT ?ans WHERE {{
-        ?s <http://value.org/operation> <http://value.org/multiply_number> . 
+        ?s <http://value.org/operation> <http://value.org/divide_number> . 
         ?s <http://value.org/variable_x> <http://value.org/1> . 
         ?s <http://value.org/variable_y> <http://value.org/1> . 
         ?s <http://value.org/variable_z> ?ans . 
@@ -24,10 +24,10 @@ def test_answer_question1_multiply_1_1_ans():
     assert resolve_bindings[0]['?ans'] == f'http://value.org/1'
 
 
-def test_answer_question2_multiply_2_1_ans():
-    # multiply(2, 1, ?ans) = 2
+def test_answer_question2_divide_2_1_ans():
+    # divide(2, 1, ?ans) = 2
     my_question = f"""
-        SELECT ?ans WHERE {{ ?s <http://value.org/operation> <http://value.org/multiply_number> .
+        SELECT ?ans WHERE {{ ?s <http://value.org/operation> <http://value.org/divide_number> .
         ?s <http://value.org/variable_x> <http://value.org/2> .
         ?s <http://value.org/variable_y> <http://value.org/1> .
         ?s <http://value.org/variable_z> ?ans .
@@ -37,70 +37,70 @@ def test_answer_question2_multiply_2_1_ans():
     assert resolve_bindings[0]['?ans'] == f'http://value.org/2'
 
 
-def test_answer_question3_multiply_1_2_ans():
-    # multiply(1, 2, ?ans) = 2
+def test_answer_question3_divide_1_2_ans():
+    # divide(1, 2, ?ans) = None
     my_question = f"""
         SELECT ?ans WHERE {{
-        ?s <http://value.org/operation> <http://value.org/multiply_number> .
+        ?s <http://value.org/operation> <http://value.org/divide_number> .
         ?s <http://value.org/variable_x> <http://value.org/1> .
         ?s <http://value.org/variable_y> <http://value.org/2> .
         ?s <http://value.org/variable_z> ?ans .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
-    assert resolve_bindings[0]['?ans'] == f'http://value.org/2'
+    assert len(resolve_bindings) == 0
 
 
-def test_answer_question4_multiply_2_2_ans():
-    # multiply(2, 2, ?ans) = 4
+def test_answer_question4_divide_2_2_ans():
+    # divide(2, 2, ?ans) = 1
     my_question = f"""
         SELECT ?ans WHERE {{
-        ?s <http://value.org/operation> <http://value.org/multiply_number> .
+        ?s <http://value.org/operation> <http://value.org/divide_number> .
         ?s <http://value.org/variable_x> <http://value.org/2> .
         ?s <http://value.org/variable_y> <http://value.org/2> .
         ?s <http://value.org/variable_z> ?ans .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
-    assert resolve_bindings[0]['?ans'] == f'http://value.org/4'
+    assert resolve_bindings[0]['?ans'] == f'http://value.org/1'
 
 
-def test_answer_question4_multiply_3_2_ans():
-    # multiply(3, 2, ?ans) = 6
+def test_answer_question4_divide_6_2_ans():
+    # divide(6, 2, ?ans) = 3
     my_question = f"""
         SELECT ?ans WHERE {{
-        ?s <http://value.org/operation> <http://value.org/multiply_number> .
-        ?s <http://value.org/variable_x> <http://value.org/3> .
+        ?s <http://value.org/operation> <http://value.org/divide_number> .
+        ?s <http://value.org/variable_x> <http://value.org/6> .
         ?s <http://value.org/variable_y> <http://value.org/2> .
         ?s <http://value.org/variable_z> ?ans .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
-    assert resolve_bindings[0]['?ans'] == f'http://value.org/6'
-
-
-def test_answer_question5_multiply_ans_2_6():
-    # multiply(?ans, 2, 6)->ans:3
-    my_question = f"""
-        SELECT ?ans WHERE {{
-        ?s <http://value.org/operation> <http://value.org/multiply_number> .
-        ?s <http://value.org/variable_x> ?ans .
-        ?s <http://value.org/variable_y> <http://value.org/2> .
-        ?s <http://value.org/variable_z> <http://value.org/6> .
-        }}"""
-    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, max_depth=10)
     assert resolve_bindings[0]['?ans'] == f'http://value.org/3'
 
 
-def test_answer_question6_multiply_3_ans_12():
-    # multiply(?ans, 2, 6)->ans:3
+def test_answer_question5_divide_ans_2_3():
+    # divide(?ans, 2, 3)->ans:6
     my_question = f"""
         SELECT ?ans WHERE {{
-        ?s <http://value.org/operation> <http://value.org/multiply_number> .
-        ?s <http://value.org/variable_x> <http://value.org/3> .
+        ?s <http://value.org/operation> <http://value.org/divide_number> .
+        ?s <http://value.org/variable_x> ?ans .
+        ?s <http://value.org/variable_y> <http://value.org/2> .
+        ?s <http://value.org/variable_z> <http://value.org/3> .
+        }}"""
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, max_depth=20)
+    assert resolve_bindings[0]['?ans'] == f'http://value.org/6'
+
+
+def test_answer_question6_divide_12_ans_3():
+    # divide(12, ?ans, 3)->ans:4
+    my_question = f"""
+        SELECT ?ans WHERE {{
+        ?s <http://value.org/operation> <http://value.org/divide_number> .
+        ?s <http://value.org/variable_x> <http://value.org/12> .
         ?s <http://value.org/variable_y> ?ans .
-        ?s <http://value.org/variable_z> <http://value.org/12> .
+        ?s <http://value.org/variable_z> <http://value.org/3> .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_question(my_sparql_query, max_depth=30)
@@ -108,12 +108,12 @@ def test_answer_question6_multiply_3_ans_12():
 
 
 def test_answer_complex_question1():
-    # multiply(3, 2, ?z), next(?z, ?ans)->z:6, ans:7
+    # divide(6, 3, ?z), next(?z, ?ans)->z:2, ans:3
     my_question = f"""
         SELECT ?ans WHERE {{
-        ?s1 <http://value.org/operation> <http://value.org/multiply_number> .
-        ?s1 <http://value.org/variable_x> <http://value.org/3> .
-        ?s1 <http://value.org/variable_y> <http://value.org/2> .
+        ?s1 <http://value.org/operation> <http://value.org/divide_number> .
+        ?s1 <http://value.org/variable_x> <http://value.org/6> .
+        ?s1 <http://value.org/variable_y> <http://value.org/3> .
         ?s1 <http://value.org/variable_z> ?z .
         ?s2 <http://value.org/operation> <http://value.org/next_number> .
         ?s2 <http://value.org/variable_x> ?z .
@@ -121,25 +121,25 @@ def test_answer_complex_question1():
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
-    assert resolve_bindings[0]['?ans'] == f'http://value.org/7'
+    assert resolve_bindings[0]['?ans'] == f'http://value.org/3'
 
 
 def test_answer_complex_question2():
-    # multiply(3, 2, ?z), multiply(?z, 5, ?ans)->z:6, ans:30
+    # divide(12, 2, ?z), divide(?z, 3, ?ans)->z:6, ans:2
     my_question = f"""
         SELECT ?ans WHERE {{
-        ?s1 <http://value.org/operation> <http://value.org/multiply_number> .
-        ?s1 <http://value.org/variable_x> <http://value.org/3> .
+        ?s1 <http://value.org/operation> <http://value.org/divide_number> .
+        ?s1 <http://value.org/variable_x> <http://value.org/12> .
         ?s1 <http://value.org/variable_y> <http://value.org/2> .
         ?s1 <http://value.org/variable_z> ?z .
-        ?s2 <http://value.org/operation> <http://value.org/multiply_number> .
+        ?s2 <http://value.org/operation> <http://value.org/divide_number> .
         ?s2 <http://value.org/variable_x> ?z .
-        ?s2 <http://value.org/variable_y> <http://value.org/5> .
+        ?s2 <http://value.org/variable_y> <http://value.org/3> .
         ?s2 <http://value.org/variable_z> ?ans .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     resolve_bindings = rdf_prolog.answer_question(my_sparql_query, max_depth=100)
-    assert resolve_bindings[0]['?ans'] == f'http://value.org/30'
+    assert resolve_bindings[0]['?ans'] == f'http://value.org/2'
 
 
 # # def test_add_1_y_z():
