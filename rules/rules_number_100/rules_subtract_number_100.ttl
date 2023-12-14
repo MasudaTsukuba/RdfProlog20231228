@@ -1,0 +1,69 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+
+##################################################################
+# rules
+
+VAL:rule_subtract_number_x_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_z ;
+            VAL:variable_z VAR:_x ] ].
+
+##################################################################
+# controls
+
+VAL:control_subtract_number_x_y_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_z ;
+            VAL:variable_z VAR:_x ] ].
+
+##################################################################
+# applications
+
+VAL:application_subtract_number_sx_sy_z
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_subtract_number_x_y_z ] .
+
+VAL:application_subtract_number_sx_y_sz
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z SOME:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_subtract_number_x_y_z ] .
+
+##################################################################
+# inferences

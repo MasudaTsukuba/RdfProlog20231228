@@ -1,0 +1,28 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+# facts are basic statements of relationships that are always true
+
+##################################################################
+# rules
+# rules are statements for reasoning without any controls
+
+VAL:rule_template
+    VAL:left_side [
+        VAL:operation VAL:rule_template_left ] ;
+    VAL:right_side [ ] .
+
+##################################################################
+# controls
+# controls are rules with execution controls implemented as priorities
+
+##################################################################
+# applications
+# applications are a set of controls with priorities
+
+##################################################################
+# inferences
+# inferences are facts that are derived by reasoning

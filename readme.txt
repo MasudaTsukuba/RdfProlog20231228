@@ -4,36 +4,36 @@ RDFのクエリ機能を利用してPrologの推論を実行するシステム�
 質問はsparql queryで与える。
 grandfather(jiro, Y).の場合。
 SELECT ?ans WHERE {
-    ?s PR:operation　PR:grandfather .
-    ?s PR:variable_x　PR:jiro .
-    ?s PR:variable_y ?ans . }
+    ?s VAL:operation　VAL:grandfather .
+    ?s VAL:variable_x　VAL:jiro .
+    ?s VAL:variable_y ?ans . }
 
 事実はRDFで与える。
 father(jiro, taro).は以下のようになる。
-PR:rule_father_jiro_taro
-    PR:operation PR:father ;
-    PR:variable_x PR:jiro ;
-    PR:variable_y PR:taro .
+VAL:rule_father_jiro_taro
+    VAL:operation VAL:father ;
+    VAL:variable_x VAL:jiro ;
+    VAL:variable_y VAL:taro .
 
 ルールもRDFで与える。
 grandfather(X, Y) :- father(X, U), father(U, Y).は次のようになる。
-PR:grandfather_father_father
-    PR:left_side [
-        PR:operation PR:grandfather ;
-        PR:variable_x VAR:x ;
-        PR:variable_y VAR:y ] ;
-    PR:right_side [
-        PR:priority "1" ;
-        PR:child [
-            PR:operation PR:father ;
-            PR:variable_x VAR:x ;
-            PR:variable_y VAR:u ] ] ;
-    PR:right_side [
-        PR:priority "2" ;
-        PR:child [
-             PR:operation PR:father ;
-             PR:variable_x VAR:u ;
-             PR:variable_y VAR:y ] ] .
+VAL:grandfather_father_father
+    VAL:left_side [
+        VAL:operation VAL:grandfather ;
+        VAL:variable_x VAR:x ;
+        VAL:variable_y VAR:y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:father ;
+            VAL:variable_x VAR:x ;
+            VAL:variable_y VAR:u ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+             VAL:operation VAL:father ;
+             VAL:variable_x VAR:u ;
+             VAL:variable_y VAR:y ] ] .
 
 ＜実行手順＞
 [answer_question]
@@ -65,7 +65,7 @@ father(jiro, U).は成功する。
 
 変数の対応関係はreturned_direct_search_bindingsに格納される。
 father(jiro, U).に対する変数の対応は次のようになる。
-[{'?s': '<http://example.org/rule_father_jiro_taro>', '?u': '<http://example.org/taro>'}]
+[{'?s': '<http://value.org/rule_father_jiro_taro>', '?u': '<http://value.org/taro>'}]
 
 ＜resolve後半、ルール探索＞
 後半では適用可能なルールを検索して順番に試す。
@@ -83,15 +83,15 @@ bindings_foundにはルールと質問の間の変数の対応関係が格納さ
 
 grandfather(jiro, Y).の場合には、２つのルールが適合する。
 parents_foundは２要素のリストになる。
-['<http://example.org/grandfather_father_father>',
- '<http://example.org/grandfather_mother_father>']
+['<http://value.org/grandfather_father_father>',
+ '<http://value.org/grandfather_mother_father>']
 
 bindings_foundはdictのlistのlistになる。keyがルール側、valueが質問側になる。
-[[{rdflib.term.Variable('s'): rdflib.term.URIRef('http://example.org/subj'),
-  rdflib.term.Variable('x'): rdflib.term.URIRef('http://example.org/jiro'),
+[[{rdflib.term.Variable('s'): rdflib.term.URIRef('http://value.org/subj'),
+  rdflib.term.Variable('x'): rdflib.term.URIRef('http://value.org/jiro'),
   rdflib.term.Variable('y'): rdflib.term.URIRef('http://variable.org/ans')}],
- [{rdflib.term.Variable('s'): rdflib.term.URIRef('http://example.org/subj'),
- rdflib.term.Variable('x'): rdflib.term.URIRef('http://example.org/jiro'),
+ [{rdflib.term.Variable('s'): rdflib.term.URIRef('http://value.org/subj'),
+ rdflib.term.Variable('x'): rdflib.term.URIRef('http://value.org/jiro'),
  rdflib.term.Variable('y'): rdflib.term.URIRef('http://variable.org/ans')}]]
 
 適合したルールを順番に試す。
@@ -117,7 +117,7 @@ grandfather(jiro, Y).の場合、最初にfather(jiro, U), father(U, Y).を試�
     argument_binding = build_argument_bindings(binding[0])
 binding[0]で変数対応の辞書を取り出す。
 戻り値のargument_bindingには左辺値の対応が入っている。
-{'?s': '<http://example.org/subj>', '?x': '<http://example.org/jiro>', '?y': '?ans'}
+{'?s': '<http://value.org/subj>', '?x': '<http://value.org/jiro>', '?y': '?ans'}
 
 次に右辺の各項を順番に試す。
 右辺の各項は親のラベルparent_for_rightを基にして、find_right_sides()で取り出す。
@@ -130,11 +130,11 @@ results_for_rightの各項rightのright_side[0]で右辺の各項のラベルが
 その結果からさらに孫要素を取り出すと、get_grand_child_rules()で右辺各項の実体が得られる。
     results_for_grandchild_rules = get_grand_child_rules(result[0])
 results_for_grandchild_rulesのbindingsは次のようになる。　これはfather(X, U).を表す。
-[{rdflib.term.Variable('p'): rdflib.term.URIRef('http://example.org/operation'),
-  rdflib.term.Variable('o'): rdflib.term.URIRef('http://example.org/father')},
- {rdflib.term.Variable('p'): rdflib.term.URIRef('http://example.org/variable_y'),
+[{rdflib.term.Variable('p'): rdflib.term.URIRef('http://value.org/operation'),
+  rdflib.term.Variable('o'): rdflib.term.URIRef('http://value.org/father')},
+ {rdflib.term.Variable('p'): rdflib.term.URIRef('http://value.org/variable_y'),
   rdflib.term.Variable('o'): rdflib.term.URIRef('http://variable.org/variable_u')},
- {rdflib.term.Variable('p'): rdflib.term.URIRef('http://example.org/variable_x'),
+ {rdflib.term.Variable('p'): rdflib.term.URIRef('http://value.org/variable_x'),
   rdflib.term.Variable('o'): rdflib.term.URIRef('http://variable.org/variable_x')}]
 
 右辺各項をresolveに対する質問に変換するためには、変数を置き換える必要がある。
@@ -144,40 +144,40 @@ results_for_grandchild_rulesのbindingsは次のようになる。　これはfa
 
 father(jiro, U).の場合には、以下のように置き換えられる。
 SELECT ?s ?u  WHERE {
-    ?s <http://example.org/operation> <http://example.org/father> .
-    ?s <http://example.org/variable_x> <http://example.org/jiro> .
-    ?s <http://example.org/variable_y> ?u . }'
+    ?s <http://value.org/operation> <http://value.org/father> .
+    ?s <http://value.org/variable_x> <http://value.org/jiro> .
+    ?s <http://value.org/variable_y> ?u . }'
 build_query()内でこの変換を行うために、tripleのpredicateとobjectを抽出する。predicateはそのままクエリに使う。
 objectについては変数でなければ、そのままクエリに使う。
 変数の場合、まず<http://variable.org/variable_x>などを?xに置き換える。
-次に、左辺値での対応argument_bindingを使って、?xを<http://example.org/jiro>に置き換える。?uは対応がないのでそのままになる。
+次に、左辺値での対応argument_bindingを使って、?xを<http://value.org/jiro>に置き換える。?uは対応がないのでそのままになる。
 最後に、前段階までのresolve_bindingsを使って確定した変数を置き換える。
 その結果、右辺の最初の項は上記のようなクエリに置き換えられる。
 
 このクエリに対してresolve()を実行すると直接の適合が見つかる。
 resolve_bindingsの戻り値は次にようになる。
-[{'?s': '<http://example.org/rule_father_jiro_taro>', '?u': '<http://example.org/taro>'}]
+[{'?s': '<http://value.org/rule_father_jiro_taro>', '?u': '<http://value.org/taro>'}]
 
 右辺第２項father(U, Y).に対してbuild_query()する際にはargument_bindingは同じだが、resolve_bindingsが
-[{'?s': '<http://example.org/rule_father_jiro_taro>', '?u': '<http://example.org/taro>'}]
+[{'?s': '<http://value.org/rule_father_jiro_taro>', '?u': '<http://value.org/taro>'}]
 になっているので、クエリはのようになる。
 SELECT ?s ?ans  WHERE {
-    ?s <http://example.org/operation> <http://example.org/father> .
-    ?s <http://example.org/variable_x> <http://example.org/taro> .
-    ?s <http://example.org/variable_y> ?ans . }'
+    ?s <http://value.org/operation> <http://value.org/father> .
+    ?s <http://value.org/variable_x> <http://value.org/taro> .
+    ?s <http://value.org/variable_y> ?ans . }'
 
 これは失敗して、第２ルールgrandfather_mother_fatherを調べる。
 第２ルールの右辺第１項は
 SELECT ?s ?u  WHERE {
-    ?s <http://example.org/operation> <http://example.org/mother> .
-    ?s <http://example.org/variable_x> <http://example.org/jiro> .
-    ?s <http://example.org/variable_y> ?u . }'
+    ?s <http://value.org/operation> <http://value.org/mother> .
+    ?s <http://value.org/variable_x> <http://value.org/jiro> .
+    ?s <http://value.org/variable_y> ?u . }'
 これは成功して、?uがhanaになる。
 第２ルールの右辺第２項は
 SELECT ?s ?ans  WHERE {
-    ?s <http://example.org/operation> <http://example.org/father> .
-    ?s <http://example.org/variable_x> <http://example.org/hana> .
-    ?s <http://example.org/variable_y> ?ans . }'
+    ?s <http://value.org/operation> <http://value.org/father> .
+    ?s <http://value.org/variable_x> <http://value.org/hana> .
+    ?s <http://value.org/variable_y> ?ans . }'
 これも成功して、?ansにichiroが入る。
 最終的なresolve_bindingsは次にようになる。
-[{'?s': '<http://example.org/rule_father_hana_ichiro>', '?ans': '<http://example.org/ichiro>'}]
+[{'?s': '<http://value.org/rule_father_hana_ichiro>', '?ans': '<http://value.org/ichiro>'}]

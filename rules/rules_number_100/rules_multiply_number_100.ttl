@@ -1,0 +1,250 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+##################################################################
+# rules
+
+VAL:rule_multiply_number_x_1_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:multiply_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAL:1 ;
+        VAL:variable_z VAR:_x ] .
+
+VAL:rule_add_number_1_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:multiply_number ;
+        VAL:variable_x VAL:1 ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_y ] .
+
+VAL:rule_add_number_x_sy_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:multiply_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:multiply_number ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_v ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_v ;
+            VAL:variable_z VAR:_z ] ] .
+
+VAL:rule_add_number_sx_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:multiply_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_x ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:multiply_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ;
+            VAL:variable_z VAR:_v ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_v ;
+            VAL:variable_y VAR:_y ;
+            VAL:variable_z VAR:_z ] ] .
+
+##################################################################
+# controls
+
+VAL:control_multiply_number_x_1_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:multiply_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAL:1 ;
+        VAL:variable_z VAR:_x ] ;
+    VAL:right_side [
+        VAL:priority "1" ] ;
+    VAL:priority "1" .
+
+VAL:control_multiply_number_1_y_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:multiply_number ;
+        VAL:variable_x VAL:1 ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_y ] ;
+   VAL:right_side [
+        VAL:priority "1"  ] ;
+   VAL:priority "1" .
+
+VAL:control_multiply_number_sx_sy_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:multiply_number ;
+        VAL:variable_x SOME:_sx ;
+        VAL:variable_y SOME:_sy ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_sy ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:multiply_number ;
+            VAL:variable_x VAR:_sx ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_v ] ] ;
+    VAL:right_side [
+        VAL:priority "3" ;
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_sx ;
+            VAL:variable_y VAR:_v ;
+            VAL:variable_z VAR:_z ] ] ;
+    VAL:priority "2" .
+
+VAL:control_multiply_number_sx_y_sz
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:multiply_number ;
+        VAL:variable_x SOME:_sx ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z SOME:_sz ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_sx ;
+            VAL:variable_y VAR:_v ;
+            VAL:variable_z VAR:_sz ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:multiply_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_sx ;
+            VAL:variable_z VAR:_v ] ] ;
+    VAL:right_side [
+        VAL:priority "3" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ] ;
+    VAL:priority "2" .
+
+VAL:control_multiply_number_x_sy_sz
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:multiply_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y SOME:_sy ;
+        VAL:variable_z SOME:_sz ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_sy ;
+            VAL:variable_y VAR:_v ;
+            VAL:variable_z VAR:_sz ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:multiply_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_sy ;
+            VAL:variable_z VAR:_v ] ] ;
+    VAL:right_side [
+        VAL:priority "3" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_x ] ] ;
+    VAL:priority "2" .
+
+##################################################################
+# applications
+
+VAL:application_multiply_number_sx_sy_z
+   VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+        VAL:operation VAL:multiply_number ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_multiply_number_1_y_z ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_multiply_number_x_1_z ;
+        VAL:priority "2" ] ;
+   VAL:use [
+        VAL:control VAL:control_multiply_number_sx_sy_z ;
+        VAL:priority "3" ] ;
+    VAL:priority "1".
+
+VAL:application_multiply_number_sx_y_sz
+   VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+       VAL:operation VAL:multiply_number ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z SOME:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_multiply_number_1_y_z ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_multiply_number_x_1_z ;
+        VAL:priority "2" ] ;
+   VAL:use [
+        VAL:control VAL:control_multiply_number_sx_y_sz ;
+        VAL:priority "3" ] ;
+    VAL:priority "1".
+
+VAL:application_multiply_number_x_sy_sz
+   VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+       VAL:operation VAL:multiply_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z SOME:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_multiply_number_1_y_z ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_multiply_number_x_1_z ;
+        VAL:priority "2" ] ;
+   VAL:use [
+        VAL:control VAL:control_multiply_number_x_sy_sz ;
+        VAL:priority "3" ] ;
+    VAL:priority "1".
+
+##################################################################
+# inferences

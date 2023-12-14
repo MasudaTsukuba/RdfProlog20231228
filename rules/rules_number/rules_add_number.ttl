@@ -1,0 +1,137 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+##################################################################
+# rules
+
+VAL:rule_add_number_x_1_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAL:one ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_z ] ] .
+
+VAL:rule_add_number_x_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_v ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_v ;
+            VAL:variable_y VAR:_z ] ] .
+
+##################################################################
+# controls
+
+VAL:control_add_number_x_1_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAL:one ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_z ] ] ;
+    VAL:priority "1" .
+
+VAL:control_add_number_x_y_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_v ] ] ;
+    VAL:right_side [
+        VAL:priority "3" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_v ;
+            VAL:variable_y VAR:_z ] ] ;
+    VAL:priority "2" .
+
+##################################################################
+# applications
+
+#VAL:application_add_number_sx_sy_z
+#   VAL:type VAL:application ;
+#    VAL:program VAL:true ;
+#    VAL:pattern [
+#        VAL:operation VAL:add_number ;
+#       VAL:variable_x SOME:_x ;
+#       VAL:variable_y SOME:_y ;
+#        VAL:variable_z VAR:_z ] ;
+#    VAL:use [
+#        VAL:control VAL:control_add_number_x_1_z ;
+#        VAL:priority "1" ] ;
+#   VAL:use [
+#        VAL:control VAL:control_add_number_x_y_z ;
+#        VAL:priority "2" ] ;
+#    VAL:priority "1".
+
+VAL:application_add_number_x_y_z
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_add_number_x_1_z ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_add_number_x_y_z ;
+        VAL:priority "2" ] ;
+    VAL:priority "2" .
+
+##################################################################
+# inferences
+
+#[]
+#    VAL:type VAL:inference ;
+#    VAL:operation VAL:add_number ;
+#    VAL:variable_x VAL:two ;
+#    VAL:variable_y VAL:three ;
+#    VAL:variable_z VAL:five .

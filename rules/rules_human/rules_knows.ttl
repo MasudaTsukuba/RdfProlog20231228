@@ -1,0 +1,155 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+VAL:rule_knows_andy_bob
+    VAL:type VAL:fact ;
+    VAL:operation VAL:knows_direct ;
+    VAL:variable_x VAL:andy ;
+    VAL:variable_y VAL:bob .
+
+VAL:rule_knows_bob_chris
+    VAL:type VAL:fact ;
+    VAL:operation VAL:knows_direct ;
+    VAL:variable_x VAL:bob ;
+    VAL:variable_y VAL:chris .
+
+VAL:rule_knows_andy_david
+    VAL:type VAL:fact ;
+    VAL:operation VAL:knows_direct ;
+    VAL:variable_x VAL:andy ;
+    VAL:variable_y VAL:david .
+
+VAL:rule_knows_david_edgar
+    VAL:type VAL:fact ;
+    VAL:operation VAL:knows_direct ;
+    VAL:variable_x VAL:david ;
+    VAL:variable_y VAL:edgar .
+
+##################################################################
+# rules
+
+VAL:rule_knows
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:knows ;
+        VAL:variable_x VAR:x ;
+        VAL:variable_y VAR:y ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:knows_indirect ;
+            VAL:variable_x VAR:x ;
+            VAL:variable_y VAR:y ] ] .
+
+VAL:rule_knows_indirect1
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:knows_indirect ;
+        VAL:variable_x VAR:x ;
+        VAL:variable_y VAR:y ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:knows_direct ;
+            VAL:variable_x VAR:x ;
+            VAL:variable_y VAR:y ] ] .
+
+VAL:rule_knows_indirect2
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:knows_indirect ;
+        VAL:variable_x VAR:x ;
+        VAL:variable_y VAR:y ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:knows_direct ;
+            VAL:variable_x VAR:x ;
+            VAL:variable_y VAR:u ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:knows_indirect ;
+            VAL:variable_x VAR:u ;
+            VAL:variable_y VAR:y ] ] .
+
+##################################################################
+# controls
+
+VAL:control_knows
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:knows ;
+        VAL:variable_x VAR:x ;
+        VAL:variable_y VAR:y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:knows_indirect ;
+            VAL:variable_x VAR:x ;
+            VAL:variable_y VAR:y ] ] .
+
+VAL:control_knows_indirect1
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:knows_indirect ;
+        VAL:variable_x VAR:x ;
+        VAL:variable_y VAR:y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:knows_direct ;
+            VAL:variable_x VAR:x ;
+            VAL:variable_y VAR:y ] ] .
+
+VAL:control_knows_indirect2
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:knows_indirect ;
+        VAL:variable_x VAR:x ;
+        VAL:variable_y VAR:y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:knows_direct ;
+            VAL:variable_x VAR:x ;
+            VAL:variable_y VAR:u ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:knows_indirect ;
+            VAL:variable_x VAR:u ;
+            VAL:variable_y VAR:y ] ] .
+
+##################################################################
+# applications
+
+VAL:application_knows_x_y
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:knows ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:use [
+        VAL:control VAL:control_knows ;
+        VAL:priority "1" ] ;
+    VAL:priority "1" .
+
+VAL:application_knows_direct_x_y
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:knows_indirect ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:use [
+        VAL:control VAL:control_knows_indirect1 ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_knows_indirect2 ;
+        VAL:priority "2" ] ;
+    VAL:priority "1" .
+
+##################################################################
+# inferences

@@ -1,0 +1,66 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+################################################################################
+# facts
+
+VAL:fact_next_number_0_1
+    VAL:type VAL:fact ;
+    VAL:operation VAL:next_number ;
+    VAL:variable_x VAL:zero ;
+    VAL:variable_y VAL:one .
+
+VAL:fact_next_number_1_2
+    VAL:type VAL:fact ;
+    VAL:operation VAL:next_number ;
+    VAL:variable_x VAL:one ;
+    VAL:variable_y VAL:two .
+
+VAL:fact_next_number_2_3
+    VAL:type VAL:fact ;
+    VAL:operation VAL:next_number ;
+    VAL:variable_x VAL:two ;
+    VAL:variable_y VAL:three .
+
+VAL:fact_next_number_3_4
+    VAL:type VAL:fact ;
+    VAL:operation VAL:next_number ;
+    VAL:variable_x VAL:three ;
+    VAL:variable_y VAL:four .
+
+VAL:fact_next_number_4_5
+    VAL:type VAL:fact ;
+    VAL:operation VAL:next_number ;
+    VAL:variable_x VAL:four ;
+    VAL:variable_y VAL:five .
+
+VAL:fact_next_number_5_6
+    VAL:type VAL:fact ;
+    VAL:operation VAL:next_number ;
+    VAL:variable_x VAL:five ;
+    VAL:variable_y VAL:six .
+
+VAL:fact_next_number_6_7
+    VAL:type VAL:fact ;
+    VAL:operation VAL:next_number ;
+    VAL:variable_x VAL:six ;
+    VAL:variable_y VAL:seven .
+
+VAL:fact_next_number_7_8
+    VAL:type VAL:fact ;
+    VAL:operation VAL:next_number ;
+    VAL:variable_x VAL:seven ;
+    VAL:variable_y VAL:eight .
+
+VAL:fact_next_number_8_9
+    VAL:type VAL:fact ;
+    VAL:operation VAL:next_number ;
+    VAL:variable_x VAL:eight ;
+    VAL:variable_y VAL:nine .
+
+VAL:fact_next_number_9_10
+    VAL:type VAL:fact ;
+    VAL:operation VAL:next_number ;
+    VAL:variable_x VAL:nine ;
+    VAL:variable_y VAL:ten .

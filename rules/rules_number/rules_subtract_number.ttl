@@ -1,0 +1,64 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+#[]
+#    VAL:type VAL:fact ;
+#    VAL:operation VAL:add_number ;
+#    VAL:variable_x VAL:three ;
+#    VAL:variable_y VAL:two ;
+#    VAL:variable_z VAL:five .
+
+##################################################################
+# rules
+
+VAL:rule_subtract_number_x_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_z ;
+            VAL:variable_z VAR:_x ] ].
+
+##################################################################
+# controls
+
+VAL:control_subtract_number_x_y_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_z ;
+            VAL:variable_z VAR:_x ] ].
+
+##################################################################
+# applications
+
+VAL:application_subtract_number_x_y_z
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_subtract_number_x_y_z ] .
+
+##################################################################
+# inferences

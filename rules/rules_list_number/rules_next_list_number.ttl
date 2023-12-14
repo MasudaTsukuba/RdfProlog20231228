@@ -1,0 +1,263 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+################################################################################
+# facts
+
+VAL:node_one
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:one ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_one .
+
+################################################################################
+# rules
+
+VAL:rule_next_list_number
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:next_list_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAR:_car_x ;
+            VAL:variable_y VAR:_cdr_x ;
+            VAL:variable_z VAR:_x ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_car_x ;
+            VAL:variable_y VAR:_car_next ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAR:_car_next ;
+            VAL:variable_y VAR:_cdr_x ;
+            VAL:variable_z VAR:_u ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:carry_up ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ] .
+
+VAL:rule_carry_up_nil
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:carry_up ;
+        VAL:variable_x VAL:nil ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAL:one ;
+            VAL:variable_y VAL:nil ;
+            VAL:variable_z VAR:_y ] ] .
+
+VAL:rule_carry_up
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:carry_up ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAR:_car_x ;
+            VAL:variable_y VAR:_cdr_x ;
+            VAL:variable_z VAR:_x ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:carry_up2 ;
+            VAL:variable_x VAR:_car_x ;
+            VAL:variable_y VAR:_cdr_x ;
+            VAL:variable_z VAR:_y ] ] .
+
+VAL:rule_carry_up2_10_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:carry_up2 ;
+        VAL:variable_x VAL:ten ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:carry_up ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_u ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAL:zero ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_z ] ] .
+
+VAL:rule_carry_up2_x_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:carry_up2 ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_y ;
+            VAL:variable_z VAR:_z ] ] .
+
+################################################################################
+# controls
+
+VAL:control_next_list_number_x_y
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:next_list_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAR:_car_x ;
+            VAL:variable_y VAR:_cdr_x ;
+            VAL:variable_z VAR:_x ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_car_x ;
+            VAL:variable_y VAR:_car_next ] ] ;
+    VAL:right_side [
+        VAL:priority "3" ;
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAR:_car_next ;
+            VAL:variable_y VAR:_cdr_x ;
+            VAL:variable_z VAR:_u ] ] ;
+    VAL:right_side [
+        VAL:priority "4" ;
+        VAL:child [
+            VAL:operation VAL:carry_up ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ] .
+
+VAL:control_carry_up_nil_y
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:carry_up ;
+        VAL:variable_x VAL:nil ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAL:one ;
+            VAL:variable_y VAL:nil ;
+            VAL:variable_z VAR:_y ] ] .
+
+VAL:control_carry_up_x_y
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:carry_up ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAR:_car_x ;
+            VAL:variable_y VAR:_cdr_x ;
+            VAL:variable_z VAR:_x ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:carry_up2 ;
+            VAL:variable_x VAR:_car_x ;
+            VAL:variable_y VAR:_cdr_x ;
+            VAL:variable_z VAR:_y ] ] .
+
+VAL:control_carry_up2_10_y_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:carry_up2 ;
+        VAL:variable_x VAL:ten ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:carry_up ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_u ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAL:zero ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_z ] ] .
+
+VAL:control_carry_up2_x_y_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:carry_up2 ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_y ;
+            VAL:variable_z VAR:_z ] ] .
+
+##################################################################
+# applications
+
+VAL:application_next_list_number_x_y
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:next_list_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:use [
+        VAL:control VAL:control_next_list_number_x_y ;
+        VAL:priority "1" ] ;
+    VAL:priority "1" .
+
+VAL:application_carry_up_x_y
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:carry_up ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:use [
+        VAL:control VAL:control_carry_up_nil_y ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_carry_up_x_y ;
+        VAL:priority "2" ] ;
+    VAL:priority "1" .
+
+VAL:application_carry_up2_x_y
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:carry_up2 ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_carry_up2_10_y_z ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_carry_up2_x_y_z ;
+        VAL:priority "2" ] ;
+    VAL:priority "1" .

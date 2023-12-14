@@ -1,0 +1,607 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+VAL:fact_next_number_1_2
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:1 ;
+	VAL:variable_y VAL:2 .
+
+VAL:fact_next_number_2_3
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:2 ;
+	VAL:variable_y VAL:3 .
+
+VAL:fact_next_number_3_4
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:3 ;
+	VAL:variable_y VAL:4 .
+
+VAL:fact_next_number_4_5
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:4 ;
+	VAL:variable_y VAL:5 .
+
+VAL:fact_next_number_5_6
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:5 ;
+	VAL:variable_y VAL:6 .
+
+VAL:fact_next_number_6_7
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:6 ;
+	VAL:variable_y VAL:7 .
+
+VAL:fact_next_number_7_8
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:7 ;
+	VAL:variable_y VAL:8 .
+
+VAL:fact_next_number_8_9
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:8 ;
+	VAL:variable_y VAL:9 .
+
+VAL:fact_next_number_9_10
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:9 ;
+	VAL:variable_y VAL:10 .
+
+VAL:fact_next_number_10_11
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:10 ;
+	VAL:variable_y VAL:11 .
+
+VAL:fact_next_number_11_12
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:11 ;
+	VAL:variable_y VAL:12 .
+
+VAL:fact_next_number_12_13
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:12 ;
+	VAL:variable_y VAL:13 .
+
+VAL:fact_next_number_13_14
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:13 ;
+	VAL:variable_y VAL:14 .
+
+VAL:fact_next_number_14_15
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:14 ;
+	VAL:variable_y VAL:15 .
+
+VAL:fact_next_number_15_16
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:15 ;
+	VAL:variable_y VAL:16 .
+
+VAL:fact_next_number_16_17
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:16 ;
+	VAL:variable_y VAL:17 .
+
+VAL:fact_next_number_17_18
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:17 ;
+	VAL:variable_y VAL:18 .
+
+VAL:fact_next_number_18_19
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:18 ;
+	VAL:variable_y VAL:19 .
+
+VAL:fact_next_number_19_20
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:19 ;
+	VAL:variable_y VAL:20 .
+
+VAL:fact_next_number_20_21
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:20 ;
+	VAL:variable_y VAL:21 .
+
+VAL:fact_next_number_21_22
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:21 ;
+	VAL:variable_y VAL:22 .
+
+VAL:fact_next_number_22_23
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:22 ;
+	VAL:variable_y VAL:23 .
+
+VAL:fact_next_number_23_24
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:23 ;
+	VAL:variable_y VAL:24 .
+
+VAL:fact_next_number_24_25
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:24 ;
+	VAL:variable_y VAL:25 .
+
+VAL:fact_next_number_25_26
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:25 ;
+	VAL:variable_y VAL:26 .
+
+VAL:fact_next_number_26_27
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:26 ;
+	VAL:variable_y VAL:27 .
+
+VAL:fact_next_number_27_28
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:27 ;
+	VAL:variable_y VAL:28 .
+
+VAL:fact_next_number_28_29
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:28 ;
+	VAL:variable_y VAL:29 .
+
+VAL:fact_next_number_29_30
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:29 ;
+	VAL:variable_y VAL:30 .
+
+VAL:fact_next_number_30_31
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:30 ;
+	VAL:variable_y VAL:31 .
+
+VAL:fact_next_number_31_32
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:31 ;
+	VAL:variable_y VAL:32 .
+
+VAL:fact_next_number_32_33
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:32 ;
+	VAL:variable_y VAL:33 .
+
+VAL:fact_next_number_33_34
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:33 ;
+	VAL:variable_y VAL:34 .
+
+VAL:fact_next_number_34_35
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:34 ;
+	VAL:variable_y VAL:35 .
+
+VAL:fact_next_number_35_36
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:35 ;
+	VAL:variable_y VAL:36 .
+
+VAL:fact_next_number_36_37
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:36 ;
+	VAL:variable_y VAL:37 .
+
+VAL:fact_next_number_37_38
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:37 ;
+	VAL:variable_y VAL:38 .
+
+VAL:fact_next_number_38_39
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:38 ;
+	VAL:variable_y VAL:39 .
+
+VAL:fact_next_number_39_40
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:39 ;
+	VAL:variable_y VAL:40 .
+
+VAL:fact_next_number_40_41
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:40 ;
+	VAL:variable_y VAL:41 .
+
+VAL:fact_next_number_41_42
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:41 ;
+	VAL:variable_y VAL:42 .
+
+VAL:fact_next_number_42_43
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:42 ;
+	VAL:variable_y VAL:43 .
+
+VAL:fact_next_number_43_44
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:43 ;
+	VAL:variable_y VAL:44 .
+
+VAL:fact_next_number_44_45
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:44 ;
+	VAL:variable_y VAL:45 .
+
+VAL:fact_next_number_45_46
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:45 ;
+	VAL:variable_y VAL:46 .
+
+VAL:fact_next_number_46_47
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:46 ;
+	VAL:variable_y VAL:47 .
+
+VAL:fact_next_number_47_48
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:47 ;
+	VAL:variable_y VAL:48 .
+
+VAL:fact_next_number_48_49
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:48 ;
+	VAL:variable_y VAL:49 .
+
+VAL:fact_next_number_49_50
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:49 ;
+	VAL:variable_y VAL:50 .
+
+VAL:fact_next_number_50_51
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:50 ;
+	VAL:variable_y VAL:51 .
+
+VAL:fact_next_number_51_52
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:51 ;
+	VAL:variable_y VAL:52 .
+
+VAL:fact_next_number_52_53
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:52 ;
+	VAL:variable_y VAL:53 .
+
+VAL:fact_next_number_53_54
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:53 ;
+	VAL:variable_y VAL:54 .
+
+VAL:fact_next_number_54_55
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:54 ;
+	VAL:variable_y VAL:55 .
+
+VAL:fact_next_number_55_56
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:55 ;
+	VAL:variable_y VAL:56 .
+
+VAL:fact_next_number_56_57
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:56 ;
+	VAL:variable_y VAL:57 .
+
+VAL:fact_next_number_57_58
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:57 ;
+	VAL:variable_y VAL:58 .
+
+VAL:fact_next_number_58_59
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:58 ;
+	VAL:variable_y VAL:59 .
+
+VAL:fact_next_number_59_60
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:59 ;
+	VAL:variable_y VAL:60 .
+
+VAL:fact_next_number_60_61
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:60 ;
+	VAL:variable_y VAL:61 .
+
+VAL:fact_next_number_61_62
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:61 ;
+	VAL:variable_y VAL:62 .
+
+VAL:fact_next_number_62_63
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:62 ;
+	VAL:variable_y VAL:63 .
+
+VAL:fact_next_number_63_64
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:63 ;
+	VAL:variable_y VAL:64 .
+
+VAL:fact_next_number_64_65
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:64 ;
+	VAL:variable_y VAL:65 .
+
+VAL:fact_next_number_65_66
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:65 ;
+	VAL:variable_y VAL:66 .
+
+VAL:fact_next_number_66_67
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:66 ;
+	VAL:variable_y VAL:67 .
+
+VAL:fact_next_number_67_68
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:67 ;
+	VAL:variable_y VAL:68 .
+
+VAL:fact_next_number_68_69
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:68 ;
+	VAL:variable_y VAL:69 .
+
+VAL:fact_next_number_69_70
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:69 ;
+	VAL:variable_y VAL:70 .
+
+VAL:fact_next_number_70_71
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:70 ;
+	VAL:variable_y VAL:71 .
+
+VAL:fact_next_number_71_72
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:71 ;
+	VAL:variable_y VAL:72 .
+
+VAL:fact_next_number_72_73
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:72 ;
+	VAL:variable_y VAL:73 .
+
+VAL:fact_next_number_73_74
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:73 ;
+	VAL:variable_y VAL:74 .
+
+VAL:fact_next_number_74_75
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:74 ;
+	VAL:variable_y VAL:75 .
+
+VAL:fact_next_number_75_76
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:75 ;
+	VAL:variable_y VAL:76 .
+
+VAL:fact_next_number_76_77
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:76 ;
+	VAL:variable_y VAL:77 .
+
+VAL:fact_next_number_77_78
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:77 ;
+	VAL:variable_y VAL:78 .
+
+VAL:fact_next_number_78_79
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:78 ;
+	VAL:variable_y VAL:79 .
+
+VAL:fact_next_number_79_80
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:79 ;
+	VAL:variable_y VAL:80 .
+
+VAL:fact_next_number_80_81
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:80 ;
+	VAL:variable_y VAL:81 .
+
+VAL:fact_next_number_81_82
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:81 ;
+	VAL:variable_y VAL:82 .
+
+VAL:fact_next_number_82_83
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:82 ;
+	VAL:variable_y VAL:83 .
+
+VAL:fact_next_number_83_84
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:83 ;
+	VAL:variable_y VAL:84 .
+
+VAL:fact_next_number_84_85
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:84 ;
+	VAL:variable_y VAL:85 .
+
+VAL:fact_next_number_85_86
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:85 ;
+	VAL:variable_y VAL:86 .
+
+VAL:fact_next_number_86_87
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:86 ;
+	VAL:variable_y VAL:87 .
+
+VAL:fact_next_number_87_88
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:87 ;
+	VAL:variable_y VAL:88 .
+
+VAL:fact_next_number_88_89
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:88 ;
+	VAL:variable_y VAL:89 .
+
+VAL:fact_next_number_89_90
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:89 ;
+	VAL:variable_y VAL:90 .
+
+VAL:fact_next_number_90_91
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:90 ;
+	VAL:variable_y VAL:91 .
+
+VAL:fact_next_number_91_92
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:91 ;
+	VAL:variable_y VAL:92 .
+
+VAL:fact_next_number_92_93
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:92 ;
+	VAL:variable_y VAL:93 .
+
+VAL:fact_next_number_93_94
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:93 ;
+	VAL:variable_y VAL:94 .
+
+VAL:fact_next_number_94_95
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:94 ;
+	VAL:variable_y VAL:95 .
+
+VAL:fact_next_number_95_96
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:95 ;
+	VAL:variable_y VAL:96 .
+
+VAL:fact_next_number_96_97
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:96 ;
+	VAL:variable_y VAL:97 .
+
+VAL:fact_next_number_97_98
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:97 ;
+	VAL:variable_y VAL:98 .
+
+VAL:fact_next_number_98_99
+	VAL:type VAL:fact ;
+	VAL:operation VAL:next_number ;
+	VAL:variable_x VAL:98 ;
+	VAL:variable_y VAL:99 .
+
+
+##################################################################
+# rules
+
+##################################################################
+# controls
+
+##################################################################
+# applications
+
+##################################################################
+# inferences

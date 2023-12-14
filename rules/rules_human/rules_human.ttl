@@ -1,0 +1,55 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+VAL:fact_human_socrates
+    VAL:type VAL:fact ;
+    VAL:operation VAL:human ;
+    VAL:variable_x VAL:socrates .
+
+##################################################################
+# rules
+
+VAL:rule_human_mortal
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:mortal ;
+        VAL:variable_x VAR:_x ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:human ;
+            VAL:variable_x VAR:_x ] ] .
+
+##################################################################
+# controls
+
+VAL:control_human_mortal
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:mortal ;
+        VAL:variable_x VAR:_x ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:human ;
+            VAL:variable_x VAR:_x ] ] .
+
+##################################################################
+# applications
+
+VAL:application_mortal_x
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:mortal ;
+        VAL:variable_x VAR:_x ] ;
+    VAL:use [
+        VAL:control VAL:control_human_mortal ;
+        VAL:priority "1" ] ;
+    VAL:priority "1" .
+
+##################################################################
+# inferences

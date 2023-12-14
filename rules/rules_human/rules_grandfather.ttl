@@ -1,0 +1,120 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+VAL:fact_father_jiro_taro
+    VAL:type VAL:fact ;
+    VAL:operation VAL:father ;
+    VAL:variable_x VAL:taro ;
+    VAL:variable_y VAL:jiro .
+
+VAL:fact_mother_jiro_hana
+    VAL:type VAL:fact ;
+    VAL:operation VAL:mother ;
+    VAL:variable_x VAL:taro ;
+    VAL:variable_y VAL:hana .
+
+VAL:fact_father_hana_ichiro
+    VAL:type VAL:fact ;
+    VAL:operation VAL:father ;
+    VAL:variable_x VAL:hana ;
+    VAL:variable_y VAL:ichiro .
+
+##################################################################
+# rules
+
+VAL:rule_grandfather_father_father
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:grandfather ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:father ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ] ] ;
+    VAL:right_side [
+        VAL:child [
+             VAL:operation VAL:father ;
+             VAL:variable_x VAR:_u ;
+             VAL:variable_y VAR:_y ] ] .
+
+VAL:rule_grandfather_mother_father
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:grandfather ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:mother ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ] ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:father ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ] .
+
+##################################################################
+# controls
+
+VAL:control_grandfather_father_father
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:grandfather ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:father ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+             VAL:operation VAL:father ;
+             VAL:variable_x VAR:_u ;
+             VAL:variable_y VAR:_y ] ] .
+
+VAL:control_grandfather_mother_father
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:grandfather ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:mother ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:father ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ] .
+
+##################################################################
+# applications
+
+VAL:application_grandfather_x_y
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:grandfather ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:use [
+        VAL:control VAL:control_grandfather_father_father ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_grandfather_mother_father ;
+        VAL:priority "2" ] ;
+    VAL:priority "1" .
