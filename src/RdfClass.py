@@ -770,7 +770,12 @@ class ClassControl:
         SELECT ?left_side  WHERE {{ <{subject}> {uri_ref_ext('left_side')} ?left_side . }}
         """
         results_for_control_left = graph.query(query_for_control_left)
-        subject_left = results_for_control_left.bindings[0]['left_side']
+        try:
+            subject_left = results_for_control_left.bindings[0]['left_side']
+        except KeyError:
+            pass  # error
+        except Exception:
+            pass  # error
         clause = ClassClause()
         self.left_side = clause.from_query(graph, subject_left)
         self.right_sides = ClassClauses()
