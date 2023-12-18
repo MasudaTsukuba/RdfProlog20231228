@@ -558,3 +558,22 @@ def test_divide_6_2_ans():
     resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=50)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?ans'] == 'http://value.org/list_three'
+
+
+def test_fibonacci_1_ans():
+    # fibinacci(1, ?ans) -> ?ans = 1
+    my_question = f"""
+        SELECT ?ans ?car ?cdr WHERE {{
+        ?s <http://value.org/operation> <http://value.org/fibonacci_number> . 
+        ?s <http://value.org/variable_x> <http://value.org/list_one> . 
+        ?s <http://value.org/variable_y> ?ans . 
+        ?s2 <http://value.org/operation> <http://value.org/cons> . 
+        ?s2 <http://value.org/variable_x> ?car . 
+        ?s2 <http://value.org/variable_y> ?cdr . 
+        ?s2 <http://value.org/variable_z> ?ans . 
+        }}"""
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=100)
+    assert len(resolve_bindings) == 1
+    assert resolve_bindings[0]['?car'] == 'http://value.org/one'
+    assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'

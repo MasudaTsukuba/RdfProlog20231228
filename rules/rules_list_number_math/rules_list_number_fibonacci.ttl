@@ -1,0 +1,93 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+# facts are basic statements of relationships that are always true
+
+##################################################################
+# rules
+
+##################################################################
+# controls
+
+VAL:control_fibonacci_number_1_1
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:fibonacci_number ;
+        VAL:variable_x VAL:list_one ;
+        VAL:variable_y VAL:list_one ] ;
+    VAL:priority "1" .
+
+VAL:control_fibonacci_number_2_1
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:fibonacci_number ;
+        VAL:variable_x VAL:list_two ;
+        VAL:variable_y VAL:list_one ] ;
+    VAL:priority "2" .
+
+VAL:control_fibonacci_number_sx_y
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:fibonacci_number ;
+        VAL:variable_x SOME:_sx ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:next_list_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_sx ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:next_list_number ;
+            VAL:variable_x VAR:_v ;
+            VAL:variable_y VAR:_u ] ] ;
+    VAL:right_side [
+        VAL:priority "3" ;
+        VAL:child [
+            VAL:operation VAL:fibonacci_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_uf ] ] ;
+    VAL:right_side [
+        VAL:priority "4" ;
+        VAL:child [
+            VAL:operation VAL:fibonacci_number ;
+            VAL:variable_x VAR:_v ;
+            VAL:variable_y VAR:_vf ] ] ;
+    VAL:right_side [
+        VAL:priority "5" ;
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_uf ;
+            VAL:variable_y VAR:_vf ;
+            VAL:variable_z VAR:_y ] ] ;
+    VAL:priority "3" .
+
+##################################################################
+# applications
+
+VAL:application_fibonacci_number_sx_y
+   VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+        VAL:operation VAL:fibonacci_number ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:use [
+        VAL:control VAL:control_fibonacci_number_1_1 ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_fibonacci_number_2_1 ;
+        VAL:priority "2" ] ;
+   VAL:use [
+        VAL:control VAL:control_fibonacci_number_sx_y ;
+        VAL:priority "3" ] ;
+    VAL:priority "1".
+
+##################################################################
+# inferences
+# inferences are facts that are derived by reasoning

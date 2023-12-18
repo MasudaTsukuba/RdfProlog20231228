@@ -65,5 +65,16 @@ VAL:application_subtract_number_sx_y_sz
     VAL:use [
         VAL:control VAL:control_subtract_number_x_y_z ] .
 
+VAL:application_subtract_number_x_sy_sz
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z SOME:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_subtract_number_x_y_z ] .
+
 ##################################################################
 # inferences

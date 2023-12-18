@@ -1,183 +1,387 @@
 RdfProlog
-RDFのクエリ機能を利用してPrologの推論を実行するシステム。
+A software for executing Prolog inferences using RDF query functions.
 
-質問はsparql queryで与える。
-grandfather(jiro, Y).の場合。
+Questions of Prolog is given in the form of SPARQL query.
+
+FOr example, in the case of grandfather(jiro, Y):
 SELECT ?ans WHERE {
     ?s VAL:operation　VAL:grandfather .
     ?s VAL:variable_x　VAL:jiro .
     ?s VAL:variable_y ?ans . }
 
-事実はRDFで与える。
-father(jiro, taro).は以下のようになる。
+Facts are also given in the form of RDF triples that have one common subject. Such kind of triples will be called a clause.
+
+For example, the fact father(jiro, taro) is in the form of
 VAL:rule_father_jiro_taro
     VAL:operation VAL:father ;
     VAL:variable_x VAL:jiro ;
     VAL:variable_y VAL:taro .
 
-ルールもRDFで与える。
-grandfather(X, Y) :- father(X, U), father(U, Y).は次のようになる。
+Inference rule are also in the form of RDF. A rule has the left_side and the right_side.
+The left_side is a single clause having the same common subject VAL:left_side.
+There are zero or more right_side representing the right_side clauses of Prolog rule.
+
+The rule grandfather(X, Y) :- mother(X, U), father(U, Y) . becomes as follows:
 VAL:grandfather_father_father
     VAL:left_side [
         VAL:operation VAL:grandfather ;
         VAL:variable_x VAR:x ;
         VAL:variable_y VAR:y ] ;
     VAL:right_side [
-        VAL:priority "1" ;
         VAL:child [
-            VAL:operation VAL:father ;
+            VAL:operation VAL:mother ;
             VAL:variable_x VAR:x ;
             VAL:variable_y VAR:u ] ] ;
     VAL:right_side [
-        VAL:priority "2" ;
         VAL:child [
              VAL:operation VAL:father ;
              VAL:variable_x VAR:u ;
              VAL:variable_y VAR:y ] ] .
 
-＜実行手順＞
-[answer_question]
-answer_questionにquestionを与える。この関数がresolveを呼び出して、結果を出力する。
-    rdf_prolog.answer_question(my_question)
+The rule in Prolog implicitly assumes the execution priority in the rule. In the above example, mother(X, U) is evaluated first, and father(U, Y) next.
+This kind of priority is explicitly declared in RdfProlog. For example, the mother-father relation is declared as
+VAL:control_grandfather_mother_father
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:grandfather ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:mother ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:father ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ] .
+The rule with execution priorities is called a control and explicitly declared as "VAL:type VAL:control".
 
-[resolve]
-answer_questionはresolveを呼び出す。resolveが実質的な処理関数。
-    resolve_succeeded, resolve_results, resolve_bindings = self.resolve(question, resolve_bindings)
-questionは上記の質問。
-resolve_bindingsは変数の対応関係を示す、dictのlist。初期値として[]を与える。
-推論が成功すると、resolve_succeededがTrueになる。失敗するとFalseになる。
-推論が成功すると、resolve_resultsに回答が格納される。
-resolve_bindingsには変数の対応関係が格納される。
+Furthermore in Prolog the priority of applying the rules is also implicitly declared by the order of rules. That is, if the rules are declares as
+    grandfather(X, Y) :- father(X, U), father(U, Y) .
+    grandfather(X, Y) :- mother(X, U), father(U, Y) .
+the first rule will be applied first, and the second rule second.
 
-＜resolve内の処理＞
-処理の核心であるresolveは再起的に呼び出される。
+This kind of priorities between rules are also explicitly declared in RdfProlog. The collection is called an application and looks like
+VAL:application_grandfather_x_y
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:grandfather ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ] ;
+    VAL:use [
+        VAL:control VAL:control_grandfather_father_father ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_grandfather_mother_father ;
+        VAL:priority "2" ] ;
+    VAL:priority "1" .
 
-＜resolve前半、直接探索＞
-resolveの前半ではquestionに対する直接の回答が無いかを検索する。
-このとき、direct_search()を呼び出す。
-    direct_search_succeeded, results_of_direct_search, returned_direct_search_bindings \
-            = direct_search(resolve_question)
-resolve_questionは回答すべき質問。
-データベースに適合する事実が存在するとdirect_search_resultsはTrueになる。存在しなければFalseになる。
-grandfather(jiro, Y).は失敗する。
-father(jiro, U).は成功する。
-事実が存在すると、検索結果がresult_of_direct_searchに格納される。
+An application also has priority against other applications.
 
-変数の対応関係はreturned_direct_search_bindingsに格納される。
-father(jiro, U).に対する変数の対応は次のようになる。
-[{'?s': '<http://value.org/rule_father_jiro_taro>', '?u': '<http://value.org/taro>'}]
+-----------------------------------------------------------------
+Execution procedures
+[answer_question method in RdfProlog class]
+The question is given to this method of an instance of RdfProlog class.
+    resolve_bindings = rdf_prolog.answer_question(my_question)
+The results of the query is returned in the form of list[dict[str, str]], where list contains multiple results of the query and dict contains the variables in the question as keys and the associated values in dictionary values.
 
-＜resolve後半、ルール探索＞
-後半では適用可能なルールを検索して順番に試す。
-直接の回答が見つからなかった時にはこちらに進む。
-直接の回答が見つかった時には実行されない。
+[reasoner method in Reasoner class]
+reasoner method is the core of the inference. It calls recursively itself util all the clauses in the question are solved.
+reasoner method returns a flag for success and resolve_bindings.
+When reasoner finds some valid results, it returns True. If no valid answers are found, it returns False.
+If the inference is succeeded, resolve_bindings contains the valid answers.
 
-[find_rules]
-与えられた質問に対応するルールの左辺値はあらかじめリストしておく。create_list_of_left_rules()
-質問に適合するルールを検索する関数がfind_rulesである。
-    parents_found, bindings_found = find_rules(resolve_question)
-質問を与えて、適合するルールのリストを得る。
-parents_foundにはルールの親のラベルが格納される。
-bindings_foundにはルールと質問の間の変数の対応関係が格納される。
-戻り値のリストが空の時には、適合するルールが見つからなかったので、resolveを失敗で呼び出し先に戻る。
+Within reasoner, the facts are first checked for the first clause of the question using search_facts() method.
+If the fact search is successful, search_fact() method returns a list of bindings.
+If the fact search fails, the list becomes empty.
+For example, grandfather(taro, Y). will be failed, because there are no such fact registered.
+The search for father(taro, U). will be succeeded, because a fact father(taro, jiro). is registered.
+The bindings becomes [{'?u': '<http://value.org/jiro>'}]
+If the list is not empty, reasoner repeatedly applies the bindings to the rest of clauses and recursively call itself.
 
-grandfather(jiro, Y).の場合には、２つのルールが適合する。
-parents_foundは２要素のリストになる。
-['<http://value.org/grandfather_father_father>',
- '<http://value.org/grandfather_mother_father>']
+Reasoner next checks the existence of applicable rules by comparing the name of the operation and the matching between the arguments.
+If there exist applicable rules, the matched clause is replaced by the right_side clauses of the rule and the bindings found while matching the left_side of the rule is applied to the remaining clauses.
+Then the modified clauses are processed by reasoner.
 
-bindings_foundはdictのlistのlistになる。keyがルール側、valueが質問側になる。
-[[{rdflib.term.Variable('s'): rdflib.term.URIRef('http://value.org/subj'),
-  rdflib.term.Variable('x'): rdflib.term.URIRef('http://value.org/jiro'),
-  rdflib.term.Variable('y'): rdflib.term.URIRef('http://variable.org/ans')}],
- [{rdflib.term.Variable('s'): rdflib.term.URIRef('http://value.org/subj'),
- rdflib.term.Variable('x'): rdflib.term.URIRef('http://value.org/jiro'),
- rdflib.term.Variable('y'): rdflib.term.URIRef('http://variable.org/ans')}]]
+-------------------------------------------------------
+Execution sample of grandfather search
 
-適合したルールを順番に試す。
-１つでも成功すれば、その段階で打ち切って、成功を返す。
-全てのルールで失敗したら、失敗を返す。
+First the question is grandfather(taro, Y), which is represented as
+        SELECT ?ans WHERE {
+        ?s <http://value.org/operation> <http://value.org/grandfather> .
+        ?s <http://value.org/variable_x> <http://value.org/taro> .
+        ?s <http://value.org/variable_y> ?ans .
+        }
 
-[resolve_right_side]
-個々のルールを試すのがresolve_right_side()である。
-    right_side_succeeded, resolve_result, resolve_bindings = resolve_right_side(parent_found, binding_found, resolve_bindings)
+reasoner first searches the fact matching grandfather(taro, Y), but fails.
 
-parent_foundには上記find_rules()で得たparents_foundの要素が入る。
-binding_foundには上記find_rules()で得たbindings_foundの要素が入る。
-resolve_bindingsには、それまでの変数対応のリストが入る。
-この関数の中でresolveを再起的に呼び出す。
-ルールの右辺が成功すればright_side_succeededはTrueになる。
-失敗すればright_side_succeededはFalseになる。
-クエリの結果はresolve_resultに格納される。
-変数の対応はresolve_bindingsに格納される。
+reasoner then searches applications that have an operation name of "VAL:operation VAL:grandfather" and finds "VAL:application_grandfather_x_y".
+This application has two controls "VAL:control_grandfather_father_father" and "VAL:control_grandfather_mother_father" and tries these controls (rules) in this order.
 
-grandfather(jiro, Y).の場合、最初にfather(jiro, U), father(U, Y).を試す。
-最初はresolve_bindings=[]である。
-左辺の変数の対応関係を解決するためにbuild_argument_bindings()を呼び出す。
-    argument_binding = build_argument_bindings(binding[0])
-binding[0]で変数対応の辞書を取り出す。
-戻り値のargument_bindingには左辺値の対応が入っている。
-{'?s': '<http://value.org/subj>', '?x': '<http://value.org/jiro>', '?y': '?ans'}
+When the first control "VAL:control_grandfather_father_father" is applied, the question clause is replaced with the right_side of the rule and after applying the bindings becomes
+    father(taro, U), father(U, Y).
+Then reasoner tries to find facts and gets the fact father(taro, jiro) and the question clause become
+    father(jiro, Y).
+Unfortunately there exist no facts or applications that give the answer for the variable Y.
 
-次に右辺の各項を順番に試す。
-右辺の各項は親のラベルparent_for_rightを基にして、find_right_sides()で取り出す。
-    results_for_right = find_right_sides(parent_for_right)  # find right hand of the rule
-results_for_rightの各項rightのright_side[0]で右辺の各項のラベルが取得できる。
+The reasoner goes back to the second control the application and the clauses become
+    mother(taro, U), father(U, Y).
 
-各項のラベルからfind_child_right()でこの子要素を取り出す。
-    results_of_right_side_search = find_child_right(right_side[0])
+There is a fact mother(taro, hana). After applying this fact, the question becomes
+    father(hana, Y).
 
-その結果からさらに孫要素を取り出すと、get_grand_child_rules()で右辺各項の実体が得られる。
-    results_for_grandchild_rules = get_grand_child_rules(result[0])
-results_for_grandchild_rulesのbindingsは次のようになる。　これはfather(X, U).を表す。
-[{rdflib.term.Variable('p'): rdflib.term.URIRef('http://value.org/operation'),
-  rdflib.term.Variable('o'): rdflib.term.URIRef('http://value.org/father')},
- {rdflib.term.Variable('p'): rdflib.term.URIRef('http://value.org/variable_y'),
-  rdflib.term.Variable('o'): rdflib.term.URIRef('http://variable.org/variable_u')},
- {rdflib.term.Variable('p'): rdflib.term.URIRef('http://value.org/variable_x'),
-  rdflib.term.Variable('o'): rdflib.term.URIRef('http://variable.org/variable_x')}]
+Repeatedly there is a fact father(hana, ichiro) and the answer Y=ichiro is obtained.
 
-右辺各項をresolveに対する質問に変換するためには、変数を置き換える必要がある。
-これをbuild_query()で処理する。
-    built_query = build_query(results_for_grandchild_rules, resolve_bindings, argument_binding)
-戻り値はクエリになる。
+-------------------------------------------------------
+Example of symbolic arithmetics
 
-father(jiro, U).の場合には、以下のように置き換えられる。
-SELECT ?s ?u  WHERE {
-    ?s <http://value.org/operation> <http://value.org/father> .
-    ?s <http://value.org/variable_x> <http://value.org/jiro> .
-    ?s <http://value.org/variable_y> ?u . }'
-build_query()内でこの変換を行うために、tripleのpredicateとobjectを抽出する。predicateはそのままクエリに使う。
-objectについては変数でなければ、そのままクエリに使う。
-変数の場合、まず<http://variable.org/variable_x>などを?xに置き換える。
-次に、左辺値での対応argument_bindingを使って、?xを<http://value.org/jiro>に置き換える。?uは対応がないのでそのままになる。
-最後に、前段階までのresolve_bindingsを使って確定した変数を置き換える。
-その結果、右辺の最初の項は上記のようなクエリに置き換えられる。
+Symbolic numbers are such that: one, two, three, ...
 
-このクエリに対してresolve()を実行すると直接の適合が見つかる。
-resolve_bindingsの戻り値は次にようになる。
-[{'?s': '<http://value.org/rule_father_jiro_taro>', '?u': '<http://value.org/taro>'}]
+The fundamental facts are declared for the next relation as
+    next(one, two).
+    next(two, three).
+    ...
 
-右辺第２項father(U, Y).に対してbuild_query()する際にはargument_bindingは同じだが、resolve_bindingsが
-[{'?s': '<http://value.org/rule_father_jiro_taro>', '?u': '<http://value.org/taro>'}]
-になっているので、クエリはのようになる。
-SELECT ?s ?ans  WHERE {
-    ?s <http://value.org/operation> <http://value.org/father> .
-    ?s <http://value.org/variable_x> <http://value.org/taro> .
-    ?s <http://value.org/variable_y> ?ans . }'
+Then the rule for addition X + Y = Z can be defined in Prolog as
+    add(X, one, Z) :- next(X, Z) .
+    add(X, Y, Z) :- next(U, Y), add(X, U, V), next(V, Z) .
 
-これは失敗して、第２ルールgrandfather_mother_fatherを調べる。
-第２ルールの右辺第１項は
-SELECT ?s ?u  WHERE {
-    ?s <http://value.org/operation> <http://value.org/mother> .
-    ?s <http://value.org/variable_x> <http://value.org/jiro> .
-    ?s <http://value.org/variable_y> ?u . }'
-これは成功して、?uがhanaになる。
-第２ルールの右辺第２項は
-SELECT ?s ?ans  WHERE {
-    ?s <http://value.org/operation> <http://value.org/father> .
-    ?s <http://value.org/variable_x> <http://value.org/hana> .
-    ?s <http://value.org/variable_y> ?ans . }'
-これも成功して、?ansにichiroが入る。
-最終的なresolve_bindingsは次にようになる。
-[{'?s': '<http://value.org/rule_father_hana_ichiro>', '?ans': '<http://value.org/ichiro>'}]
+Using these rules, a question add(two, one, Z) gives an answer Z=three, according to the first rule.
+
+If the question is add(one, two, Z), the question is converted to next(U, two), add(one, U, V), next(V, Z) .
+next(U, two) gives U=one and the remainder becomes add(one, one, V), next(V, Z) and further becomes next(one, V), next(V, Z).
+Then V=two and next(two, Z). gives Z=three.
+
+Thus the addition can be defined on the basis of next relation.
+
+However, the superiority of Prolog is its flexibility that Prolog also can answer the question add(X, one, three).
+By applying the first rule, the question add(X, one, three) becomes next(X, three) and according to the fact next(two, three), the answer X=two can be obtained.
+
+THe problem of this flexibility becomes evident when answering the question add(one, Y, three).
+The first rule cannot be applied to this question.
+By applying the second rule, the question is converted to
+    next(U, Y), add(X, U, V), next(V, Z) .
+Since both U and X are not bound to fixed constant, the fact search returns all the pair of next numbers: U=one, X=two; U=two, X=three, ...
+The reasoner tries the calculation of the remaining clauses for all the possible values of U.
+
+To solve this problem, the order of applying rules must be changed depending on the arguments of a question.
+FOr the question add(one, Y, three), the rules must be ordered
+    add(X, Y, Z) :- next(V, Z), add(X, U, V), next(U, Y) .
+Using this order, the question will be converted to next(V, three), add(one, U, V), next(U, Y) -> add(one, U, two), next(U, Y).
+add(one, U, two) matches the first rule with binding U=one, and next(one, Y) gives the correct answer Y=two without executing unnecessary trials.
+
+To implement this kind of argument dependent rule selection, we introduce a prefix SOME for a variable in the left_side of rules and also in the pattern declaration of applications.
+While a normal variable with a prefix VAR matches against both a constant and a variable, a variable with SOME prefix only matches with a constant and not with avariable.
+Thus the control and application for addition becomes
+
+##################################################################
+# controls
+
+VAL:control_add_number_x_1_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAL:1 ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_z ] ] ;
+    VAL:priority "1" .
+
+VAL:control_add_number_1_y_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAL:1 ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_z ] ] ;
+    VAL:priority "1" .
+
+VAL:control_add_number_sx_sy_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAR:_sx ;
+        VAL:variable_y VAR:_sy ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_sy ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_sx ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_v ] ] ;
+    VAL:right_side [
+        VAL:priority "3" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_v ;
+            VAL:variable_y VAR:_z ] ] ;
+    VAL:priority "2" .
+
+VAL:control_add_number_sx_y_sz
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAR:_sx ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_sz ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_sx ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_v ;
+            VAL:variable_y VAR:_sz ] ] ;
+    VAL:right_side [
+        VAL:priority "3" ;
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_v ] ] ;
+    VAL:priority "2" .
+
+VAL:control_add_number_x_sy_sz
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_sy ;
+        VAL:variable_z VAR:_sz ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_sy ] ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:next_number ;
+            VAL:variable_x VAR:_v ;
+            VAL:variable_y VAR:_sz ] ] ;
+    VAL:right_side [
+        VAL:priority "3" ;
+        VAL:child [
+            VAL:operation VAL:add_number ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_v ] ] ;
+    VAL:priority "2" .
+
+##################################################################
+# applications
+
+VAL:application_add_number_sx_sy_z
+   VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_add_number_x_1_z ;
+        VAL:priority "1" ] ;
+   VAL:use [
+        VAL:control VAL:control_add_number_sx_sy_z ;
+        VAL:priority "2" ] ;
+    VAL:priority "1".
+
+VAL:application_add_number_sx_y_sz
+   VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z SOME:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_add_number_1_y_z ;
+        VAL:priority "1" ] ;
+   VAL:use [
+        VAL:control VAL:control_add_number_sx_y_sz ;
+        VAL:priority "2" ] ;
+    VAL:priority "1".
+
+VAL:application_add_number_x_sy_sz
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:add_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z SOME:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_add_number_x_1_z ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_add_number_x_sy_sz ;
+        VAL:priority "2" ] ;
+    VAL:priority "2" .
+
+Based on these argument dependent rule application, subtraction controls and applications are defines as follows:
+
+##################################################################
+# applications
+
+VAL:application_subtract_number_sx_sy_z
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_subtract_number_x_y_z ] .
+
+VAL:application_subtract_number_sx_y_sz
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z SOME:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_subtract_number_x_y_z ] .
+
+VAL:application_subtract_number_x_sy_sz
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:subtract_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z SOME:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_subtract_number_x_y_z ] .
+
