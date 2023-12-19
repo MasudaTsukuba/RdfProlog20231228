@@ -180,6 +180,21 @@ VAL:control_carry_up_x_y
             VAL:variable_y VAR:_cdr_x ;
             VAL:variable_z VAR:_y ] ] .
 
+VAL:control_carry_up2_10_nil_z
+    VAL:type VAL:control ;
+    VAL:left_side [
+        VAL:operation VAL:carry_up2 ;
+        VAL:variable_x VAL:ten ;
+        VAL:variable_y VAL:nil ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:priority "2" ;
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAL:zero ;
+            VAL:variable_y VAL:list_one ;
+            VAL:variable_z VAR:_z ] ] .
+
 VAL:control_carry_up2_10_y_z
     VAL:type VAL:control ;
     VAL:left_side [
@@ -190,7 +205,7 @@ VAL:control_carry_up2_10_y_z
     VAL:right_side [
         VAL:priority "1" ;
         VAL:child [
-            VAL:operation VAL:carry_up ;
+            VAL:operation VAL:next_list_number ;
             VAL:variable_x VAR:_y ;
             VAL:variable_y VAR:_u ] ] ;
     VAL:right_side [
@@ -255,9 +270,12 @@ VAL:application_carry_up2_x_y
         VAL:variable_y VAR:_y ;
         VAL:variable_z VAR:_z ] ;
     VAL:use [
-        VAL:control VAL:control_carry_up2_10_y_z ;
+        VAL:control VAL:control_carry_up2_10_nil_z ;
         VAL:priority "1" ] ;
     VAL:use [
-        VAL:control VAL:control_carry_up2_x_y_z ;
+        VAL:control VAL:control_carry_up2_10_y_z ;
         VAL:priority "2" ] ;
-    VAL:priority "1" .
+    VAL:use [
+        VAL:control VAL:control_carry_up2_x_y_z ;
+        VAL:priority "3" ] ;
+    VAL:priority "3" .

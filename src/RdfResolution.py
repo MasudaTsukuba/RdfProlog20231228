@@ -106,6 +106,8 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
                     print(e)
                     logging.debug(e)
                     pass
+            print('Depth reached: ', reasoner.depth_reached)  # 2023/12/19
+            logging.debug(f'Depth reached: {reasoner.depth_reached}')
             print('===================================================================================================')
             logging.debug('===================================================================================================')
             return resolve_bindings
@@ -124,12 +126,13 @@ class Reasoner:
 
     Attributes:
         find_all (bool): find all the possible answers.
-        max_depth (int): maximum depth of recursive call.
+        depth_limit (int): maximum depth of recursive call.
     """
-    def __init__(self, rdf_prolog, find_all=False, max_depth: int = 30):
+    def __init__(self, rdf_prolog, find_all=False, depth_limit: int = 30):
         self.rdf_prolog = rdf_prolog
         self.find_all = find_all  # find all the possible answers
-        self.max_depth = max_depth  # maximum depth of recursive call
+        self.depth_limit = depth_limit  # maximum depth of recursive call
+        self.depth_reached = 0  # depth reached while executing reasoning
 
     def reasoner(self, clauses: ClassClauses, depth=0):
         """Execute the depth first search.
@@ -143,8 +146,10 @@ class Reasoner:
 
         """
         print('reasoner: depth=', depth)  # for debug
-        if depth > self.max_depth:  # if the depth reaches the max_depth, return with failure
-            print(f'Max depth reached: {depth}')  #
+        if depth > self.depth_reached:  # if depth exceeds depth_reached
+            self.depth_reached = depth  # update depth_reached
+        if depth > self.depth_limit:  # if the depth reaches the max_depth, return with failure
+            print(f'Depth limit reached: {depth}')  #
             return False, []  # success = False, list_of_bindings = None
         first_clause, rest_clauses = clauses.split_clauses()  # split the clauses into the first and the remainder
         if first_clause is None or len(first_clause.list_of_triple) == 0:

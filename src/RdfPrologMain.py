@@ -663,6 +663,36 @@ def main():
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
         pass
 
+    # list number next
+    if True:
+        rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
+
+        # next([9, 9], ?ans) = [0, 0, 1] means 100
+        my_question = f"""
+            SELECT ?car_one_hundred ?car ?cdr WHERE {{
+            ?s1 <http://value.org/operation> <http://value.org/cons> .
+            ?s1 <http://value.org/variable_x> <http://value.org/nine> .
+            ?s1 <http://value.org/variable_y> <http://value.org/nil> .
+            ?s1 <http://value.org/variable_z> ?list_nine .
+            ?s1b <http://value.org/operation> <http://value.org/cons> .
+            ?s1b <http://value.org/variable_x> <http://value.org/nine> .
+            ?s1b <http://value.org/variable_y> ?list_nine .
+            ?s1b <http://value.org/variable_z> ?list_ninety_nine .
+            ?s2 <http://value.org/operation> <http://value.org/next_list_number> .
+            ?s2 <http://value.org/variable_x> ?list_ninety_nine .
+            ?s2 <http://value.org/variable_y> ?list_one_hundred .
+            ?s3 <http://value.org/operation> <http://value.org/cons> .
+            ?s3 <http://value.org/variable_x> ?car_one_hundred .
+            ?s3 <http://value.org/variable_y> ?cdr_one_hundred .
+            ?s3 <http://value.org/variable_z> ?list_one_hundred .
+            ?s4 <http://value.org/operation> <http://value.org/cons> .
+            ?s4 <http://value.org/variable_x> ?car .
+            ?s4 <http://value.org/variable_y> ?cdr .
+            ?s4 <http://value.org/variable_z> ?cdr_one_hundred .
+            }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+
     # list_number add
     if True:
     #     rdf_prolog = RdfProlog(rules_folder='rules/rules_list_number_add')
@@ -756,7 +786,7 @@ def main():
 
     # list number math
     if True:
-        rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
+        # rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
 
         # next([1], ?ans) = [2]
         my_question = f"""
@@ -845,7 +875,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=50)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=50)
 
         pass
 

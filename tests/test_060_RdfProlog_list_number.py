@@ -79,6 +79,38 @@ def test_list_next_9_ans():
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
 
 
+def test_list_next_99_ans():
+    # next([9, 9], ?ans) = [0, 0, 1] means 100
+    my_question = f"""
+        SELECT ?car_one_hundred ?car ?cdr WHERE {{
+        ?s1 <http://value.org/operation> <http://value.org/cons> .
+        ?s1 <http://value.org/variable_x> <http://value.org/nine> .
+        ?s1 <http://value.org/variable_y> <http://value.org/nil> .
+        ?s1 <http://value.org/variable_z> ?list_nine .
+        ?s1b <http://value.org/operation> <http://value.org/cons> .
+        ?s1b <http://value.org/variable_x> <http://value.org/nine> .
+        ?s1b <http://value.org/variable_y> ?list_nine .
+        ?s1b <http://value.org/variable_z> ?list_ninety_nine .
+        ?s2 <http://value.org/operation> <http://value.org/next_list_number> .
+        ?s2 <http://value.org/variable_x> ?list_ninety_nine .
+        ?s2 <http://value.org/variable_y> ?list_one_hundred .
+        ?s3 <http://value.org/operation> <http://value.org/cons> .
+        ?s3 <http://value.org/variable_x> ?car_one_hundred .
+        ?s3 <http://value.org/variable_y> ?cdr_one_hundred .
+        ?s3 <http://value.org/variable_z> ?list_one_hundred .
+        ?s4 <http://value.org/operation> <http://value.org/cons> .
+        ?s4 <http://value.org/variable_x> ?car .
+        ?s4 <http://value.org/variable_y> ?cdr .
+        ?s4 <http://value.org/variable_z> ?cdr_one_hundred .
+        }}"""
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    assert len(resolve_bindings) == 1
+    assert resolve_bindings[0]['?car_one_hundred'] == 'http://value.org/zero'
+    assert resolve_bindings[0]['?car'] == 'http://value.org/zero'
+    assert resolve_bindings[0]['?cdr'] == 'http://value.org/list_one'
+
+
 def test_list_next_ans_2():
     # next(?ans, [2])
     my_question = f"""
