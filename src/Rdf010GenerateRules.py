@@ -1,15 +1,16 @@
-"""
+"""Generate rules
 Rdf010GenerateRules.py
 T. Masuda, 2023/12/11
 """
 
 
 def main_rules_number_100():
-    """
+    """Generate next_number for symbolic numbers
 
     Returns:
-
+        None
     """
+
     """
     VAL:fact_next_number_1_2
     VAL:type VAL:fact ;

@@ -385,3 +385,27 @@ VAL:application_subtract_number_x_sy_sz
     VAL:use [
         VAL:control VAL:control_subtract_number_x_y_z ] .
 
+-------------------------------------------------------
+Introduction of list numbers
+
+Symbolic numbers such as VAL:one are finite and cannot handle any numbers unless they are defined in next() predicates.
+
+Therefore, a list representation of natural numbers (positive integers) is introduced.
+
+A number 1 is represented with a list [1], and 23 with [3, 2]. The least significant digit is the first and the most significant digit last.
+
+Since there are no direct method for handling a list in RDF, a list is constructed with cons operator.
+
+A list [1] is cons(1, nil), where 1 is a symbolic number and nil represents empty.
+
+The first argument of cons is a car element and the second argument is a cdr element as in Lisp.
+
+A list [3, 2] is cons(3, cons(2, nil)).
+
+To handle any number, cons() is assumed to be always declared as a fact, but in reality, it is not possible.
+
+Therefore, each time query for cons(const, const) appears, the cons element is registered in the RDF graph and is returned as a fact.
+
+This way, numbers with any size will be handled with Prolog.
+
+Next, add, subtract, multiply, divide operations have been implemented.

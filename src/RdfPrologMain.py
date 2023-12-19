@@ -1,4 +1,4 @@
-"""
+"""Main module to run RdfProlog
 RdfPrologMain.py
 Executing Prolog on RDF query system
 Main function
@@ -20,8 +20,7 @@ logging.debug('Starting debug log')
 
 
 def main():
-    """
-    Main function for RdfProlog.
+    """Main function for RdfProlog.
 
     Args:
 

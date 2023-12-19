@@ -1,4 +1,4 @@
-"""
+"""Module for reasoning
 RdfResolution.py
 Execute Prolog on RDF query system
 2022/12/20, 2023/3/16, 2023/10/30, 2023/11/6, 2023/11/28
@@ -12,15 +12,13 @@ from src.RdfClass import *  # ClassClauses, ClassClause, ClassRule, ClassRules, 
 
 
 class RdfProlog:  # Prolog Class, prepare a graph and available rules
-    """
-    Prolog Class, prepare a graph and available rules.
+    """Prolog Class, prepare a graph and available rules.
 
     Attributes:
 
     """
     def __init__(self, rules_folder='../rules/rules_human'):
-        """
-        Initialize the RdfProlog class.
+        """Initialize the RdfProlog class.
 
         Create a Graph g_rules for storing facts and rules.
 
@@ -64,9 +62,8 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
         # print()  # line feed
         logging.debug('')  # line feed
 
-    def answer_question(self, sparql_query, find_all=False, max_depth: int = 30):  # answer a sparql query with multiple clauses
-        """
-        Answer a sparql query with multiple clauses.
+    def answer_question(self, sparql_query, find_all: bool = False, max_depth: int = 30):  # answer a sparql query with multiple clauses
+        """Answer a SPARQL query with multiple clauses.
 
         Args:
             sparql_query
@@ -123,8 +120,7 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
 
 
 class Reasoner:
-    """
-    Execute the depth first search for reasoning.
+    """Execute the depth first search for reasoning.
 
     Attributes:
         find_all (bool): find all the possible answers.
@@ -136,24 +132,23 @@ class Reasoner:
         self.max_depth = max_depth  # maximum depth of recursive call
 
     def reasoner(self, clauses: ClassClauses, depth=0):
-        """
-        Execute the depth first search.
+        """Execute the depth first search.
 
         Args:
-            clauses:
-            bindings_in:
+            clauses (ClassClauses):
+            # bindings_in:
             depth:
 
         Returns:
 
         """
-        print('reasoner: depth=', depth)  # debug
+        print('reasoner: depth=', depth)  # for debug
         if depth > self.max_depth:  # if the depth reaches the max_depth, return with failure
             print(f'Max depth reached: {depth}')  #
             return False, []  # success = False, list_of_bindings = None
         first_clause, rest_clauses = clauses.split_clauses()  # split the clauses into the first and the remainder
-        if first_clause == None or len(first_clause.list_of_triple) == 0:
-             return True, [{}]  # success = True, list_of_bindings = [{}]
+        if first_clause is None or len(first_clause.list_of_triple) == 0:
+            return True, [{}]  # success = True, list_of_bindings = [{}]
         list_of_bindings_return = []  # list of bindings to be returned
         success_out = False  # flag for success
         print('first clause: ', first_clause.predicate_object_dict)  # debug
@@ -198,8 +193,7 @@ class Reasoner:
 
 
 # class Resolution:  # main class for resolution
-#     """
-#     main class for resolution
+#     """Main class for resolution.
 #
 #     Attributes:
 #         graph (Graph): set the knowledge graph
@@ -321,8 +315,7 @@ class Reasoner:
 #             return return_succeeded, resolve_bindings_out
 #
 #     def resolve_rule(self, rule: ClassRule) -> (bool, list[dict[str, str]]):  # resolve multiple clauses
-#         """
-#         resolve_ruleはルールを処理する。
+#         """resolve_ruleはルールを処理する。
 #
 #         ルールとして呼び出された場合には左側が評価されてargument_bindingsが生成される。
 #
@@ -515,8 +508,7 @@ class Reasoner:
 
 
 def main():
-    """
-    Main function for RdfProlog (This is for test).
+    """Main function for RdfProlog (This is for test).
 
     Args:
 

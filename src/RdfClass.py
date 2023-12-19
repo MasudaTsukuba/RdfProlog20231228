@@ -1,4 +1,4 @@
-"""
+"""RdfClass
 RdfClass.py
 Classes supporting RdfProlog reasoning
 T. Masuda, 2023/10/30
@@ -14,21 +14,40 @@ from lark import Lark, Transformer, Token  # , Tree
 
 
 # utility functions
-def uri_ref(key_word: str, extension=False, ref=True) -> URIRef:
+def uri_ref(key_word: str, extension: bool = False, ref: bool = True) -> URIRef:
+    """Convert a key word into an uri string or an URIRef object
+
+    Args:
+        key_word (str): input uri string
+        extension (bool): enclose with < and >
+        ref (bool): convert to URIRef object
+
+    Returns:
+        URIRef:
+
+    """
     reference = f'http://value.org/{key_word}'
     if extension:
         reference = f'<{reference}>'
     if ref:
-        reference = URIRef(reference)
+        reference = URIRef(reference)  # get URIRef object
     return reference
 
 
 def uri_ref_ext(key_word: str) -> URIRef:
+    """Use uri_ref function
+
+    Args:
+        key_word:
+
+    Returns:
+
+    """
     return URIRef(f'<http://value.org/{key_word}>')
 
 
 class ClassClauses:
-    """
+    """Class for handling clauses (a list of clauses)
     ClassClauses holds a set of clause.
     Used for the right sides of a rule.
     Since the clauses are stored in a list, they are sorted according to the priorities.
@@ -48,12 +67,11 @@ class ClassClauses:
         pass
 
     def split_clauses(self):
-        """
-        Split the clauses into the first clause and the rest of clauses.
+        """Split the clauses into the first clause and the rest of clauses.
 
         Returns:
-             first clause (ClassClause)
-             rest clauses (ClassClauses)
+             ClassClause: first clause
+             ClassClauses: rest clauses
         """
         if len(self.list_of_clauses) > 0:
             rest_clauses = ClassClauses()
@@ -63,8 +81,7 @@ class ClassClauses:
             return None, None
 
     def combine(self, clauses: 'ClassClauses'):
-        """
-        Combine other clauses to the current clauses.
+        """Combine other clauses to the current clauses.
 
         Args:
             clauses (ClassClauses):
@@ -77,11 +94,10 @@ class ClassClauses:
         return combined_clauses
 
     def apply_bindings(self, bindings: dict[str, str]):
-        """
-        Apply bindings to the current clauses and returns a new ClassClauses instance.
+        """Apply bindings to the current clauses and returns a new ClassClauses instance.
 
         Args:
-            bindings (dict[str, str]):
+            bindings (dict[str, str]): bindings of variables and values
 
         Returns:
              ClassClauses: clauses after applying the bindings
@@ -91,8 +107,7 @@ class ClassClauses:
         return return_clauses
 
     def update_variables(self):
-        """
-        Modify the names of variables contained in the current clauses and returns a new instance of ClassClauses.
+        """Modify the names of variables contained in the current clauses and returns a new instance of ClassClauses.
         Variables are modified such as _x -> _x1000.
 
         Args:
@@ -109,12 +124,12 @@ class ClassClauses:
 
 
 class ClassClause:
-    """
-    Clause is a list of triples that have the same subject.
+    """Class for a clause.
+    A clause is a list of triples that have the same subject.
     One of the triples indicates the operation such as add or next.
 
     Attributes:
-        list_of_triple (list[ClassTriple]):
+        list_of_triple (list[ClassTriple]): a list of triples
         operation_name_uri (str): ex. http://value.org/add_number
         predicate_object_dict (dict[str, str]): subject is unnamed and common among triples
         set_of_variables_in_query (set[tuple[str, str]]): [(object_variable, predicate)]
@@ -130,8 +145,7 @@ class ClassClause:
         self.variables_of_interest: set[str] = set()
 
     def from_triples(self, list_of_triple):
-        """
-        Create a Clause class from a list of triples.
+        """Create a Clause class from a list of triples.
 
         Args:
             list_of_triple (list[ClassTriple]): list of triples that have the same subject.
@@ -166,8 +180,7 @@ class ClassClause:
                 self.operation_name_uri = uri_ref(operation_name)  # keep as UriRef
 
     def from_query(self, graph: Graph, subject: rdflib.term.URIRef):
-        """
-        Create a Clause class from a SPARQL query.
+        """Create a Clause class from a SPARQL query.
 
         Args:
             graph (Graph): RDF graph.
@@ -208,8 +221,7 @@ class ClassClause:
         return self
 
     def search_facts(self, rdf_prolog):
-        """
-        Search facts that may match this clause.
+        """Search facts that may match this clause.
 
         Args:
             rdf_prolog:
@@ -219,8 +231,7 @@ class ClassClause:
         """
 
         def match_fact(candidate):
-            """
-            Test whether the argument candidate fact matches the request.
+            """Test whether the argument candidate fact matches the request.
 
             Args:
                 candidate:
@@ -246,8 +257,7 @@ class ClassClause:
             return success, bindings
 
         def generate_cons():
-            """
-            Generate a cons element.
+            """Generate a cons element.
 
             Args:
 
@@ -297,8 +307,7 @@ class ClassClause:
         return return_bindings
 
     def match_rule(self, rule):
-        """
-        Test whether the argument rule matches the request.
+        """Test whether the argument rule matches the request.
 
         Args:
             rule (ClassRule):
@@ -331,8 +340,7 @@ class ClassClause:
         return matched, rule.rule_right_clauses(), forward_bindings, backward_bindings
 
     def match_application(self, application):
-        """
-        Test whether the argument application matches with this clause.
+        """Test whether the argument application matches with this clause.
 
         Args:
             application (ClassApplication):
@@ -359,7 +367,24 @@ class ClassClause:
             return bindings
 
         def apply_internal_bindings(forward_multiple, backward_multiple):
+            """
+
+            Args:
+                forward_multiple:
+                backward_multiple:
+
+            Returns:
+
+            """
             def is_constant(term: str) -> bool:
+                """Check whether term is a variable or not.
+
+                Args:
+                    term (str):
+
+                Returns:
+
+                """
                 if term.find('http://value.org/') >= 0:
                     return True
                 return False
@@ -522,14 +547,13 @@ class ClassClause:
         return matched, list_of_clauses, list_of_forward_bindings, list_of_backward_bindings
 
     def apply_bindings(self, bindings: dict[str, str]):
-        """
-        Apply bindings to this clause.
+        """Apply bindings to this clause.
 
         Args:
-            bindings dict[str, str]:
+            bindings dict[str, str]: bindings to be applied.
 
         Returns:
-            ClassClause:
+            ClassClause: a clause after the application of the bindings.
 
         """
         clause_applied = ClassClause()  # create an instance of ClassClause to be returned
@@ -562,8 +586,7 @@ class ClassClause:
 
 
 class ClassFacts:
-    """
-    This class holds a set of facts extracted from the RDF graph.
+    """This class holds a set of facts extracted from the RDF graph.
 
     Attributes:
         facts (set[ClassFact]): a set of facts.
@@ -578,7 +601,7 @@ class ClassFacts:
         # register facts
         query_for_facts = f"""
             SELECT ?subject WHERE {{ ?subject {uri_ref_ext('type')} {uri_ref_ext('fact')} . }}
-        """
+            """
         results_for_facts = graph.query(query_for_facts)  # find subjects that are marked as 'fact'
         for binding in results_for_facts.bindings:
             subject = binding['subject']  # extract the subject
@@ -589,7 +612,7 @@ class ClassFacts:
         # register inferences in a graph
         query_for_inferences = f"""
             SELECT ?subject WHERE {{ ?subject {uri_ref_ext('type')} {uri_ref_ext('inference')} . }}
-        """
+            """
         results_for_inferences = graph.query(query_for_inferences)
         for binding in results_for_inferences.bindings:
             subject = binding['subject']
@@ -599,8 +622,7 @@ class ClassFacts:
         pass
 
     def add_fact(self, fact):
-        """
-        Add and register a fact to facts set.
+        """Add and register a fact to facts set.
 
         Args:
             fact (ClassFact): a fact to be added to the set and to the fact_dict
@@ -618,8 +640,7 @@ class ClassFacts:
 
 
 class ClassFact:
-    """
-    A clause asserted as a fact in the RDF graph.
+    """A clause asserted as a fact in the RDF graph.
 
     Attributes:
         fact (ClassClause):
@@ -630,8 +651,7 @@ class ClassFact:
         self.operation_name_uri = ''
 
     def build(self, graph, subject):
-        """
-        Build a fact from the subject term
+        """Build a fact from the subject term
 
         Args:
             graph (Graph): RDF graph contains all the necessary info for the facts
@@ -645,8 +665,7 @@ class ClassFact:
         self.operation_name_uri = self.fact.operation_name_uri
 
     def build_from_triples(self, list_of_triple):
-        """
-        Build an instance of ClassFact from a list of triples.
+        """Build an instance of ClassFact from a list of triples.
 
         Args:
             list_of_triple (list[ClassTriple]):
@@ -661,8 +680,7 @@ class ClassFact:
 
 
 class ClassApplications:
-    """
-    Class for handling applications.
+    """Class for handling applications.
 
     Attributes:
         applications (list[ClassApplication]): a list of ClassApplication
@@ -694,8 +712,7 @@ class ClassApplications:
 
 
 class ClassApplication:
-    """
-        Class for handling an application
+    """Class for handling an application.
 
     Attributes:
         program (bool): True if this application is a program without back tracking
@@ -731,7 +748,7 @@ class ClassApplication:
 
 
 class ClassControls:
-    """
+    """Class for handling controls.
 
     Attributes:
         controls (list[ClassControl]):
@@ -760,7 +777,7 @@ class ClassControls:
 
 
 class ClassControl:
-    """
+    """Class for handling a control object.
 
     Attributes:
 
@@ -796,21 +813,20 @@ class ClassControl:
 
 
 class ClassRules:  # list of rules
-    """
-    Holds a list of all rules
+    """Class for handling rules.
+    Holds a list of all rules.
 
     Attributes:
-        list_of_rules (list[ClassRule]): List of rule instances
-        dict_of_rules (dict[str, set[ClassRule]]): dict of rule instances
+        list_of_rules (list[ClassRule]): List of rule instances.
+        dict_of_rules (dict[str, set[ClassRule]]): dict of rule instances.
     """
     graph = None
 
-    def __init__(self, graph):
-        """
-        Initialize ClassRules class.
+    def __init__(self, graph: Graph):
+        """Initialize ClassRules class.
 
         Args:
-            graph:
+            graph (Graph):
         """
         ClassRules.graph = graph
         self.list_of_rules = []
@@ -827,7 +843,7 @@ class ClassRules:  # list of rules
         self.dict_of_rules = {}  # dict of rules. operation name as a key
         query_for_rules = f"""
             SELECT ?rule WHERE {{ ?rule {uri_ref_ext('type')} {uri_ref_ext('rule')} }}
-        """ # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
+            """ # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
         results_for_rule = graph.query(query_for_rules)  # execute query and extract
         for binding in results_for_rule.bindings:
             subject = binding['rule']
@@ -842,8 +858,7 @@ class ClassRules:  # list of rules
 
 
 class ClassRule:  # class for individual rule
-    """
-    Class for an individual rule.
+    """Class for an individual rule.
 
     Attributes:
         label (str): label of the rule
@@ -854,8 +869,7 @@ class ClassRule:  # class for individual rule
     serial_number = 1000  # a variable to convert variables: x -> x1000
 
     def __init__(self, graph, subject):
-        """
-        initialize ClassRule class
+        """Initialize ClassRule class.
         """
         self.label = ''
         self.rule_left = ClassRuleLeft(graph, subject)
@@ -890,12 +904,12 @@ class ClassRule:  # class for individual rule
     #     return self
 
     def modify_variables(self):  # x -> x1000, etc.
-        """
+        """Modify a variable name by appending a unique number.
         This function is used to avoid confusion between classes that have variables with the same name.
         x -> x1000, etc.
 
         Returns:
-            None: This function just modifies the internal variables.
+            None: This function just modifies the internal variables of a class instance.
         """
         self.variables_dict = {}  # The variables are held in this list.
         for var in self.rule_left.set_of_variables_in_query:
@@ -937,8 +951,7 @@ class ClassRule:  # class for individual rule
 
 
 class ClassRuleLeft(ClassClause):  # left side of a rule
-    """
-    Left side of a rule
+    """Left side of a rule.
 
     Attributes:
         label: id for the left part of the rule
@@ -978,13 +991,12 @@ class ClassRuleLeft(ClassClause):  # left side of a rule
             self.from_query(graph, bindings[0]['left'])
         pass
 
-    def build(self, graph, rule_left_label):  # executed at the initial stage
-        """
-        Build the left side part of a rule from the label.
-        Executed at the initial stage
+    def build(self, graph: Graph, rule_left_label):  # executed at the initial stage
+        """Build the left side part of a rule from the label.
+        Executed at the initial stage.
 
         Args:
-            graph:
+            graph (Graph):
             rule_left_label:
 
         Returns:
@@ -1034,22 +1046,19 @@ class ClassRuleLeft(ClassClause):  # left side of a rule
 
 
 class ClassRuleRight(ClassClauses):  # right side of a rule
-    """
-    Right side of a rule.
+    """Right side of a rule.
 
     Attributes:
-        child (ClassRuleRightChild): child of the right side clause
+        child (ClassRuleRightChild): child of the right side clause.
     """
     def __init__(self):
-        """
-        initialize ClassRuleRight class
+        """Initialize ClassRuleRight class.
         """
         super().__init__()
         # self.child = ClassRuleRightChild()  # right side clause has one child, which in turn has one or more grandchild
 
     def build(self, graph: Graph, right_side_for_child):  # executed at the initial stage
-        """
-        Build the right side clause of a rule.
+        """Build the right side clause of a rule.
         Executed at the initial stage.
 
         Args:
@@ -1068,7 +1077,6 @@ class ClassRuleRight(ClassClauses):  # right side of a rule
 
     def revise(self, right_clauses, bindings):  # bindingsは辞書型
         """
-
 
         Args:
             right_clauses:
@@ -1177,8 +1185,7 @@ class ClassRuleRight(ClassClauses):  # right side of a rule
 
 
 class ClassTriple:  # triple class
-    """
-    Triple class.
+    """Triple class.
 
     Attributes:
         subject (ClassTerm): subject of a triple
@@ -1186,16 +1193,14 @@ class ClassTriple:  # triple class
         object (ClassTerm): object of a triple
     """
     def __init__(self):  # triple has subject, predicate and object
-        """
-        Triple has subject, predicate and object.
+        """Triple has subject, predicate and object.
         """
         self.subject = ClassTerm()  # create an empty terms
         self.predicate = ClassTerm()
         self.object = ClassTerm()
 
     def build(self, triple: dict[str, str]):  # triple is a dict
-        """
-        Build a triple.
+        """Build a triple.
 
         Args:
             triple (dict[str, str]):
@@ -1253,7 +1258,7 @@ class ClassTriple:  # triple class
 
 
 class ClassTerm:  # term is either subject, predicate or object
-    """
+    """Class for a term.
     Term is either subject, predicate or object.
 
     Attributes:
@@ -1261,19 +1266,17 @@ class ClassTerm:  # term is either subject, predicate or object
         is_variable (bool): True if this term represents a variable
     """
     def __init__(self):  # initialize
+        """Initialize ClassTerm instance.
         """
-        Initialize ClassTerm instance.
-        """
-        self.term_text = ''
-        self.is_variable = False
+        self.term_text: str = ''
+        self.is_variable: bool = False
 
-    def build(self, term_text):  # extract text element
-        """
-        Build a term from term text.
+    def build(self, term_text: str):  # extract text element
+        """Build a term from term text.
         <http://variable.org/x> -> x.
 
         Args:
-            term_text:
+            term_text (str):
 
         Returns:
             self:
@@ -1294,14 +1297,13 @@ class ClassTerm:  # term is either subject, predicate or object
         return self
 
     def to_uriref(self) -> URIRef:
-        """
-        Service function to produce URIRef from ClassTerm.
+        """Service function to produce URIRef from ClassTerm.
         'x' -> 'rdflib.term.URIRef('http://variable.org/x')
 
         Args:
 
         Returns:
-             uri_ref (URIRef)
+             URIRef:
         """
         if self.is_variable:
             return URIRef('http://variable.org/' + self.term_text)
@@ -1348,8 +1350,7 @@ class ClassTerm:  # term is either subject, predicate or object
         return '?' + self.term_text.replace('http://value.org/', '')  # http://value.org/x -> ?x
 
     def revise(self, bindings: dict[str, str]):  # bindings: dict
-        """
-        Revise a term based on the bindings.
+        """Revise a term based on the bindings.
 
         Args:
             bindings (dict[str, str]):
@@ -1431,8 +1432,7 @@ class ClassTerm:  # term is either subject, predicate or object
 
 
 class ClassSparqlQuery:  # Sparql Query Class
-    """
-    Sparql query class.
+    """Sparql query class.
 
     Attributes:
         query:
@@ -1440,11 +1440,10 @@ class ClassSparqlQuery:  # Sparql Query Class
         list_of_variables: list of variables
         rule (ClassRule): empty rule
     """
-    cons_number = 10000
+    cons_number = 10000  # unique number for every cons object.
 
     def __init__(self):  # initialize the sparql query class instance
-        """
-        Initialize the sparql query class instance.
+        """Initialize the sparql query class instance.
         """
 
         self.query = None  # sparql query string
@@ -1453,8 +1452,7 @@ class ClassSparqlQuery:  # Sparql Query Class
         # self.rule = ClassRule()  # empty rule
 
     def set(self, sparql_query: str) -> 'ClassSparqlQuery':  # convert from sparql query string to a sparql query class instance
-        """
-        Convert from sparql query string to a sparql query class instance.
+        """Convert from SPARQL query string to a SPARQL query class instance.
 
         Args:
             sparql_query (str):
@@ -1489,8 +1487,7 @@ class ClassSparqlQuery:  # Sparql Query Class
         return self
 
     def build_variable_list(self):  # create a list of variables
-        """
-        Create a list of variables.
+        """Create a list of variables.
 
         Returns:
             None: Just modify the internal state.
@@ -1502,8 +1499,7 @@ class ClassSparqlQuery:  # Sparql Query Class
         pass
 
     def build_query(self, results_for_build_query):  # build a query string
-        """
-        Build a query string.
+        """Build a query string.
 
         Args:
             results_for_build_query:
@@ -1568,8 +1564,7 @@ class ClassSparqlQuery:  # Sparql Query Class
             pass
 
     def direct_search(self):  # find a triple in the graph that directly matches the query
-        """
-        Find a triple in the graph that directly matches the query.
+        """Find a triple in the graph that directly matches the query.
 
         Args:
             # graph (Graph): an RDF graph holding all the info of facts and rules.
@@ -1612,7 +1607,7 @@ class ClassSparqlQuery:  # Sparql Query Class
 
             succeeded, bindings = build_bindings(results.bindings)  # create bindings to be returned
             return succeeded, bindings
-        else:
+        else:  # len(results) == 0
             found_cons = True  # try creating cons node  # 2023/11/10
             var_x = None
             var_y = None
@@ -1644,7 +1639,7 @@ class ClassSparqlQuery:  # Sparql Query Class
 
                 cons_node = URIRef(f'http://value.org/cons_node{ClassSparqlQuery.cons_number}')
                 cons_list = URIRef(f'http://value.org/cons_list{ClassSparqlQuery.cons_number}')
-                ClassSparqlQuery.cons_number += 1
+                ClassSparqlQuery.cons_number += 1  # update the unique number for cons
 
                 ClassRules.graph.add((cons_node, URIRef('http://value.org/operation'), URIRef('http://value.org/cons')))
                 ClassRules.graph.add((cons_node, URIRef('http://value.org/variable_x'), var_x))
@@ -1655,8 +1650,7 @@ class ClassSparqlQuery:  # Sparql Query Class
             return False, []  # no direct match was found. return False (Not Found) and an empty list
 
     def find_applicable_rules(self, rules):  # find rules applicable to this query
-        """
-        Find rules applicable to this query.
+        """Find rules applicable to this query.
 
         Args:
             rules (ClassRules): a class holding info of rules.
@@ -1788,8 +1782,7 @@ class ClassSparqlQuery:  # Sparql Query Class
         return list_of_applicable_rules2  # return the applicable rules
 
     def build_rule(self):  # build the right side of a rule
-        """
-        Build the right side of a rule.
+        """Build the right side of a rule.
 
         Args:
 
@@ -1906,11 +1899,10 @@ class MyTransformer(Transformer):
 
     @staticmethod
     def sparql(tree: list[str]) -> str:
-        """
-        build a sparql query string
+        """Build a sparql query string.
 
         Args:
-             tree (list[str]): a list of lark tree strings
+             tree (list[str]): a list of lark tree strings.
 
         Returns:
              sparql query string (str)
@@ -1921,8 +1913,7 @@ class MyTransformer(Transformer):
 
     @staticmethod
     def where(tree: list[str]) -> str:
-        """
-        Build the WHERE clause of a sparql query string.
+        """Build the WHERE clause of a sparql query string.
 
         Args:
             tree (list[str]): lark tree string
@@ -1947,8 +1938,7 @@ class MyTransformer(Transformer):
         return f'{tree[0]}'
 
     def triple(self, tree: list[str]) -> str:
-        """
-        Build a triple in a sparql query string.
+        """Build a triple in a sparql query string.
 
         Args:
             tree (list[str]):
@@ -1962,8 +1952,7 @@ class MyTransformer(Transformer):
         return return_str + '. '
 
     def subject(self, tree: list[Token]) -> str:
-        """
-        Build a subject of a triple in a sparql query string.
+        """Build a subject of a triple in a sparql query string.
 
         Args:
             tree (list[Token]): list of Tokens
@@ -1982,8 +1971,7 @@ class MyTransformer(Transformer):
         return ret + ','  # ret is just for debug
 
     def predicate(self, tree: list[Token]) -> str:
-        """
-        Build a predicate of a triple in a sparql query string.
+        """Build a predicate of a triple in a sparql query string.
 
         Args:
             tree (list[Token]):
@@ -2003,8 +1991,7 @@ class MyTransformer(Transformer):
         return ret+','
 
     def object(self, tree: list[Token]) -> str:
-        """
-        Build an object part of a triple in a sparql query string.
+        """Build an object part of a triple in a sparql query string.
 
         Args:
             tree (list[Token]):
@@ -2022,11 +2009,10 @@ class MyTransformer(Transformer):
 
 
 def convert_question(question: str) -> list[list[ClassTerm]]:
-    """
-    Convert a sparql query string into a list of triples.
+    """Convert a sparql query string into a list of triples.
 
     Args:
-        question(str): sparql query string
+        question(str): SPARQL query string
 
     Returns:
         list[list[ClassTerm]]: a list of triples
