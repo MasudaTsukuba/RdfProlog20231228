@@ -232,7 +232,7 @@ def main():
     #        ?s <http://value.org/variable_z> ?z .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True, max_depth=30)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True, depth_limit=30)
     #     pass
     #
     # #     # add(9, ?y, ?z)
@@ -295,7 +295,7 @@ def main():
     # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
     # #     pass
     # #
-    # #     # add(3, 1, ?ans) max_depth=0
+    # #     # add(3, 1, ?ans) depth_limit=0
     # #     my_question = f"""
     # #        SELECT ?ans WHERE {{
     # #        ?s <http://value.org/operation> <http://value.org/add_number> .
@@ -304,9 +304,9 @@ def main():
     # #        ?s <http://value.org/variable_z> ?ans .
     # #        }}"""
     # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=1)
+    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=1)
     # #
-    # #     # add(3, 1, ?ans) max_depth=1
+    # #     # add(3, 1, ?ans) depth_limit=1
     # #     my_question = f"""
     # #        SELECT ?ans WHERE {{
     # #        ?s <http://value.org/operation> <http://value.org/add_number> .
@@ -315,7 +315,7 @@ def main():
     # #        ?s <http://value.org/variable_z> ?ans .
     # #        }}"""
     # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=2)
+    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=2)
         pass
 
     # subtract
@@ -781,7 +781,7 @@ def main():
     #        ?s <http://value.org/variable_z> <http://value.org/list_three> . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=100)
+    #     resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
         pass
 
     # list number math
@@ -830,7 +830,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=100)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
 
         # multiply(3, 2, ?ans) -> ?ans = 6
         my_question = f"""
@@ -845,7 +845,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=100)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
 
         # multiply(3, ?ans, 9) -> ?ans = 3
         my_question = f"""
@@ -860,7 +860,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=100)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
 
         # divide(6, 2, ?ans) -> ?ans = [3]
         my_question = f"""
@@ -875,7 +875,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, max_depth=50)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=50)
 
         pass
 

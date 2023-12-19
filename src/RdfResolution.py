@@ -62,22 +62,22 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
         # print()  # line feed
         logging.debug('')  # line feed
 
-    def answer_question(self, sparql_query, find_all: bool = False, max_depth: int = 30):  # answer a sparql query with multiple clauses
+    def answer_question(self, sparql_query, find_all: bool = False, depth_limit: int = 30):  # answer a sparql query with multiple clauses
         """Answer a SPARQL query with multiple clauses.
 
         Args:
             sparql_query
             find_all (bool): if true, find all the possible answers.
-            max_depth (int): maximum depth of resolution.
+            depth_limit (int): maximum depth of resolution.
 
         Returns:
             list[dict[str, str]]: list of binding
         """
         self.find_all = find_all  # if true, find all the possible answers
-        # resolution = Resolution(self.rules, self.find_all, max_depth)  # create an instance of Resolution class, left_rules: ClassLeftRules
+        # resolution = Resolution(self.rules, self.find_all, depth_limit)  # create an instance of Resolution class, left_rules: ClassLeftRules
         # resolve_succeeded, resolve_bindings \
         #     = resolution.resolve_rule(sparql_query.rule)  # execute the resolution / resolve rule
-        reasoner = Reasoner(self, self.find_all, max_depth)
+        reasoner = Reasoner(self, self.find_all, depth_limit)
         clauses_in = sparql_query.to_clauses()
         resolve_succeeded, resolve_bindings_temp = reasoner.reasoner(clauses_in, depth=1)  # start from depth = 1
         resolve_bindings = []
@@ -148,7 +148,7 @@ class Reasoner:
         print('reasoner: depth=', depth)  # for debug
         if depth > self.depth_reached:  # if depth exceeds depth_reached
             self.depth_reached = depth  # update depth_reached
-        if depth > self.depth_limit:  # if the depth reaches the max_depth, return with failure
+        if depth > self.depth_limit:  # if the depth reaches the depth_limit, return with failure
             print(f'Depth limit reached: {depth}')  #
             return False, []  # success = False, list_of_bindings = None
         first_clause, rest_clauses = clauses.split_clauses()  # split the clauses into the first and the remainder
@@ -207,7 +207,7 @@ class Reasoner:
 #     """
 #     resolve_right_recursive_count = 0  # indicate the depth of recursive call.  # for debug
 #
-#     def __init__(self, rules, find_all: bool, max_depth: int):
+#     def __init__(self, rules, find_all: bool, depth_limit: int):
 #         """
 #         initialize Resolution class
 #
@@ -215,7 +215,7 @@ class Reasoner:
 #         # self.graph = graph  # set the knowledge graph
 #         self.rules = rules  # ClassRules(graph)
 #         self.find_all = find_all  # find all possible answers
-#         self.max_depth = max_depth  # maximum depth of resolution
+#         self.depth_limit = depth_limit  # maximum depth of resolution
 #         pass
 #
 #     def resolve_recursive(self, right_clauses: ClassClauses) -> (bool, list[dict[str, str]]):  # resolve_bindings_in 辞書の配列
@@ -257,7 +257,7 @@ class Reasoner:
 #             print('[', Resolution.resolve_right_recursive_count, '] ENTERING resolve_recursive')  # debug
 #             logging.debug(f'[{Resolution.resolve_right_recursive_count}] ENTERING resolve_recursive')  # debug
 #             Resolution.resolve_right_recursive_count += 1  # 再帰呼び出しの深さをup。debug
-#             if Resolution.resolve_right_recursive_count > self.max_depth:  # exceeds max_depth of resolution  # 2023/11/7
+#             if Resolution.resolve_right_recursive_count > self.depth_limit:  # exceeds depth_limit of resolution  # 2023/11/7
 #                 Resolution.resolve_right_recursive_count -= 1
 #                 return False, []
 #             grandchild_rules, right_clauses_sub = right_clauses.split_clauses()  # first clauseを取り出す, rest of clausesは後で処理する。
