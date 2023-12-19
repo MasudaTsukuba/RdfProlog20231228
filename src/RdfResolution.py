@@ -12,16 +12,19 @@ from src.RdfClass import *  # ClassClauses, ClassClause, ClassRule, ClassRules, 
 
 
 class RdfProlog:  # Prolog Class, prepare a graph and available rules
-    """Prolog Class, prepare a graph and available rules.
+    """Prolog Class, prepare a graph and available rules, and also execute query.
 
     Attributes:
+        find_all (bool): stop the search if the first result is obtained.
+        facts (ClassFacts): facts
+        rules (ClassRules): set the rules in ClassRules class
+        controls (ClassControls): controls
+        applications (ClassApplications): applications
 
     """
     def __init__(self, rules_folder='../rules/rules_human'):
         """Initialize the RdfProlog class.
-
-        Create a Graph g_rules for storing facts and rules.
-
+        Create a graph g_rules for storing facts and rules.
         Prepare applicable rules from the left sides of the rules.
 
         Args:
@@ -32,16 +35,16 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
         """
         # print('$$$$$$$$$$ PREPARING $$$$$$$$$$')  # debug
         logging.debug('$$$$$$$$$$ PREPARING $$$$$$$$$$')  # debug
-        self.find_all = False  # stop the search if the first result is obtained.
+        # self.find_all: bool = False  # stop the search if the first result is obtained.
         # self.find_all = True  # find all the results using inferences.
 
         graph = Graph()  # graph for facts and rules
         g_temp = Graph()  # temporary graph for reading RDF files
-        self.rules_folder: str = rules_folder  # folder where the RDFs describing rules exist.
-        files = os.listdir(self.rules_folder)
+        # self.rules_folder: str = rules_folder  # folder where the RDFs describing rules exist.
+        files = os.listdir(rules_folder)
         for file in files:  # read all the turtle files in rules folder
             if file.endswith('.ttl'):
-                g_temp.parse(f'{self.rules_folder}/{file}')
+                g_temp.parse(f'{rules_folder}/{file}')
 
         results = g_temp.query('SELECT ?s ?p ?o WHERE { ?s ?p ?o . }')  # retrieve all the triples read in
         for result in results:
@@ -53,31 +56,32 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
             if isinstance(oo, BNode):
                 oo = f'http://value.org/{str(oo)}'
             graph.add((URIRef(ss), URIRef(pp), URIRef(oo)))
-        self.facts = ClassFacts(graph)
-        self.rules = ClassRules(graph)  # set the rules in ClassRules class
-        self.controls = ClassControls(graph)
-        self.applications = ClassApplications(graph)
+        self.facts: ClassFacts = ClassFacts(graph)  # facts
+        self.rules: ClassRules = ClassRules(graph)  # set the rules in ClassRules class
+        self.controls: ClassControls = ClassControls(graph)  # controls
+        self.applications: ClassApplications = ClassApplications(graph)  # applications
         print('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')  # debug
         logging.debug('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')  # debug
         # print()  # line feed
         logging.debug('')  # line feed
 
-    def answer_question(self, sparql_query, find_all: bool = False, depth_limit: int = 30):  # answer a sparql query with multiple clauses
+    def answer_question(self, sparql_query, results_limit: int = 1, depth_limit: int = 30):  # answer a sparql query with multiple clauses
         """Answer a SPARQL query with multiple clauses.
 
         Args:
             sparql_query
-            find_all (bool): if true, find all the possible answers.
+            # find_all (bool): if true, find all the possible answers.
+            results_limit (int): maximum number of bindings in results.
             depth_limit (int): maximum depth of resolution.
 
         Returns:
             list[dict[str, str]]: list of binding
         """
-        self.find_all = find_all  # if true, find all the possible answers
+        # self.find_all = find_all  # if true, find all the possible answers
         # resolution = Resolution(self.rules, self.find_all, depth_limit)  # create an instance of Resolution class, left_rules: ClassLeftRules
         # resolve_succeeded, resolve_bindings \
         #     = resolution.resolve_rule(sparql_query.rule)  # execute the resolution / resolve rule
-        reasoner = Reasoner(self, self.find_all, depth_limit)
+        reasoner = Reasoner(self, results_limit=results_limit, depth_limit=depth_limit)
         clauses_in = sparql_query.to_clauses()
         resolve_succeeded, resolve_bindings_temp = reasoner.reasoner(clauses_in, depth=1)  # start from depth = 1
         resolve_bindings = []
@@ -122,28 +126,34 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
 
 
 class Reasoner:
-    """Execute the depth first search for reasoning.
+    """Class for reasoning.
 
     Attributes:
-        find_all (bool): find all the possible answers.
+        # find_all (bool): find all the possible answers.
+        results_limit (int): results_limit  # limit of bindings in results.
         depth_limit (int): maximum depth of recursive call.
+        number_of_results_obtained (int): number of successful results obtained.
+        depth_reached (int): depth reached while executing reasoning.
     """
-    def __init__(self, rdf_prolog, find_all=False, depth_limit: int = 30):
+    def __init__(self, rdf_prolog, results_limit: int = 10, depth_limit: int = 30):
         self.rdf_prolog = rdf_prolog
-        self.find_all = find_all  # find all the possible answers
-        self.depth_limit = depth_limit  # maximum depth of recursive call
-        self.depth_reached = 0  # depth reached while executing reasoning
+        # self.find_all: bool = find_all  # find all the possible answers
+        self.results_limit: int = results_limit  # limit of bindings in results
+        self.depth_limit: int = depth_limit  # maximum depth of recursive call
+        self.number_of_results_obtained: int = 0  # number of successful results obtained
+        self.depth_reached: int = 0  # depth reached while executing reasoning
 
-    def reasoner(self, clauses: ClassClauses, depth=0):
+    def reasoner(self, clauses: ClassClauses, depth: int = 0):
         """Execute the depth first search.
 
         Args:
-            clauses (ClassClauses):
+            clauses (ClassClauses): clauses to be resolved
             # bindings_in:
-            depth:
+            depth (int): recursive call depth of reasoner
 
         Returns:
-
+            bool: success or failure
+            dict[str, str]: results bindings
         """
         print('reasoner: depth=', depth)  # for debug
         if depth > self.depth_reached:  # if depth exceeds depth_reached
@@ -153,6 +163,7 @@ class Reasoner:
             return False, []  # success = False, list_of_bindings = None
         first_clause, rest_clauses = clauses.split_clauses()  # split the clauses into the first and the remainder
         if first_clause is None or len(first_clause.list_of_triple) == 0:
+            self.number_of_results_obtained += 1  # successful result is obtained
             return True, [{}]  # success = True, list_of_bindings = [{}]
         list_of_bindings_return = []  # list of bindings to be returned
         success_out = False  # flag for success
@@ -168,8 +179,9 @@ class Reasoner:
                 success_out = True  # at least one trial is successful
                 list_of_bindings_out = [{**bindings_current, **bindings_fact} for bindings_fact in list_of_bindings_fact]  # combine the bindings
                 list_of_bindings_return += list_of_bindings_out  # add to the list
-                if not self.find_all:  # at least one trial is successful
-                    return success_out, list_of_bindings_out  # return the first answer
+                # if not self.find_all:  # at least one trial is successful
+                if self.number_of_results_obtained >= self.results_limit:  # 2023/12/19
+                    return success_out, list_of_bindings_return  # return the answer
 
         # try applications
         print('trying applications')
@@ -189,8 +201,9 @@ class Reasoner:
                         success_out = True
                         list_of_bindings_out = [{**bindings_backward, **bindings_application} for bindings_application in list_of_bindings_application]
                         list_of_bindings_return += list_of_bindings_out
-                        if not self.find_all:
-                            return True, list_of_bindings_out
+                        # if not self.find_all:
+                        if self.number_of_results_obtained >= self.results_limit:  # 2023/12/19
+                            return True, list_of_bindings_return
         except KeyError as e:
             print('applications not found', e)
         print('return, depth=', depth)
@@ -611,7 +624,7 @@ def main():
     #     ?s <http://value.org/variable_z> ?ans .
     #     }}"""
     # my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # # resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=False)
+    # # resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query)
     #
     # # add(3, 1, ?z)
     # my_question = f"""
@@ -719,7 +732,7 @@ def main():
     #     ?s <http://value.org/variable_z> ?z .
     #     }}"""
     # my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # # resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=True)
+    # # resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, results_limit=10)
     # pass
     #
     # # add(9, ?y, ?z)
@@ -731,7 +744,7 @@ def main():
     #     ?s <http://value.org/variable_z> ?z .
     #     }}"""
     # my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # # resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, find_all=True)
+    # # resolve_bindings = rdf_prolog.answer_complex_question(my_sparql_query, results_limit=10)
     # pass
     #
     # # grandfather(taro, ?ans)

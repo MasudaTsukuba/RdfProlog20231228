@@ -124,7 +124,7 @@ def main():
     #        ?s <http://value.org/variable_z> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     #
     #     # add(3, 1, ?z)
     #     my_question = f"""
@@ -232,7 +232,7 @@ def main():
     #        ?s <http://value.org/variable_z> ?z .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True, depth_limit=30)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10, depth_limit=30)
     #     pass
     #
     # #     # add(9, ?y, ?z)
@@ -244,7 +244,7 @@ def main():
     # #        ?s <http://value.org/variable_z> ?z .
     # #        }}"""
     # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
+    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
     # #     pass
     # #
     # #     # add(?x, 1, ?z)
@@ -256,7 +256,7 @@ def main():
     # #        ?s <http://value.org/variable_z> ?z .
     # #        }}"""
     # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
+    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
     # #     pass
     # #
     # #     # add(?x, 9, ?z)
@@ -268,7 +268,7 @@ def main():
     # #        ?s <http://value.org/variable_z> ?z .
     # #        }}"""
     # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
+    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
     # #     pass
     # #
     # #     # add(?x, ?y, 2)
@@ -280,7 +280,7 @@ def main():
     # #        ?s <http://value.org/variable_z> <http://value.org/two> .
     # #        }}"""
     # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
+    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
     # #     pass
     # #
     # #     # add(?x, ?y, 3)
@@ -292,7 +292,7 @@ def main():
     # #        ?s <http://value.org/variable_z> <http://value.org/three> .
     # #        }}"""
     # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
+    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
     # #     pass
     # #
     # #     # add(3, 1, ?ans) depth_limit=0
@@ -304,7 +304,7 @@ def main():
     # #        ?s <http://value.org/variable_z> ?ans .
     # #        }}"""
     # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=1)
+    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=1)
     # #
     # #     # add(3, 1, ?ans) depth_limit=1
     # #     my_question = f"""
@@ -315,7 +315,7 @@ def main():
     # #        ?s <http://value.org/variable_z> ?ans .
     # #        }}"""
     # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=2)
+    # #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=2)
         pass
 
     # subtract
@@ -389,7 +389,7 @@ def main():
            ?s <http://value.org/variable_z> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
         # xxx = resolve_bindings[0]['?ans']
         pass
 
@@ -402,7 +402,7 @@ def main():
                    ?s <http://value.org/variable_z> ?ans .
                    }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
         # xxx = resolve_bindings[0]['?ans']
         pass
 
@@ -415,7 +415,7 @@ def main():
            ?s <http://value.org/variable_z> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
         # xxx = resolve_bindings[0]['?ans']
         pass
 
@@ -428,7 +428,7 @@ def main():
            ?s <http://value.org/variable_z> <http://value.org/6> .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
         # xxx = resolve_bindings[0]['?ans']
         pass
 
@@ -441,7 +441,7 @@ def main():
             ?s <http://value.org/variable_z> <http://value.org/3> .
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
         # xxx = resolve_bindings[0]['?ans']
         pass
 
@@ -474,77 +474,77 @@ def main():
         pass
 
     # knows
-    # if True:
-    # #     rdf_prolog = RdfProlog(rules_folder='../rules/rules_human')
-    # #     # knows(andy, bob)
-    # #     my_question = f"""
-    # #        SELECT ?s WHERE {{
-    # #        ?s <http://value.org/operation> <http://value.org/knows_direct> .
-    # #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    # #        ?s <http://value.org/variable_y> <http://value.org/bob> .
-    # #        }}"""
-    # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # rdf_prolog.answer_question(my_sparql_query)
-    # #
-    # #     # knows_direct(andy, chris)
-    # #     my_question = f"""
-    # #        SELECT ?s WHERE {{
-    # #        ?s <http://value.org/operation> <http://value.org/knows_direct> .
-    # #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    # #        ?s <http://value.org/variable_y> <http://value.org/chris> .
-    # #        }}"""
-    # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # rdf_prolog.answer_question(my_sparql_query)
-    # #
-    # #     # knows_direct(andy, ?ans)
-    # #     my_question = f"""
-    # #        SELECT ?s ?ans WHERE {{
-    # #        ?s <http://value.org/operation> <http://value.org/knows_direct> .
-    # #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    # #        ?s <http://value.org/variable_y> ?ans .
-    # #        }}"""
-    # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # rdf_prolog.answer_question(my_sparql_query)
-    # #
-    # #     # knows_indirect(andy, chris)
-    # #     my_question = f"""
-    # #        SELECT ?s WHERE {{
-    # #        ?s <http://value.org/operation> <http://value.org/knows_indirect> .
-    # #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    # #        ?s <http://value.org/variable_y> <http://value.org/chris> .
-    # #        }}"""
-    # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # rdf_prolog.answer_question(my_sparql_query)
-    # #
-    # #     # knows_indirect(andy, edgar)
-    # #     my_question = f"""
-    # #        SELECT ?s WHERE {{
-    # #        ?s <http://value.org/operation> <http://value.org/knows_indirect> .
-    # #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    # #        ?s <http://value.org/variable_y> <http://value.org/edgar> .
-    # #        }}"""
-    # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # rdf_prolog.answer_question(my_sparql_query)
-    # #
-    # #     # knows_indirect(andy, ?ans)
-    # #     my_question = f"""
-    # #        SELECT ?s WHERE {{
-    # #        ?s <http://value.org/operation> <http://value.org/knows_indirect> .
-    # #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    # #        ?s <http://value.org/variable_y> ?ans .
-    # #        }}"""
-    # #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    # #     # rdf_prolog.answer_question(my_sparql_query)
-    # #
-    # #     # knows(andy, ?ans)
-    # #     my_question = f"""
-    # #        SELECT ?ans WHERE {{
-    # #        ?s <http://value.org/operation> <http://value.org/knows> .
-    # #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    # #        ?s <http://value.org/variable_y> ?ans .
-    # #        }}"""
-    # #     my_sparql_query = ClassSparqlQuery(rdf_prolog.g_rules).set(my_question).build_rule()
-    # #     # rdf_prolog.answer_question(my_sparql_query)
+    if True:
+        rdf_prolog = RdfProlog(rules_folder='../rules/rules_human')
+    #     # knows(andy, bob)
+    #     my_question = f"""
+    #        SELECT ?s WHERE {{
+    #        ?s <http://value.org/operation> <http://value.org/knows_direct> .
+    #        ?s <http://value.org/variable_x> <http://value.org/andy> .
+    #        ?s <http://value.org/variable_y> <http://value.org/bob> .
+    #        }}"""
+    #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    #     # rdf_prolog.answer_question(my_sparql_query)
+    #
+    #     # knows_direct(andy, chris)
+    #     my_question = f"""
+    #        SELECT ?s WHERE {{
+    #        ?s <http://value.org/operation> <http://value.org/knows_direct> .
+    #        ?s <http://value.org/variable_x> <http://value.org/andy> .
+    #        ?s <http://value.org/variable_y> <http://value.org/chris> .
+    #        }}"""
+    #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    #     # rdf_prolog.answer_question(my_sparql_query)
+    #
+        # knows_direct(andy, ?ans)
+        my_question = f"""
+           SELECT ?s ?ans WHERE {{
+           ?s <http://value.org/operation> <http://value.org/knows_direct> .
+           ?s <http://value.org/variable_x> <http://value.org/andy> .
+           ?s <http://value.org/variable_y> ?ans .
+           }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # rdf_prolog.answer_question(my_sparql_query, results_limit=2)
+    #
+    #     # knows_indirect(andy, chris)
+    #     my_question = f"""
+    #        SELECT ?s WHERE {{
+    #        ?s <http://value.org/operation> <http://value.org/knows_indirect> .
+    #        ?s <http://value.org/variable_x> <http://value.org/andy> .
+    #        ?s <http://value.org/variable_y> <http://value.org/chris> .
+    #        }}"""
+    #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    #     # rdf_prolog.answer_question(my_sparql_query)
+    #
+    #     # knows_indirect(andy, edgar)
+    #     my_question = f"""
+    #        SELECT ?s WHERE {{
+    #        ?s <http://value.org/operation> <http://value.org/knows_indirect> .
+    #        ?s <http://value.org/variable_x> <http://value.org/andy> .
+    #        ?s <http://value.org/variable_y> <http://value.org/edgar> .
+    #        }}"""
+    #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    #     # rdf_prolog.answer_question(my_sparql_query)
+    #
+        # knows_indirect(andy, ?ans)
+        my_question = f"""
+           SELECT ?s WHERE {{
+           ?s <http://value.org/operation> <http://value.org/knows_indirect> .
+           ?s <http://value.org/variable_x> <http://value.org/andy> .
+           ?s <http://value.org/variable_y> ?ans .
+           }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # rdf_prolog.answer_question(my_sparql_query)
+
+        # knows(andy, ?ans)
+        my_question = f"""
+           SELECT ?ans WHERE {{
+           ?s <http://value.org/operation> <http://value.org/knows> .
+           ?s <http://value.org/variable_x> <http://value.org/andy> .
+           ?s <http://value.org/variable_y> ?ans .
+           }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        rdf_prolog.answer_question(my_sparql_query, results_limit=4)
         pass
 
     # list_number next
@@ -562,7 +562,7 @@ def main():
     #        ?s2 <http://value.org/variable_z> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
 
     #     # next(2, ?ans)
     #     my_question = f"""
@@ -580,7 +580,7 @@ def main():
     #        ?s3 <http://value.org/variable_z> ?list_three . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     #
     #     # next(9, ?ans)
     #     my_question = f"""
@@ -602,7 +602,7 @@ def main():
     #        ?s4 <http://value.org/variable_z> ?cdr_ten . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     #
     #     # next(?ans, [2])
     #     my_question = f"""
@@ -620,7 +620,7 @@ def main():
     #        ?s4 <http://value.org/variable_z> ?list_one . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     #
     #     # next(?ans, [3])
     #     my_question = f"""
@@ -638,7 +638,7 @@ def main():
     #        ?s4 <http://value.org/variable_z> ?list_two . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     #
     #     # next(?ans, [3])
     #     my_question = f"""
@@ -660,12 +660,12 @@ def main():
     #        ?s4 <http://value.org/variable_z> ?list_two . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
         pass
 
     # list number next
     if True:
-        rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
+        # rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
 
         # next([9, 9], ?ans) = [0, 0, 1] means 100
         my_question = f"""
@@ -691,7 +691,7 @@ def main():
             ?s4 <http://value.org/variable_z> ?cdr_one_hundred .
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
 
     # list_number add
     if True:
@@ -709,7 +709,7 @@ def main():
     #        ?s2 <http://value.org/variable_z> ?ans . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     # 
     #     # add(2, 1, ?ans)
     #     my_question = f"""
@@ -724,7 +724,7 @@ def main():
     #        ?s2 <http://value.org/variable_z> ?ans . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     # 
     #     # add(1, 2, ?ans)
     #     my_question = f"""
@@ -739,7 +739,7 @@ def main():
     #        ?s2 <http://value.org/variable_z> ?ans . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     # 
     #     # add(9, 1, ?ans)
     #     my_question = f"""
@@ -754,7 +754,7 @@ def main():
     #        ?s2 <http://value.org/variable_z> ?ans . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     # 
     #     # add(1, ?ans, 2)
     #     my_question = f"""
@@ -769,7 +769,7 @@ def main():
     #        ?s2 <http://value.org/variable_z> ?ans . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     # 
     # 
     #     # add(1, ?ans, 3)
@@ -781,7 +781,7 @@ def main():
     #        ?s <http://value.org/variable_z> <http://value.org/list_three> . 
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
+    #     resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
         pass
 
     # list number math
@@ -800,7 +800,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans .
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
 
         # add(2, ?ans, 3)
         my_question = f"""
@@ -815,7 +815,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
 
         # multiply(3, 1, ?ans) -> ?ans = 3
         my_question = f"""
@@ -830,7 +830,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
 
         # multiply(3, 2, ?ans) -> ?ans = 6
         my_question = f"""
@@ -845,7 +845,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
 
         # multiply(3, ?ans, 9) -> ?ans = 3
         my_question = f"""
@@ -860,7 +860,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
 
         # divide(6, 2, ?ans) -> ?ans = [3]
         my_question = f"""
@@ -875,7 +875,7 @@ def main():
             ?s2 <http://value.org/variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=50)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=50)
 
         pass
 
