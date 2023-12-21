@@ -496,54 +496,133 @@ class ClassClause:
             if not success:
                 matched = False
                 return matched, list_of_clauses, list_of_forward_bindings, list_of_backward_bindings
-            controls = application.list_of_controls
+
             matched = False
-            for control in controls:
-                left_side = control.left_side.update_variables()
-                forward_binding_control_multiple = {}
-                backward_binding_control_multiple = {}
-                match_control = True
-                for key, value in self.predicate_object_dict.items():
-                    if value.find('http://variable.org/') >= 0:
-                        try:
-                            left_value = left_side.predicate_object_dict[key]
-                            if left_value.find('http://variable.org/') >= 0:
-                                # forward_binding_control[left_value] = value
-                                forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value)  # 2023/12/12
-                            elif left_value.find('http://some.org/') >= 0:
-                                match_control = False
-                                break
-                            else:
-                                # backward_binding_control[value] = left_value
-                                backward_binding_control_multiple = append_to_bindings(backward_binding_control_multiple, value, left_value)  # 2023/12/12
-                        except KeyError:
-                            match_control = False
-                            break
-                    else:
-                        try:
-                            left_value = left_side.predicate_object_dict[key]
-                            if left_value.find('http://variable.org/') >= 0:
-                                # forward_binding_control[left_value] = value
-                                forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value)  # 2023/12/12
-                            elif left_value.find('http://some.org/') >= 0:
-                                # forward_binding_control[left_value] = value
-                                forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value)  # 2023/12/12
-                            else:
-                                if left_value == value:
-                                    pass
-                                else:
+
+            def try_controls(matched):
+                controls = application.list_of_controls
+                for control in controls:
+                    left_side = control.left_side.update_variables()  # ?x -> ?x1000, etc.
+                    forward_binding_control_multiple = {}
+                    backward_binding_control_multiple = {}
+                    match_control = True
+                    for key, value in self.predicate_object_dict.items():
+                        if value.find('http://variable.org/') >= 0:
+                            try:
+                                left_value = left_side.predicate_object_dict[key]
+                                if left_value.find('http://variable.org/') >= 0:
+                                    # forward_binding_control[left_value] = value
+                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value)  # 2023/12/12
+                                elif left_value.find('http://some.org/') >= 0:
                                     match_control = False
-                                    break
-                        except KeyError:
-                            match_control = False
-                            break
-                if match_control:
-                    success, forward_binding_control, backward_binding_control = apply_internal_bindings(forward_binding_control_multiple, backward_binding_control_multiple)
-                    if success:
-                        matched = True
-                        list_of_forward_bindings.append({**forward_binding, **forward_binding_control})
-                        list_of_backward_bindings.append({**backward_binding, **backward_binding_control})
-                        list_of_clauses.append(control.right_sides.update_variables())
+                                    break  # match failed, no further matching in useless
+                                else:
+                                    # backward_binding_control[value] = left_value
+                                    backward_binding_control_multiple = append_to_bindings(backward_binding_control_multiple, value, left_value)  # 2023/12/12
+                            except KeyError:
+                                match_control = False
+                                break  # match failed, no further matching in useless
+                        else:  # value in key-value pair is a constant, therefore the argument in the control must be a variable, a semi-variable or the same constant value
+                            try:
+                                left_value = left_side.predicate_object_dict[key]
+                                if left_value.find('http://variable.org/') >= 0:
+                                    # forward_binding_control[left_value] = value
+                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value)  # 2023/12/12
+                                elif left_value.find('http://some.org/') >= 0:
+                                    # forward_binding_control[left_value] = value
+                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value)  # 2023/12/12
+                                else:
+                                    if left_value == value:
+                                        pass  # if the constant has the same value, match is OK.
+                                    else:
+                                        match_control = False
+                                        break  # match failed, no further matching in useless
+                            except KeyError:
+                                match_control = False
+                                break  # match failed, no further matching in useless
+                    if match_control:  # the arguments of this control match with the values in the current clause
+                        success, forward_binding_control, backward_binding_control = apply_internal_bindings(forward_binding_control_multiple, backward_binding_control_multiple)
+                        if success:
+                            matched = True
+                            list_of_forward_bindings.append({**forward_binding, **forward_binding_control})
+                            list_of_backward_bindings.append({**backward_binding, **backward_binding_control})
+                            list_of_clauses.append(control.right_sides.update_variables())
+                return matched
+
+            matched = try_controls(matched)
+
+            def try_functions(matched):
+                def exec_function(operation_name_uri, forward_binding):
+                    function_file_name = f'../rules/rules_number_100/function_{str(operation_name_uri.replace("http://value.org/", ""))}.py'
+                    with open(function_file_name, 'r') as file:
+                        code_to_execute = file.read()
+                        local_vars = {}
+                        for key, value in forward_binding.items():
+                            key_modified = key.replace('http://some.org/_', '').replace('http://variable.org/_', '')
+                            value_modified = value.replace('http://value.org/', '').replace('http://variable.org/', '')
+                            local_vars[key_modified] = value_modified
+                        exec(code_to_execute, {}, local_vars)
+                        result_bindings = local_vars.get('result', None)
+                        return_bindings = {}
+                        for key, value in result_bindings.items():
+                            key_modified = f'http://variable.org/{key}'
+                            value_modified = f'http://value.org/{str(value)}'
+                            return_bindings[key_modified] = value_modified
+                        return return_bindings
+                    pass
+
+                functions = application.list_of_functions
+                for function in functions:
+                    left_side = function.left_side  # .update_variables()  # ?x -> ?x1000, etc.
+                    forward_binding_function_multiple = {}
+                    backward_binding_function_multiple = {}
+                    match_function = True
+                    for key, value in self.predicate_object_dict.items():
+                        if value.find('http://variable.org/') >= 0:
+                            try:
+                                left_value = left_side.predicate_object_dict[key]
+                                if left_value.find('http://variable.org/') >= 0:
+                                    # forward_binding_function[left_value] = value
+                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value)  # 2023/12/12
+                                elif left_value.find('http://some.org/') >= 0:
+                                    match_function = False
+                                    break  # match failed, no further matching in useless
+                                else:
+                                    # backward_binding_control[value] = left_value
+                                    backward_binding_function_multiple = append_to_bindings(backward_binding_function_multiple, value, left_value)  # 2023/12/12
+                            except KeyError:
+                                match_function = False
+                                break  # match failed, no further matching in useless
+                        else:  # value in key-value pair is a constant, therefore the argument in the control must be a variable, a semi-variable or the same constant value
+                            try:
+                                left_value = left_side.predicate_object_dict[key]
+                                if left_value.find('http://variable.org/') >= 0:
+                                    # forward_binding_control[left_value] = value
+                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value)  # 2023/12/12
+                                elif left_value.find('http://some.org/') >= 0:
+                                    # forward_binding_control[left_value] = value
+                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value)  # 2023/12/12
+                                else:
+                                    if left_value == value:
+                                        pass  # if the constant has the same value, match is OK.
+                                    else:
+                                        match_function = False
+                                        break  # match failed, no further matching in useless
+                            except KeyError:
+                                match_function = False
+                                break  # match failed, no further matching in useless
+                    if match_function:  # the arguments of this control match with the values in the current clause
+                        success, forward_binding_function, backward_binding_function = apply_internal_bindings(forward_binding_function_multiple, backward_binding_function_multiple)
+                        if success:
+                            matched = True
+                            # list_of_clauses.append(function.right_sides.update_variables())
+                            result_bindings = exec_function(function.right_sides.list_of_clauses[0].operation_name_uri, forward_binding_function)
+                            list_of_forward_bindings.append({**forward_binding, **forward_binding_function, **result_bindings})
+                            list_of_backward_bindings.append({**backward_binding, **backward_binding_function})
+                return matched
+
+            matched = try_functions(matched)
+
         return matched, list_of_clauses, list_of_forward_bindings, list_of_backward_bindings
 
     def apply_bindings(self, bindings: dict[str, str]):
@@ -741,9 +820,20 @@ class ClassApplication:
         results_for_application_use = graph.query(query_for_application_use)
         self.list_of_controls = []
         for binding in results_for_application_use.bindings:
-            subject = binding['control']
-            control = ClassControl(graph, subject)
+            control_uri = binding['control']
+            control = ClassControl(graph, control_uri)
             self.list_of_controls.append(control)
+        query_for_application_use = f"""
+                    SELECT ?function WHERE {{ <{subject}> {uri_ref_ext('use')} ?use . 
+                    ?use {uri_ref_ext('function')} ?function .
+                    OPTIONAL {{ ?use {uri_ref_ext('priority')} ?priority . }} }} ORDER BY ?priority 
+                """
+        results_for_application_use = graph.query(query_for_application_use)
+        self.list_of_functions = []
+        for binding in results_for_application_use.bindings:
+            function_uri = binding['function']
+            function = ClassFunction(graph, function_uri)
+            self.list_of_functions.append(function)
         pass
 
 
@@ -806,6 +896,42 @@ class ClassControl:
 
         results_for_control_right = graph.query(query_for_control_right)
         for binding in results_for_control_right.bindings:
+            clause = ClassClause()
+            right_side = clause.from_query(graph, binding['child'])
+            self.right_sides.list_of_clauses.append(right_side)
+        pass
+
+
+class ClassFunction:
+    """Class for handling a function object.
+
+    Attributes:
+
+    """
+    def __init__(self, graph, function_uri: rdflib.term.URIRef):
+        query_for_function_left = f"""
+        SELECT ?left_side  WHERE {{ <{function_uri}> {uri_ref_ext('left_side')} ?left_side . }}
+        """
+        results_for_function_left = graph.query(query_for_function_left)
+        try:
+            function_left = results_for_function_left.bindings[0]['left_side']
+        except KeyError:
+            pass  # error
+        except Exception:
+            pass  # error
+        clause = ClassClause()
+        self.left_side = clause.from_query(graph, function_left)
+
+        self.right_sides = ClassClauses()
+        query_for_function_right = f"""
+        SELECT ?child  WHERE {{ 
+        <{function_uri}> {uri_ref_ext('right_side')} ?right_side . 
+        ?right_side {uri_ref_ext('child')} ?child .
+        OPTIONAL {{ ?right_side {uri_ref_ext('priority')} ?priority . }}
+        }} ORDER BY ?priority
+        """
+        results_for_function_right = graph.query(query_for_function_right)
+        for binding in results_for_function_right.bindings:
             clause = ClassClause()
             right_side = clause.from_query(graph, binding['child'])
             self.right_sides.list_of_clauses.append(right_side)

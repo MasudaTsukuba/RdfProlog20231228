@@ -445,6 +445,48 @@ def main():
         # xxx = resolve_bindings[0]['?ans']
         pass
 
+    # function_100
+    if True:  # function_100
+        rdf_prolog = RdfProlog(rules_folder='../rules/rules_number_100')
+
+        # solve_simultaneous_linear_equation(2, 3, 12, 1, 1, 5, ?ans1, ?ans2)
+        my_question = f"""
+           SELECT ?ans1 ?ans2 WHERE {{
+           ?s <http://value.org/operation> <http://value.org/solve_simultaneous_linear_equation> .
+           ?s <http://value.org/variable_a11> <http://value.org/2> .
+           ?s <http://value.org/variable_a12> <http://value.org/3> .
+           ?s <http://value.org/variable_b1> <http://value.org/12> .
+           ?s <http://value.org/variable_a21> <http://value.org/1> .
+           ?s <http://value.org/variable_a22> <http://value.org/1> .
+           ?s <http://value.org/variable_b2> <http://value.org/5> .
+           ?s <http://value.org/variable_x1> ?ans1 .
+           ?s <http://value.org/variable_x2> ?ans2 .
+           }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
+        # xxx = resolve_bindings[0]['?ans']
+
+        # solve_simultaneous_linear_equation(2, 3, 12, 1, 1, 5, ?ans1, ?ans2), add(?ans1, ?ans2, ?ans) .
+        my_question = f"""
+           SELECT ?ans ?ans1 ?ans2 WHERE {{
+           ?s <http://value.org/operation> <http://value.org/solve_simultaneous_linear_equation> .
+           ?s <http://value.org/variable_a11> <http://value.org/3> .
+           ?s <http://value.org/variable_a12> <http://value.org/2> .
+           ?s <http://value.org/variable_b1> <http://value.org/22> .
+           ?s <http://value.org/variable_a21> <http://value.org/2> .
+           ?s <http://value.org/variable_a22> <http://value.org/1> .
+           ?s <http://value.org/variable_b2> <http://value.org/13> .
+           ?s <http://value.org/variable_x1> ?ans1 .
+           ?s <http://value.org/variable_x2> ?ans2 .
+           ?s2 <http://value.org/operation> <http://value.org/add_number> .
+           ?s2 <http://value.org/variable_x> ?ans1 .
+           ?s2 <http://value.org/variable_y> ?ans2 .
+           ?s2 <http://value.org/variable_z> ?ans .
+           }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
+
+        pass
 
     # family
     if True:
@@ -461,7 +503,7 @@ def main():
         pass
 
     # mortal
-    # if True:
+    if True:
     #     rdf_prolog = RdfProlog(rules_folder='../rules/rules_human')
     #     # mortal(?ans)
     #     my_question = f"""
@@ -475,7 +517,8 @@ def main():
 
     # knows
     if True:
-        rdf_prolog = RdfProlog(rules_folder='../rules/rules_human')
+        # rdf_prolog = RdfProlog(rules_folder='../rules/rules_human')
+
     #     # knows(andy, bob)
     #     my_question = f"""
     #        SELECT ?s WHERE {{
@@ -544,7 +587,7 @@ def main():
            ?s <http://value.org/variable_y> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        rdf_prolog.answer_question(my_sparql_query, results_limit=4)
+        # rdf_prolog.answer_question(my_sparql_query, results_limit=4)
         pass
 
     # list_number next
@@ -693,7 +736,7 @@ def main():
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
 
-    # list_number add
+    # list number add
     if True:
     #     rdf_prolog = RdfProlog(rules_folder='rules/rules_list_number_add')
     #     # add(1, 1, ?ans)

@@ -1,0 +1,67 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+##################################################################
+# rules
+
+##################################################################
+# controls
+
+##################################################################
+# functions
+
+VAL:function_solve_simultaneous_linear_equation_a11_a12_b1_a21_a22_b2_x1_x2
+    VAL:type VAL:function ;
+    VAL:left_side [
+        VAL:operation VAL:solve_simultaneous_linear_equation ;
+        VAL:variable_a11 SOME:_a11 ;
+        VAL:variable_a12 SOME:_a12 ;
+        VAL:variable_b1 SOME:_b1 ;
+        VAL:variable_a21 SOME:_a21 ;
+        VAL:variable_a22 SOME:_a22 ;
+        VAL:variable_b2 SOME:_b2 ;
+        VAL:variable_x1 VAR:_x1 ;
+        VAL:variable_x2 VAR:_x2 ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:solve_simultaneous_linear_equation ;
+            VAL:variable_a11 SOME:_a11 ;
+            VAL:variable_a12 SOME:_a12 ;
+            VAL:variable_b1 SOME:_b1 ;
+            VAL:variable_a21 SOME:_a21 ;
+            VAL:variable_a22 SOME:_a22 ;
+            VAL:variable_b2 SOME:_b2 ;
+            VAL:variable_x1 VAR:_x1 ;
+            VAL:variable_x2 VAR:_x2 ] ] ;
+
+    VAL:priority "1" .
+
+##################################################################
+# applications
+
+VAL:application_solve_simultaneous_linear_equation_a11_a12_b1_a21_a22_b2_x1_x2
+    VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+        VAL:operation VAL:solve_simultaneous_linear_equation ;
+        VAL:variable_a11 SOME:_a11 ;
+        VAL:variable_a12 SOME:_a12 ;
+        VAL:variable_b1 SOME:_b1 ;
+        VAL:variable_a21 SOME:_a21 ;
+        VAL:variable_a22 SOME:_a22 ;
+        VAL:variable_b2 SOME:_b2 ;
+        VAL:variable_x1 VAR:_x1 ;
+        VAL:variable_x2 VAR:_x2 ] ;
+    VAL:use [
+        VAL:function VAL:function_solve_simultaneous_linear_equation_a11_a12_b1_a21_a22_b2_x1_x2 ;
+        VAL:priority "1" ] ;
+    VAL:priority "1".
+
+
+##################################################################
+# inferences
