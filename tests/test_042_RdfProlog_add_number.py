@@ -124,7 +124,7 @@ def test_add_1_y_z():
         ?s <http://value.org/variable_z> ?z . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True, depth_limit=30)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10, depth_limit=30)
     assert len(resolve_bindings) == 9
 
 
@@ -138,7 +138,7 @@ def test_add_9_y_z():
         ?s <http://value.org/variable_z> ?z . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True, depth_limit=20)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10, depth_limit=20)
     assert resolve_bindings[0]['?y'] == f'http://value.org/one'
     assert resolve_bindings[0]['?z'] == f'http://value.org/ten'
 
@@ -153,7 +153,7 @@ def test_add_x_1_z():
         ?s <http://value.org/variable_z> ?z . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
     assert len(resolve_bindings) == 9
 
 
@@ -167,7 +167,7 @@ def test_add_x_9_z():
         ?s <http://value.org/variable_z> ?z . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
     assert resolve_bindings[0]['?x'] == 'http://value.org/one'
     assert resolve_bindings[0]['?z'] == 'http://value.org/ten'
 
@@ -182,7 +182,7 @@ def test_add_x_y_2():
         ?s <http://value.org/variable_z> <http://value.org/two> . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
     assert resolve_bindings[0]['?x'] == 'http://value.org/one'
     assert resolve_bindings[0]['?y'] == 'http://value.org/one'
 
@@ -197,7 +197,7 @@ def test_add_x_y_3():
         ?s <http://value.org/variable_z> <http://value.org/three> . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True, depth_limit=10)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10, depth_limit=10)
     assert len(resolve_bindings) == 2
 
 
@@ -211,7 +211,7 @@ def test_depth_limit_add_3_1_ans():
         ?s <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=1)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=1)
     assert len(resolve_bindings) == 0
 
 
@@ -225,6 +225,6 @@ def test_depth_limit_add_3_1_ans_2():
         ?s <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=2)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=2)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?ans'] == 'http://value.org/four'

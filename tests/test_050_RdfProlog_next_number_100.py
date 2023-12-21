@@ -86,5 +86,5 @@ def test_answer_next_x_y():
         ?s <http://value.org/variable_y> ?y .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=100)
     assert len(resolve_bindings) == 98

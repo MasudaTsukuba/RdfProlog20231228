@@ -23,7 +23,7 @@ def test_cons_5_list1_ans():
             ?s2 <http://value.org/variable_z> ?ans .
             }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/five'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/list_one'
@@ -41,7 +41,7 @@ def test_list_next_1_ans():
         ?s2 <http://value.org/variable_z> ?ans .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/two'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -64,7 +64,7 @@ def test_list_next_2_ans():
         ?s3 <http://value.org/variable_z> ?list_three . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/three'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -91,7 +91,7 @@ def test_list_next_9_ans():
         ?s4 <http://value.org/variable_z> ?cdr_ten . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car_ten'] == 'http://value.org/zero'
     assert resolve_bindings[0]['?car'] == 'http://value.org/one'
@@ -117,7 +117,7 @@ def test_list_next_9_ans0_next_ans0_ans():
         ?s5 <http://value.org/variable_z> ?cdr_eleven . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car_eleven'] == 'http://value.org/one'
     assert resolve_bindings[0]['?car'] == 'http://value.org/one'
@@ -140,7 +140,7 @@ def test_list_next_ans_0():
         ?s4 <http://value.org/variable_z> ?list_minus1 . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 0
     # assert resolve_bindings[0]['?list_zero'] == 'http://value.org/list_zero'
     # assert resolve_bindings[0]['?car'] == 'http://value.org/minus_one'
@@ -164,7 +164,7 @@ def test_list_next_ans_1():
         ?s4 <http://value.org/variable_z> ?list_zero . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     # assert resolve_bindings[0]['?list_zero'] == 'http://value.org/list_zero'
     assert resolve_bindings[0]['?car'] == 'http://value.org/zero'
@@ -188,7 +188,7 @@ def test_list_next_ans_2():
         ?s4 <http://value.org/variable_z> ?list_one . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?list_one'] == 'http://value.org/list_one'
     assert resolve_bindings[0]['?car'] == 'http://value.org/one'
@@ -216,7 +216,7 @@ def test_list_next_ans_3():
         ?s4 <http://value.org/variable_z> ?list_two . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/two'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -236,7 +236,7 @@ def test_add_1_1_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/two'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -256,7 +256,7 @@ def test_add_2_1_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/three'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -276,7 +276,7 @@ def test_add_1_2_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/three'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -296,7 +296,7 @@ def test_add_9_1_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/zero'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/list_one'
@@ -321,7 +321,7 @@ def test_add_6_6_ans():
         ?s3 <http://value.org/variable_z> ?cdr . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/two'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/list_one'
@@ -341,7 +341,7 @@ def test_add_2_ans_3():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/one'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -361,7 +361,7 @@ def test_add_ans_2_4():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/two'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -381,7 +381,7 @@ def test_subtract_4_2_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/two'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -401,7 +401,7 @@ def test_subtract_4_ans_1():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/three'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -421,7 +421,7 @@ def test_subtract_ans_5_2():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/seven'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -441,7 +441,7 @@ def test_multiply_2_1_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/two'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -461,7 +461,7 @@ def test_multiply_3_2_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/six'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -481,7 +481,7 @@ def test_multiply_3_ans_9():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/three'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -501,7 +501,7 @@ def test_divide_4_2_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/two'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -521,7 +521,7 @@ def test_divide_5_1_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/five'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'
@@ -537,7 +537,7 @@ def test_divide_5_2_ans():
         ?s <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
     assert len(resolve_bindings) == 0
 
 
@@ -555,7 +555,7 @@ def test_divide_6_2_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=50)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=50)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?ans'] == 'http://value.org/list_three'
 
@@ -573,7 +573,7 @@ def test_fibonacci_1_ans():
         ?s2 <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=100)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?car'] == 'http://value.org/one'
     assert resolve_bindings[0]['?cdr'] == 'http://value.org/nil'

@@ -76,7 +76,7 @@ def test_answer_question2():
         ?s <http://value.org/variable_y> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=True)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=2)
     assert np.logical_or(resolve_bindings[0]['?ans'] == 'http://value.org/bob',
                          resolve_bindings[1]['?ans'] == 'http://value.org/bob')
     assert np.logical_or(resolve_bindings[0]['?ans'] == 'http://value.org/david',
@@ -92,7 +92,7 @@ def test_answer_question3():
         ?s <http://value.org/variable_y> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, True)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=4)
     assert len(resolve_bindings) == 4  # > 0
 
 

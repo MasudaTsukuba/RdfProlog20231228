@@ -48,7 +48,7 @@ def test_answer_question3_3_minus_2():
         ?s <http://value.org/variable_z> ?ans .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, find_all=False, depth_limit=10)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=10)
     assert resolve_bindings[0]['?ans'] == f'http://value.org/1'
 
 
