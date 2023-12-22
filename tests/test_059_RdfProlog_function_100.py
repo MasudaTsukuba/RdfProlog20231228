@@ -1,4 +1,4 @@
-"""
+"""Test function call.
 test_059_RdfProlog_function_100.py
 test for function call
 T. Masuda, 2023/12/21
@@ -72,3 +72,16 @@ def test_answer_question3_solve_simultaneous_linear_equation():
     assert resolve_bindings[0]['?ans1'] == 'http://value.org/4'
     assert resolve_bindings[0]['?ans2'] == 'http://value.org/5'
     assert resolve_bindings[0]['?ans'] == 'http://value.org/9'
+
+
+def test_answer_question4_factorial():
+    # factorial(4, ?ans) -> ?ans = 24
+    my_question = f"""
+       SELECT ?ans WHERE {{
+       ?s <http://value.org/operation> <http://value.org/factorial> .
+       ?s <http://value.org/variable_x> <http://value.org/4> .
+       ?s <http://value.org/variable_fact> ?ans .
+       }}"""
+    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
+    assert resolve_bindings[0]['?ans'] == 'http://value.org/24'

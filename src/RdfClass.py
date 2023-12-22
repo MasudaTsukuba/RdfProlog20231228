@@ -1,6 +1,6 @@
-"""RdfClass
+"""Classes for handling RDF info for Prolog
 RdfClass.py
-Classes supporting RdfProlog reasoning
+Classes supporting RdfProlog reasoning.
 T. Masuda, 2023/10/30
 """
 
@@ -9,7 +9,7 @@ import logging
 import sys
 
 import rdflib
-from rdflib import Graph, URIRef  # , BNode, Variable
+from rdflib import Graph, URIRef, Variable  # , BNode
 from lark import Lark, Transformer, Token  # , Tree
 
 
@@ -48,13 +48,13 @@ def uri_ref_ext(key_word: str) -> URIRef:
 
 class ClassClauses:
     """Class for handling clauses (a list of clauses)
-    ClassClauses holds a set of clause.
-    Used for the right sides of a rule.
+    ClassClauses holds a list of clauses.
+    Also, sed for the right sides of a rule.
     Since the clauses are stored in a list, they are sorted according to the priorities.
 
     Attributes:
-        list_of_clauses (list[ClassClause]):
-        list_of_variables (list[]):
+        list_of_clauses (list[ClassClause]): List of clauses
+        list_of_variables (list[]): Variables contained in the clauses
     """
     variable_modifier = 1000  # number for updating temporal variables
 
@@ -162,21 +162,21 @@ class ClassClause:
 
         for triple in self.list_of_triple:
             subj = triple.subject  # ClassTerm
-            pred = triple.predicate
-            obje = triple.object
+            predicate = triple.predicate
+            object_ = triple.object
             subj_uri = subj.to_uri(drop=True)  # http://variable.org/s
-            pred_uri = pred.to_uri(drop=True)  # http://value.org/operation
-            obje_uri = obje.to_uri(drop=True)  # http://value.org/add_number
-            g_temp.add((URIRef(subj_uri), URIRef(pred_uri), URIRef(obje_uri)))  # add to the temporary graph
-            g_temp_debug.append((URIRef(subj_uri), URIRef(pred_uri), URIRef(obje_uri)))
-            self.predicate_object_dict[pred_uri] = obje_uri  # build predicate-object pairs
+            predicate_uri = predicate.to_uri(drop=True)  # http://value.org/operation
+            object_uri = object_.to_uri(drop=True)  # http://value.org/add_number
+            g_temp.add((URIRef(subj_uri), URIRef(predicate_uri), URIRef(object_uri)))  # add to the temporary graph
+            g_temp_debug.append((URIRef(subj_uri), URIRef(predicate_uri), URIRef(object_uri)))
+            self.predicate_object_dict[predicate_uri] = object_uri  # build predicate-object pairs
             len_effective_rdfs += 1
-            if not obje.is_variable:  # .find('http://variable.org/') < 0:
+            if not object_.is_variable:  # .find('http://variable.org/') < 0:
                 pass  # skip if the object is a variable
             else:
-                self.set_of_variables_in_query.add((obje_uri, pred_uri))
-            if pred_uri == 'http://value.org/operation':
-                operation_name = obje_uri.replace('http://value.org/', '')  # extract operation name
+                self.set_of_variables_in_query.add((object_uri, predicate_uri))
+            if predicate_uri == 'http://value.org/operation':
+                operation_name = object_uri.replace('http://value.org/', '')  # extract operation name
                 self.operation_name_uri = uri_ref(operation_name)  # keep as UriRef
 
     def from_query(self, graph: Graph, subject: rdflib.term.URIRef):
@@ -200,23 +200,23 @@ class ClassClause:
         self.set_of_variables_in_query: set[tuple[str, str]] = set()  # [(object_variable, predicate)]
 
         subj = subject  # subject is an instance of ClassTerm
-        subj_uri = str(subj)  # convert to a uri string such as http://variable.org/s
+        subj_uri = str(subj)  # convert to an uri string such as http://variable.org/s
         for binding in results_for_clause.bindings:  # extract predicate - object pair
-            pred = binding['?p']
-            obje = binding['?o']
-            pred_uri = str(pred)  # http://value.org/operation
-            obje_uri = str(obje)  # http://value.org/add_number
+            predicate = binding[Variable('?p')]
+            object_ = binding[Variable('?o')]
+            predicate_uri = str(predicate)  # http://value.org/operation
+            object_uri = str(object_)  # http://value.org/add_number
             triple = ClassTriple()  # create an instance of ClassTriple
-            triple.build_from_spo(subj_uri, pred_uri, obje_uri)
+            triple.build_from_spo(subj_uri, predicate_uri, object_uri)
             self.list_of_triple.append(triple)
-            self.predicate_object_dict[pred_uri] = obje_uri  # build predicate - object pairs
+            self.predicate_object_dict[predicate_uri] = object_uri  # build predicate - object pairs
             len_effective_rdfs += 1
-            if obje_uri.find('http://variable.org/') >= 0:  # object is a variable
-                self.set_of_variables_in_query.add((obje_uri, pred_uri))  # add the variable
-            if obje_uri.find('http://some.org/') >= 0:  # object is a semi-variable
-                self.set_of_half_variables.add((obje_uri, pred_uri))
-            if pred_uri == 'http://value.org/operation':  # operation name
-                operation_name = obje_uri.replace('http://value.org/', '')  # extract operation name
+            if object_uri.find('http://variable.org/') >= 0:  # object is a variable
+                self.set_of_variables_in_query.add((object_uri, predicate_uri))  # add the variable
+            if object_uri.find('http://some.org/') >= 0:  # object is a semi-variable
+                self.set_of_half_variables.add((object_uri, predicate_uri))
+            if predicate_uri == 'http://value.org/operation':  # operation name
+                operation_name = object_uri.replace('http://value.org/', '')  # extract operation name
                 self.operation_name_uri = uri_ref(operation_name)  # keep as UriRef
         return self
 
@@ -230,31 +230,31 @@ class ClassClause:
 
         """
 
-        def match_fact(candidate):
+        def match_fact(candidate_):
             """Test whether the argument candidate fact matches the request.
 
             Args:
-                candidate:
+                candidate_:
 
             Returns:
 
             """
-            success = True
-            bindings = {}
-            for predicate, object in self.predicate_object_dict.items():
+            success_ = True
+            bindings_ = {}
+            for predicate, object_ in self.predicate_object_dict.items():
                 try:
-                    if object.find('http://variable.org/') >= 0:
-                        bindings[object] = candidate.fact.predicate_object_dict[predicate]
+                    if object_.find('http://variable.org/') >= 0:
+                        bindings_[object_] = candidate_.fact.predicate_object_dict[predicate]
                     else:
-                        if candidate.fact.predicate_object_dict[predicate] == object:
+                        if candidate_.fact.predicate_object_dict[predicate] == object_:
                             pass
                         else:
-                            success = False
+                            success_ = False
                             break
                 except Exception as e:
-                    success = False
+                    success_ = False
                     break
-            return success, bindings
+            return success_, bindings_
 
         def generate_cons():
             """Generate a cons element.
@@ -264,8 +264,8 @@ class ClassClause:
             Returns:
 
             """
-            success = True  # assume the success
-            bindings = {}
+            success_ = True  # assume the success
+            bindings_ = {}
             variable_x = self.predicate_object_dict[uri_ref('variable_x', ref=False)]
             variable_y = self.predicate_object_dict[uri_ref('variable_y', ref=False)]
             variable_z = self.predicate_object_dict[uri_ref('variable_z', ref=False)]
@@ -285,10 +285,10 @@ class ClassClause:
                 fact = ClassFact()
                 fact.build_from_triples([triple1, triple2, triple3, triple4])
                 rdf_prolog.facts.add_fact(fact)
-                bindings[variable_z] = cons_list
+                bindings_[variable_z] = cons_list
             else:
-                success = False
-            return success, bindings
+                success_ = False
+            return success_, bindings_
 
         operation_name_uri = self.operation_name_uri
         return_bindings = []
@@ -339,31 +339,32 @@ class ClassClause:
                 continue
         return matched, rule.rule_right_clauses(), forward_bindings, backward_bindings
 
-    def match_application(self, application):
+    def match_application(self, rdf_prolog, application):
         """Test whether the argument application matches with this clause.
 
         Args:
+            rdf_prolog:
             application (ClassApplication):
 
         Returns:
 
         """
-        def append_to_bindings(bindings, key, value):
+        def append_to_bindings(bindings, key_, value_):
             """
 
             Args:
                 bindings:
-                key:
-                value:
+                key_:
+                value_:
 
             Returns:
 
             """
             try:
-                xxx = bindings[key]  # search an entry
+                xxx = bindings[key_]  # search an entry
             except KeyError:  # no entry found
-                bindings[key] = []  # empty list
-            bindings[key].append(value)
+                bindings[key_] = []  # empty list
+            bindings[key_].append(value_)
             return bindings
 
         def apply_internal_bindings(forward_multiple, backward_multiple):
@@ -389,63 +390,63 @@ class ClassClause:
                     return True
                 return False
 
-            success = True
-            forward_binding = {}
-            backward_binding = {}
-            for key, values in forward_multiple.items():
+            success_ = True
+            forward_binding_ = {}
+            backward_binding_ = {}
+            for key_, values in forward_multiple.items():
                 if len(values) == 1:   # this is the only element in the list
-                    forward_binding[key] = values[0]  # just copy the first element
+                    forward_binding_[key_] = values[0]  # just copy the first element
                 elif len(values) > 1:
                     first_constant: str = ''  # start from empty string
-                    for value in values:
-                        if is_constant(value):  # value is a constant
+                    for value_ in values:
+                        if is_constant(value_):  # value is a constant
                             if first_constant == '':  # first_constant is not yet assigned
-                                first_constant = value  # set the constant value
+                                first_constant = value_  # set the constant value
                             else:
-                                if first_constant == value:  # same value
+                                if first_constant == value_:  # same value
                                     pass
                                 else:  # different constants are assigned to a variable
-                                    success = False
+                                    success_ = False
                                     break
                     first_element = first_constant
                     if first_constant == '':  # no constant value is found
-                        for value in values:
-                            if not is_constant(value):
-                                first_element = value
-                    for value in values:  # scan for the variables
-                        if not is_constant(value):  # the value is a variable
-                            backward_binding[value] = first_element
+                        for value_ in values:
+                            if not is_constant(value_):
+                                first_element = value_
+                    for value_ in values:  # scan for the variables
+                        if not is_constant(value_):  # the value is a variable
+                            backward_binding_[value_] = first_element
                 else:  # error
                     sys.exit(-1)
 
-            if not success:
-                return success, forward_binding, backward_binding
+            if not success_:
+                return success_, forward_binding_, backward_binding_
 
             first_constant = ''
-            for key, values in backward_multiple.items():
+            for key_, values in backward_multiple.items():
                 if len(values) == 1:  # this is the only element in the list
-                    backward_binding[key] = values[0]  # just copy the first element
+                    backward_binding_[key_] = values[0]  # just copy the first element
                 elif len(values) > 1:
                     first_constant: str = ''  # start from empty string
-                    for value in values:
-                        if is_constant(value):  # value is a constant
+                    for value_ in values:
+                        if is_constant(value_):  # value is a constant
                             if first_constant == '':  # first_constant is not yet assigned
-                                first_constant = value  # set the constant value
+                                first_constant = value_  # set the constant value
                             else:
-                                if first_constant == value:  # same value
+                                if first_constant == value_:  # same value
                                     pass
                                 else:  # different constants are assigned to a variable
-                                    success = False
+                                    success_ = False
                                     break
                     if first_constant == '':  # no constant value is found
                         break
-                    for value in values:  # scan for the variables
-                        if not is_constant(value):  # the value is a variable
-                            backward_binding[value] = first_constant
+                    for value_ in values:  # scan for the variables
+                        if not is_constant(value_):  # the value is a variable
+                            backward_binding_[value_] = first_constant
                 else:  # error
                     sys.exit(-1)
 
-            return success, forward_binding, backward_binding
+            return success_, forward_binding_, backward_binding_
 
         # try to match the pattern of an application
         pattern = application.pattern  # extract the pattern in the application
@@ -499,40 +500,41 @@ class ClassClause:
 
             matched = False
 
-            def try_controls(matched):
+            def try_controls(matched_):
                 controls = application.list_of_controls
-                for control in controls:
+                for control_uri in controls:
+                    control = rdf_prolog.controls.operation_name_dict[control_uri]
                     left_side = control.left_side.update_variables()  # ?x -> ?x1000, etc.
                     forward_binding_control_multiple = {}
                     backward_binding_control_multiple = {}
                     match_control = True
-                    for key, value in self.predicate_object_dict.items():
-                        if value.find('http://variable.org/') >= 0:
+                    for key_, value_ in self.predicate_object_dict.items():
+                        if value_.find('http://variable.org/') >= 0:
                             try:
-                                left_value = left_side.predicate_object_dict[key]
+                                left_value = left_side.predicate_object_dict[key_]
                                 if left_value.find('http://variable.org/') >= 0:
                                     # forward_binding_control[left_value] = value
-                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value)  # 2023/12/12
+                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
                                 elif left_value.find('http://some.org/') >= 0:
                                     match_control = False
                                     break  # match failed, no further matching in useless
                                 else:
                                     # backward_binding_control[value] = left_value
-                                    backward_binding_control_multiple = append_to_bindings(backward_binding_control_multiple, value, left_value)  # 2023/12/12
+                                    backward_binding_control_multiple = append_to_bindings(backward_binding_control_multiple, value_, left_value)  # 2023/12/12
                             except KeyError:
                                 match_control = False
                                 break  # match failed, no further matching in useless
                         else:  # value in key-value pair is a constant, therefore the argument in the control must be a variable, a semi-variable or the same constant value
                             try:
-                                left_value = left_side.predicate_object_dict[key]
+                                left_value = left_side.predicate_object_dict[key_]
                                 if left_value.find('http://variable.org/') >= 0:
                                     # forward_binding_control[left_value] = value
-                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value)  # 2023/12/12
+                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
                                 elif left_value.find('http://some.org/') >= 0:
                                     # forward_binding_control[left_value] = value
-                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value)  # 2023/12/12
+                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
                                 else:
-                                    if left_value == value:
+                                    if left_value == value_:
                                         pass  # if the constant has the same value, match is OK.
                                     else:
                                         match_control = False
@@ -541,69 +543,68 @@ class ClassClause:
                                 match_control = False
                                 break  # match failed, no further matching in useless
                     if match_control:  # the arguments of this control match with the values in the current clause
-                        success, forward_binding_control, backward_binding_control = apply_internal_bindings(forward_binding_control_multiple, backward_binding_control_multiple)
-                        if success:
-                            matched = True
+                        success_, forward_binding_control, backward_binding_control = apply_internal_bindings(forward_binding_control_multiple, backward_binding_control_multiple)
+                        if success_:
+                            matched_ = True
                             list_of_forward_bindings.append({**forward_binding, **forward_binding_control})
                             list_of_backward_bindings.append({**backward_binding, **backward_binding_control})
                             list_of_clauses.append(control.right_sides.update_variables())
-                return matched
+                return matched_
 
             matched = try_controls(matched)
 
-            def try_functions(matched):
-                def exec_function(operation_name_uri, forward_binding):
-                    function_file_name = f'../rules/rules_number_100/function_{str(operation_name_uri.replace("http://value.org/", ""))}.py'
-                    with open(function_file_name, 'r') as file:
-                        code_to_execute = file.read()
-                        local_vars = {}
-                        for key, value in forward_binding.items():
-                            key_modified = key.replace('http://some.org/_', '').replace('http://variable.org/_', '')
-                            value_modified = value.replace('http://value.org/', '').replace('http://variable.org/', '')
-                            local_vars[key_modified] = value_modified
-                        exec(code_to_execute, {}, local_vars)
-                        result_bindings = local_vars.get('result', None)
-                        return_bindings = {}
-                        for key, value in result_bindings.items():
-                            key_modified = f'http://variable.org/{key}'
-                            value_modified = f'http://value.org/{str(value)}'
-                            return_bindings[key_modified] = value_modified
-                        return return_bindings
+            def try_functions(matched_):
+                def exec_function(function_: ClassFunction, forward_binding_: dict[str, str]):
+                    code_to_execute: str = function_.code
+                    local_vars = {}
+                    for key1, value1 in forward_binding_.items():
+                        key_modified = key1.replace('http://some.org/_', '').replace('http://variable.org/_', '')
+                        value_modified = value1.replace('http://value.org/', '').replace('http://variable.org/', '')
+                        local_vars[key_modified] = value_modified
+                    exec(code_to_execute, {}, local_vars)
+                    result_bindings_: dict[str, str] = local_vars.get('result', None)
+                    return_bindings: dict[str, str] = {}
+                    for key2, value2 in result_bindings_.items():
+                        key_modified = f'http://variable.org/{key2}'
+                        value_modified = f'http://value.org/{str(value2)}'
+                        return_bindings[key_modified] = value_modified
+                    return return_bindings
                     pass
 
                 functions = application.list_of_functions
-                for function in functions:
+                for function_uri in functions:
+                    function = rdf_prolog.functions.operation_name_dict[function_uri]
                     left_side = function.left_side  # .update_variables()  # ?x -> ?x1000, etc.
                     forward_binding_function_multiple = {}
                     backward_binding_function_multiple = {}
                     match_function = True
-                    for key, value in self.predicate_object_dict.items():
-                        if value.find('http://variable.org/') >= 0:
+                    for key_, value_ in self.predicate_object_dict.items():
+                        if value_.find('http://variable.org/') >= 0:
                             try:
-                                left_value = left_side.predicate_object_dict[key]
+                                left_value = left_side.predicate_object_dict[key_]
                                 if left_value.find('http://variable.org/') >= 0:
                                     # forward_binding_function[left_value] = value
-                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value)  # 2023/12/12
+                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
                                 elif left_value.find('http://some.org/') >= 0:
                                     match_function = False
                                     break  # match failed, no further matching in useless
                                 else:
                                     # backward_binding_control[value] = left_value
-                                    backward_binding_function_multiple = append_to_bindings(backward_binding_function_multiple, value, left_value)  # 2023/12/12
+                                    backward_binding_function_multiple = append_to_bindings(backward_binding_function_multiple, value_, left_value)  # 2023/12/12
                             except KeyError:
                                 match_function = False
                                 break  # match failed, no further matching in useless
                         else:  # value in key-value pair is a constant, therefore the argument in the control must be a variable, a semi-variable or the same constant value
                             try:
-                                left_value = left_side.predicate_object_dict[key]
+                                left_value = left_side.predicate_object_dict[key_]
                                 if left_value.find('http://variable.org/') >= 0:
                                     # forward_binding_control[left_value] = value
-                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value)  # 2023/12/12
+                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
                                 elif left_value.find('http://some.org/') >= 0:
                                     # forward_binding_control[left_value] = value
-                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value)  # 2023/12/12
+                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
                                 else:
-                                    if left_value == value:
+                                    if left_value == value_:
                                         pass  # if the constant has the same value, match is OK.
                                     else:
                                         match_function = False
@@ -612,14 +613,14 @@ class ClassClause:
                                 match_function = False
                                 break  # match failed, no further matching in useless
                     if match_function:  # the arguments of this control match with the values in the current clause
-                        success, forward_binding_function, backward_binding_function = apply_internal_bindings(forward_binding_function_multiple, backward_binding_function_multiple)
-                        if success:
-                            matched = True
+                        success_, forward_binding_function, backward_binding_function = apply_internal_bindings(forward_binding_function_multiple, backward_binding_function_multiple)
+                        if success_:
+                            matched_ = True
                             # list_of_clauses.append(function.right_sides.update_variables())
-                            result_bindings = exec_function(function.right_sides.list_of_clauses[0].operation_name_uri, forward_binding_function)
+                            result_bindings = exec_function(function, forward_binding_function)
                             list_of_forward_bindings.append({**forward_binding, **forward_binding_function, **result_bindings})
                             list_of_backward_bindings.append({**backward_binding, **backward_binding_function})
-                return matched
+                return matched_
 
             matched = try_functions(matched)
 
@@ -710,7 +711,7 @@ class ClassFacts:
 
         """
         self.facts.add(fact)
-        operation_name = fact.operation_name_uri
+        # operation_name = fact.operation_name_uri
         try:
             self.fact_dict[fact.operation_name_uri].add(fact)
         except KeyError:
@@ -776,7 +777,7 @@ class ClassApplications:
         """
         results_for_applications = graph.query(query_for_applications)
         for binding in results_for_applications.bindings:
-            application = ClassApplication(graph, binding['application'])
+            application = ClassApplication(graph, URIRef(binding[Variable('application')]))
             self.applications.append(application)
             operation_name = application.operation_name_uri
             try:
@@ -808,9 +809,9 @@ class ClassApplication:
         """
         results_for_application = graph.query(query_for_application)
         if len(results_for_application.bindings) > 0:
-            self.program = str(results_for_application.bindings[0]['program']).find(f'{uri_ref("true")}') >= 0
+            self.program = str(results_for_application.bindings[0][Variable('program')]).find(f'{uri_ref("true")}') >= 0
             self.pattern = ClassClause()
-            self.pattern.from_query(graph, results_for_application.bindings[0]['pattern'])
+            self.pattern.from_query(graph, URIRef(results_for_application.bindings[0][Variable('pattern')]))
         self.operation_name_uri = self.pattern.operation_name_uri
         query_for_application_use = f"""
             SELECT ?control WHERE {{ <{subject}> {uri_ref_ext('use')} ?use . 
@@ -820,9 +821,10 @@ class ClassApplication:
         results_for_application_use = graph.query(query_for_application_use)
         self.list_of_controls = []
         for binding in results_for_application_use.bindings:
-            control_uri = binding['control']
-            control = ClassControl(graph, control_uri)
-            self.list_of_controls.append(control)
+            control_uri = binding[Variable('control')]
+            # control = ClassControl(graph, control_uri)
+            self.list_of_controls.append(control_uri)
+
         query_for_application_use = f"""
                     SELECT ?function WHERE {{ <{subject}> {uri_ref_ext('use')} ?use . 
                     ?use {uri_ref_ext('function')} ?function .
@@ -831,9 +833,10 @@ class ClassApplication:
         results_for_application_use = graph.query(query_for_application_use)
         self.list_of_functions = []
         for binding in results_for_application_use.bindings:
-            function_uri = binding['function']
-            function = ClassFunction(graph, function_uri)
-            self.list_of_functions.append(function)
+            function_uri = binding[Variable('function')]
+            # function = ClassFunction(graph, function_uri)
+            # self.list_of_functions.append(function)
+            self.list_of_functions.append(function_uri)
         pass
 
 
@@ -855,14 +858,15 @@ class ClassControls:
         """
         results_for_controls = graph.query(query_for_controls)
         for binding in results_for_controls.bindings:
-            control = ClassControl(graph, binding['s'])
+            control = ClassControl(graph, URIRef(binding[Variable('s')]))
             self.controls.append(control)
-            operation_name = control.left_side.operation_name_uri
-            try:
-                self.operation_name_dict[operation_name].append(control)
-            except Exception as e:
-                self.operation_name_dict[operation_name] = []
-                self.operation_name_dict[operation_name].append(control)
+            operation_name = control.control_uri
+            # try:
+            #     self.operation_name_dict[operation_name].append(control)
+            # except Exception as e:
+            #     self.operation_name_dict[operation_name] = []
+            #     self.operation_name_dict[operation_name].append(control)
+            self.operation_name_dict[operation_name] = control
         pass
 
 
@@ -873,33 +877,76 @@ class ClassControl:
 
     """
     def __init__(self, graph, subject: rdflib.term.URIRef):
+        self.control_uri = subject
         query_for_control_left = f"""
         SELECT ?left_side  WHERE {{ <{subject}> {uri_ref_ext('left_side')} ?left_side . }}
         """
         results_for_control_left = graph.query(query_for_control_left)
         try:
             subject_left = results_for_control_left.bindings[0]['left_side']
+            clause = ClassClause()
+            self.left_side = clause.from_query(graph, subject_left)
+            self.right_sides = ClassClauses()
+            query_for_control_right = f"""
+            SELECT ?child  WHERE {{ 
+            <{subject}> {uri_ref_ext('right_side')} ?right_side . 
+            ?right_side {uri_ref_ext('child')} ?child .
+            OPTIONAL {{ ?right_side {uri_ref_ext('priority')} ?priority . }}
+            }} ORDER BY ?priority
+            """
+
+            results_for_control_right = graph.query(query_for_control_right)
+            for binding in results_for_control_right.bindings:
+                clause = ClassClause()
+                right_side = clause.from_query(graph, binding['child'])
+                self.right_sides.list_of_clauses.append(right_side)
         except KeyError:
             pass  # error
         except Exception:
             pass  # error
-        clause = ClassClause()
-        self.left_side = clause.from_query(graph, subject_left)
-        self.right_sides = ClassClauses()
-        query_for_control_right = f"""
-        SELECT ?child  WHERE {{ 
-        <{subject}> {uri_ref_ext('right_side')} ?right_side . 
-        ?right_side {uri_ref_ext('child')} ?child .
-        OPTIONAL {{ ?right_side {uri_ref_ext('priority')} ?priority . }}
-        }} ORDER BY ?priority
+        pass
+
+
+class ClassFunctions:
+    """Class for handling functions.
+
+    """
+    def __init__(self, graph: Graph, rules_folder: str):
         """
 
-        results_for_control_right = graph.query(query_for_control_right)
-        for binding in results_for_control_right.bindings:
-            clause = ClassClause()
-            right_side = clause.from_query(graph, binding['child'])
-            self.right_sides.list_of_clauses.append(right_side)
-        pass
+        Args:
+            graph (Graph): RDF graph containing info on functions.
+            rules_folder (str): Path to the folder containing rules and function definitions.
+
+        """
+        self.functions: list[ClassFunction] = []
+        self.operation_name_dict = {}
+        query_for_functions = f"""
+             SELECT ?s WHERE {{
+             ?s {uri_ref_ext('type')} {uri_ref_ext('function')} . 
+             OPTIONAL {{ ?s {uri_ref_ext('priority')} ?priority . }}
+             }} ORDER BY ?priority
+         """
+        results_for_functions = graph.query(query_for_functions)
+        for binding in results_for_functions.bindings:
+            function = ClassFunction(graph, URIRef(binding[Variable('s')]))
+            self.functions.append(function)
+            # operation_name = function.left_side.operation_name_uri
+            function_uri = function.function_uri
+            # try:
+            #     self.operation_name_dict[function_uri].append(function)
+            # except Exception as e:
+            #     self.operation_name_dict[function_uri] = []
+            #     self.operation_name_dict[function_uri].append(function)
+            self.operation_name_dict[function_uri] = function
+        for function in self.functions:  # read the function codes
+            function_name = function.left_side.operation_name_uri
+            function_name = f'function_{function_name.replace("http://value.org/", "")}.py'
+            with open(f'{rules_folder}/{function_name}', 'r') as function_file:
+                code = function_file.read()
+                function.code = code
+        pass  # end of __init__
+    pass  # end of ClassFunctions
 
 
 class ClassFunction:
@@ -909,10 +956,12 @@ class ClassFunction:
 
     """
     def __init__(self, graph, function_uri: rdflib.term.URIRef):
+        self.code: str = ''
         query_for_function_left = f"""
         SELECT ?left_side  WHERE {{ <{function_uri}> {uri_ref_ext('left_side')} ?left_side . }}
         """
         results_for_function_left = graph.query(query_for_function_left)
+        function_left = None
         try:
             function_left = results_for_function_left.bindings[0]['left_side']
         except KeyError:
@@ -920,6 +969,7 @@ class ClassFunction:
         except Exception:
             pass  # error
         clause = ClassClause()
+        self.function_uri = function_uri
         self.left_side = clause.from_query(graph, function_left)
 
         self.right_sides = ClassClauses()
@@ -935,293 +985,293 @@ class ClassFunction:
             clause = ClassClause()
             right_side = clause.from_query(graph, binding['child'])
             self.right_sides.list_of_clauses.append(right_side)
-        pass
+        pass  # end of __init__
 
 
-class ClassRules:  # list of rules
-    """Class for handling rules.
-    Holds a list of all rules.
-
-    Attributes:
-        list_of_rules (list[ClassRule]): List of rule instances.
-        dict_of_rules (dict[str, set[ClassRule]]): dict of rule instances.
-    """
-    graph = None
-
-    def __init__(self, graph: Graph):
-        """Initialize ClassRules class.
-
-        Args:
-            graph (Graph):
-        """
-        ClassRules.graph = graph
-        self.list_of_rules = []
-        # query_for_rules = SELECT ?s ?left WHERE {{ ' \
-        #                   ?s <{uri_ref("left_side")}> ?left .
-        #                   f'OPTIONAL {{ ?s <{uri_ref("priority")}> ?priority .}} }}' \
-        #                   f'ORDER BY ?priority '  # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
-        # results_for_rule_left = graph.query(query_for_rules)  # execute query and extract
-        # for binding_for_left in results_for_rule_left.bindings:
-        #     instance_rule = ClassRule()  # create a rule instance
-        #     instance_rule.build(graph, binding_for_left['s'], binding_for_left['left'])  # s: rule id, o: rule pattern
-        #     self.list_of_rules.append(instance_rule)  # append the rule to the list
-
-        self.dict_of_rules = {}  # dict of rules. operation name as a key
-        query_for_rules = f"""
-            SELECT ?rule WHERE {{ ?rule {uri_ref_ext('type')} {uri_ref_ext('rule')} }}
-            """ # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
-        results_for_rule = graph.query(query_for_rules)  # execute query and extract
-        for binding in results_for_rule.bindings:
-            subject = binding['rule']
-            instance_rule = ClassRule(graph, subject)  # create a rule instance
-            operation_name = instance_rule.rule_left.operation_name_uri
-            try:
-                self.dict_of_rules[operation_name].add(instance_rule)
-            except KeyError:
-                self.dict_of_rules[operation_name] = set()
-                self.dict_of_rules[operation_name].add(instance_rule)
-        pass
-
-
-class ClassRule:  # class for individual rule
-    """Class for an individual rule.
-
-    Attributes:
-        label (str): label of the rule
-        rule_left (ClassRuleLeft): left part of the rule
-        rule_right (list[ClassRuleRight]): right part of the class consisting of a list of ClassRuleRight
-        variables_dict (dict[str, str]): dict of the variables in the rule
-    """
-    serial_number = 1000  # a variable to convert variables: x -> x1000
-
-    def __init__(self, graph, subject):
-        """Initialize ClassRule class.
-        """
-        self.label = ''
-        self.rule_left = ClassRuleLeft(graph, subject)
-        self.rule_right: ClassRuleRight = ClassRuleRight()
-        self.variables_dict = {}
-        # self.build(graph, subject)
-
-    # def build(self, graph, rule_label):
-    #     """
-    #     build a rule from rule label and rule left label.
-    #
-    #     Args:
-    #         graph: RDF graph holding all info of rules
-    #         rule_label: label of this rule
-    #         rule_left_label: label of the left part of the rule
-    #
-    #     Returns:
-    #         ClassRule: return the self as a ClassRule
-    #     """
-    #     # print('DETECTED RULE: ', rule_label)  # left side rule returned as an object  # debug
-    #     self.label = rule_label
-    #     self.rule_left.build(graph, rule_left_label)  # build the left parts of the rule from the left label.
-    #     self.rule_right = []
-    #     # get the right parts of the rule while considering the priorities to apply the sub goal.
-    #     query = SELECT ?o WHERE {{ <{self.label}> <{uri_ref("right_side")}> ?o .
-    #             f'?o <{uri_ref("priority")}> ?priority . }} ORDER BY (?priority) '
-    #     results = graph.query(query)
-    #     # print('NUMBER OF CHILD RULES: ' + str(len(results)))  # debug
-    #     for result in results:
-    #         right_clause = ClassClauses().build(graph, result)  # build the right side part of the rule
-    #         self.rule_right.append(right_clause)  # save into a list
-    #     return self
-
-    def modify_variables(self):  # x -> x1000, etc.
-        """Modify a variable name by appending a unique number.
-        This function is used to avoid confusion between classes that have variables with the same name.
-        x -> x1000, etc.
-
-        Returns:
-            None: This function just modifies the internal variables of a class instance.
-        """
-        self.variables_dict = {}  # The variables are held in this list.
-        for var in self.rule_left.set_of_variables_in_query:
-            self.variables_dict[var] = var + str(ClassRule.serial_number)  # x -> x1000
-        for right_clause in self.rule_right:
-            for grand_child in right_clause.child.grandchildren:
-                triple = grand_child.triple
-                if triple.subject.is_variable:  # subject
-                    var = triple.subject.to_var_string()  # rdflib.term.Variable -> ?x
-                    try:
-                        value = self.variables_dict[var]  # already registered
-                        triple.subject.build(value)
-                    except KeyError:
-                        self.variables_dict[var] = var + str(ClassRule.serial_number)  # convert free variable
-                        triple.subject.build(self.variables_dict[var])
-                if triple.object.is_variable:  # object
-                    var = triple.object.to_var_string()
-                    try:
-                        value = self.variables_dict[var]  # already registered
-                        triple.object.build(value)
-                    except KeyError:
-                        self.variables_dict[var] = var + str(ClassRule.serial_number)  # convert free variable
-                        triple.object.build(self.variables_dict[var])
-        ClassRule.serial_number += 1  # update the serial number to prepare for the next conversion
-        pass
-
-    def rule_right_clauses(self):
-        """
-
-        Returns:
-
-        """
-        clauses = []
-        for right_clause in self.rule_right:
-            clause = ClassClause()
-            clause.list_of_triple = [triple for triple in right_clause.child.grandchildren]
-            clauses.append(clause)
-        return clauses
+# class ClassRules:  # list of rules
+#     """Class for handling rules.
+#     Holds a list of all rules.
+#
+#     Attributes:
+#         list_of_rules (list[ClassRule]): List of rule instances.
+#         dict_of_rules (dict[str, set[ClassRule]]): dict of rule instances.
+#     """
+#     graph = None
+#
+#     def __init__(self, graph: Graph):
+#         """Initialize ClassRules class.
+#
+#         Args:
+#             graph (Graph):
+#         """
+#         ClassRules.graph = graph
+#         self.list_of_rules = []
+#         # query_for_rules = SELECT ?s ?left WHERE {{ ' \
+#         #                   ?s <{uri_ref("left_side")}> ?left .
+#         #                   f'OPTIONAL {{ ?s <{uri_ref("priority")}> ?priority .}} }}' \
+#         #                   f'ORDER BY ?priority '  # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
+#         # results_for_rule_left = graph.query(query_for_rules)  # execute query and extract
+#         # for binding_for_left in results_for_rule_left.bindings:
+#         #     instance_rule = ClassRule()  # create a rule instance
+#         #     instance_rule.build(graph, binding_for_left['s'], binding_for_left['left'])  # s: rule id, o: rule pattern
+#         #     self.list_of_rules.append(instance_rule)  # append the rule to the list
+#
+#         self.dict_of_rules = {}  # dict of rules. operation name as a key
+#         query_for_rules = f"""
+#             SELECT ?rule WHERE {{ ?rule {uri_ref_ext('type')} {uri_ref_ext('rule')} }}
+#             """ # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
+#         results_for_rule = graph.query(query_for_rules)  # execute query and extract
+#         for binding in results_for_rule.bindings:
+#             subject = binding['rule']
+#             instance_rule = ClassRule(graph, subject)  # create a rule instance
+#             operation_name = instance_rule.rule_left.operation_name_uri
+#             try:
+#                 self.dict_of_rules[operation_name].add(instance_rule)
+#             except KeyError:
+#                 self.dict_of_rules[operation_name] = set()
+#                 self.dict_of_rules[operation_name].add(instance_rule)
+#         pass
 
 
-class ClassRuleLeft(ClassClause):  # left side of a rule
-    """Left side of a rule.
-
-    Attributes:
-        label: id for the left part of the rule
-        content: sparql query for finding applicable rules
-        bindings:
-        var_list: a list of variables in the triple
-        const_dict: dict of constants in object with the correspondent predicate
-        predicate_object_dict: dict for finding object from predicate as a key
-        forward_bindings:
-        backward_bindings:
-    """
-    def __init__(self, graph, subject):
-        """
-        Initialize ClassRuleLeft class.
-        """
-        super().__init__()
-        self.list_of_triples: list[ClassTriple] = []
-        self.operation_name_uri: str = ''  # ex. http://value.org/add_number
-        self.predicate_object_dict: dict[str, str] = {}  # subject is unnamed and common among triples
-        self.set_of_variables_in_query: set[tuple[str, str]] = set()  # [(object_variable, predicate)]
-        self.set_of_half_variables: set[tuple[str, str]] = set()  # SOME:x
-        self.variables_of_interest: set[str] = set()
-
-        self.label = None  # id for the left part of the rule
-        self.content = None  # sparql query for finding applicable rules
-        self.bindings = {}
-        # self.var_list = []  # a list of variables in the triple
-        self.const_dict = {}  # dict of constants in object with the correspondent predicate
-        self.forward_bindings = {}
-        self.backward_bindings = {}
-        query_for_rule_left = f"""
-            SELECT ?left WHERE {{ <{subject}> {uri_ref_ext('left_side')} ?left }}
-        """
-        results_for_rule_left = graph.query(query_for_rule_left)
-        bindings = results_for_rule_left.bindings
-        if len(bindings) > 0:
-            self.from_query(graph, bindings[0]['left'])
-        pass
-
-    def build(self, graph: Graph, rule_left_label):  # executed at the initial stage
-        """Build the left side part of a rule from the label.
-        Executed at the initial stage.
-
-        Args:
-            graph (Graph):
-            rule_left_label:
-
-        Returns:
-
-        """
-        self.label = None  # label for the left side part of a rule
-        self.content = None
-        self.bindings = {}
-        self.var_list = []
-        self.const_dict = {}  # dict of constants in object with the corresponding predicate
-        self.predicate_object_dict = {}  # dict for finding object from predicate as a key
-
-        # print('DETECTED LEFT RULE: ', rule_left_label)  # left side rule in returned as an object  # debug
-        # get the actual rules of the left side
-        query_for_left_content = f"""
-            SELECT ?p ?o WHERE {{ 
-            <{str(rule_left_label)}> ?p ?o . }}"""  # extract content of left side rule from the label
-        results_for_left_content = graph.query(query_for_left_content)  # execute a query
-
-        var_list_string = '?s '  # build VAR_LIST of sparql query for left side rule
-        # self.var_list.append('?s')  # also store the variables in a list
-        sparql_query = f"""SELECT VAR_LIST WHERE {{ """  # VAR_LIST will be replaced at the end
-        for bindings_for_left_content in results_for_left_content.bindings:  # analyze the query results
-            triple_predicate = bindings_for_left_content['p']  # predicate part of the left side of a rule
-            triple_object0 = bindings_for_left_content['o']  # object part of the left side of a rule
-            triple_object = f'<{triple_object0}>'  # convert object to URI string
-            self.predicate_object_dict[triple_predicate] = triple_object
-            try:
-                if triple_object.find('http://variable.org/') >= 0:
-                    triple_object = triple_object.replace('<http://variable.org/', '?').replace('>', '')
-                    var_list_string += str(triple_object) + ' '  # register the variable to a list
-                    # self.var_list.append(str(triple_object))  # also append the variable to a list
-                else:
-                    self.const_dict[triple_predicate] = triple_object
-            except KeyError:
-                pass  # object is not a variable
-            if triple_predicate.find('http://value.org/operation') >= 0 or triple_object.find('?') >= 0:
-                sparql_query += f""" ?s <{triple_predicate}> {triple_object} . """
-
-        sparql_query += f'}}'  # close the sparql query
-        sparql_query = sparql_query.replace('VAR_LIST', var_list_string)  # insert variables list
-        self.label = str(rule_left_label)
-        self.var_list = var_list_string.strip().split(' ')
-        self.content = sparql_query
-        self.bindings = results_for_left_content.bindings
-        return self
+# class ClassRule:  # class for individual rule
+#     """Class for an individual rule.
+#
+#     Attributes:
+#         label (str): label of the rule
+#         rule_left (ClassRuleLeft): left part of the rule
+#         rule_right (list[ClassRuleRight]): right part of the class consisting of a list of ClassRuleRight
+#         variables_dict (dict[str, str]): dict of the variables in the rule
+#     """
+#     serial_number: int = 1000  # a variable to convert variables: x -> x1000
+#
+#     def __init__(self, graph, subject):
+#         """Initialize ClassRule class.
+#         """
+#         self.label: str = ''
+#         self.rule_left: ClassRuleLeft = ClassRuleLeft(graph, subject)
+#         # self.rule_right: ClassRuleRight = ClassRuleRight()
+#         self.variables_dict: dict[str, str] = {}
+#         # self.build(graph, subject)
+#
+#     # def build(self, graph, rule_label):
+#     #     """
+#     #     build a rule from rule label and rule left label.
+#     #
+#     #     Args:
+#     #         graph: RDF graph holding all info of rules
+#     #         rule_label: label of this rule
+#     #         rule_left_label: label of the left part of the rule
+#     #
+#     #     Returns:
+#     #         ClassRule: return the self as a ClassRule
+#     #     """
+#     #     # print('DETECTED RULE: ', rule_label)  # left side rule returned as an object  # debug
+#     #     self.label = rule_label
+#     #     self.rule_left.build(graph, rule_left_label)  # build the left parts of the rule from the left label.
+#     #     self.rule_right = []
+#     #     # get the right parts of the rule while considering the priorities to apply the sub goal.
+#     #     query = SELECT ?o WHERE {{ <{self.label}> <{uri_ref("right_side")}> ?o .
+#     #             f'?o <{uri_ref("priority")}> ?priority . }} ORDER BY (?priority) '
+#     #     results = graph.query(query)
+#     #     # print('NUMBER OF CHILD RULES: ' + str(len(results)))  # debug
+#     #     for result in results:
+#     #         right_clause = ClassClauses().build(graph, result)  # build the right side part of the rule
+#     #         self.rule_right.append(right_clause)  # save into a list
+#     #     return self
+#
+#     def modify_variables(self):  # x -> x1000, etc.
+#         """Modify a variable name by appending a unique serial number.
+#         x -> x1000, etc.
+#         This function is used to avoid confusion between classes that have variables with the same name.
+#
+#         Returns:
+#             None: This function just modifies the internal variables of a class instance.
+#         """
+#         self.variables_dict = {}  # The variables are held in this list.
+#         for var in self.rule_left.set_of_variables_in_query:
+#             self.variables_dict[var] = var + str(ClassRule.serial_number)  # x -> x1000
+#         for right_clause in self.rule_right:
+#             for grand_child in right_clause.child.grandchildren:
+#                 triple = grand_child.triple
+#                 if triple.subject.is_variable:  # subject
+#                     var = triple.subject.to_var_string()  # rdflib.term.Variable -> ?x
+#                     try:
+#                         value = self.variables_dict[var]  # already registered
+#                         triple.subject.build(value)
+#                     except KeyError:
+#                         self.variables_dict[var] = var + str(ClassRule.serial_number)  # convert free variable
+#                         triple.subject.build(self.variables_dict[var])
+#                 if triple.object.is_variable:  # object
+#                     var = triple.object.to_var_string()
+#                     try:
+#                         value = self.variables_dict[var]  # already registered
+#                         triple.object.build(value)
+#                     except KeyError:
+#                         self.variables_dict[var] = var + str(ClassRule.serial_number)  # convert free variable
+#                         triple.object.build(self.variables_dict[var])
+#         ClassRule.serial_number += 1  # update the serial number to prepare for the next conversion
+#         pass
+#
+#     def rule_right_clauses(self):
+#         """
+#
+#         Returns:
+#
+#         """
+#         clauses = []
+#         for right_clause in self.rule_right:
+#             clause = ClassClause()
+#             clause.list_of_triple = [triple for triple in right_clause.child.grandchildren]
+#             clauses.append(clause)
+#         return clauses
 
 
-class ClassRuleRight(ClassClauses):  # right side of a rule
-    """Right side of a rule.
+# class ClassRuleLeft(ClassClause):  # left side of a rule
+#     """Left side of a rule.
+#
+#     Attributes:
+#         label: id for the left part of the rule
+#         content: sparql query for finding applicable rules
+#         bindings:
+#         var_list: a list of variables in the triple
+#         const_dict: dict of constants in object with the correspondent predicate
+#         predicate_object_dict: dict for finding object from predicate as a key
+#         forward_bindings:
+#         backward_bindings:
+#     """
+#     def __init__(self, graph, subject):
+#         """
+#         Initialize ClassRuleLeft class.
+#         """
+#         super().__init__()
+#         self.list_of_triples: list[ClassTriple] = []
+#         self.operation_name_uri: str = ''  # ex. http://value.org/add_number
+#         self.predicate_object_dict: dict[str, str] = {}  # subject is unnamed and common among triples
+#         self.set_of_variables_in_query: set[tuple[str, str]] = set()  # [(object_variable, predicate)]
+#         self.set_of_half_variables: set[tuple[str, str]] = set()  # SOME:x
+#         self.variables_of_interest: set[str] = set()
+#
+#         self.label = None  # id for the left part of the rule
+#         self.content = None  # sparql query for finding applicable rules
+#         self.bindings = {}
+#         # self.var_list = []  # a list of variables in the triple
+#         self.const_dict = {}  # dict of constants in object with the correspondent predicate
+#         self.forward_bindings = {}
+#         self.backward_bindings = {}
+#         query_for_rule_left = f"""
+#             SELECT ?left WHERE {{ <{subject}> {uri_ref_ext('left_side')} ?left }}
+#         """
+#         results_for_rule_left = graph.query(query_for_rule_left)
+#         bindings = results_for_rule_left.bindings
+#         if len(bindings) > 0:
+#             self.from_query(graph, bindings[0]['left'])
+#         pass
+#
+#     def build(self, graph: Graph, rule_left_label):  # executed at the initial stage
+#         """Build the left side part of a rule from the label.
+#         Executed at the initial stage.
+#
+#         Args:
+#             graph (Graph):
+#             rule_left_label:
+#
+#         Returns:
+#
+#         """
+#         self.label = None  # label for the left side part of a rule
+#         self.content = None
+#         self.bindings = {}
+#         self.var_list = []
+#         self.const_dict = {}  # dict of constants in object with the corresponding predicate
+#         self.predicate_object_dict = {}  # dict for finding object from predicate as a key
+#
+#         # print('DETECTED LEFT RULE: ', rule_left_label)  # left side rule in returned as an object  # debug
+#         # get the actual rules of the left side
+#         query_for_left_content = f"""
+#             SELECT ?p ?o WHERE {{
+#             <{str(rule_left_label)}> ?p ?o . }}"""  # extract content of left side rule from the label
+#         results_for_left_content = graph.query(query_for_left_content)  # execute a query
+#
+#         var_list_string = '?s '  # build VAR_LIST of sparql query for left side rule
+#         # self.var_list.append('?s')  # also store the variables in a list
+#         sparql_query = f"""SELECT VAR_LIST WHERE {{ """  # VAR_LIST will be replaced at the end
+#         for bindings_for_left_content in results_for_left_content.bindings:  # analyze the query results
+#             triple_predicate = bindings_for_left_content['p']  # predicate part of the left side of a rule
+#             triple_object0 = bindings_for_left_content['o']  # object part of the left side of a rule
+#             triple_object = f'<{triple_object0}>'  # convert object to URI string
+#             self.predicate_object_dict[triple_predicate] = triple_object
+#             try:
+#                 if triple_object.find('http://variable.org/') >= 0:
+#                     triple_object = triple_object.replace('<http://variable.org/', '?').replace('>', '')
+#                     var_list_string += str(triple_object) + ' '  # register the variable to a list
+#                     # self.var_list.append(str(triple_object))  # also append the variable to a list
+#                 else:
+#                     self.const_dict[triple_predicate] = triple_object
+#             except KeyError:
+#                 pass  # object is not a variable
+#             if triple_predicate.find('http://value.org/operation') >= 0 or triple_object.find('?') >= 0:
+#                 sparql_query += f""" ?s <{triple_predicate}> {triple_object} . """
+#
+#         sparql_query += f'}}'  # close the sparql query
+#         sparql_query = sparql_query.replace('VAR_LIST', var_list_string)  # insert variables list
+#         self.label = str(rule_left_label)
+#         self.var_list = var_list_string.strip().split(' ')
+#         self.content = sparql_query
+#         self.bindings = results_for_left_content.bindings
+#         return self
 
-    Attributes:
-        child (ClassRuleRightChild): child of the right side clause.
-    """
-    def __init__(self):
-        """Initialize ClassRuleRight class.
-        """
-        super().__init__()
-        # self.child = ClassRuleRightChild()  # right side clause has one child, which in turn has one or more grandchild
 
-    def build(self, graph: Graph, right_side_for_child):  # executed at the initial stage
-        """Build the right side clause of a rule.
-        Executed at the initial stage.
-
-        Args:
-            graph (Graph):
-            right_side_for_child:
-
-        Returns:
-
-        """
-        # print('CHILD RULE: ' + str(right_side_for_child[0]))  # debug
-        query_for_child = f"""SELECT ?o WHERE {{ <{str(right_side_for_child[0])}> <{uri_ref("child")}> ?o .}} """
-        results_of_right_side_child = graph.query(query_for_child)  # query by the child name
-
-        self.child.build(graph, results_of_right_side_child.bindings[0])  # build a child from the query results
-        return self
-
-    def revise(self, right_clauses, bindings):  # bindingsは辞書型
-        """
-
-        Args:
-            right_clauses:
-            bindings (dict[str, str]):
-
-        Returns:
-
-        """
-        for grandchild in right_clauses.child.grandchildren:
-            pass
-            # grandchild_revised = ClassRightGrandChild()  # create a new grandchild
-            # new_term = grandchild.triple.subject.revise(bindings)
-            # grandchild_revised.triple.subject.build(new_term)  # subject
-            # new_term = grandchild.triple.predicate.revise(bindings)
-            # grandchild_revised.triple.predicate.build(new_term)  # predicate
-            # new_term = grandchild.triple.object.revise(bindings)
-            # grandchild_revised.triple.object.build(new_term)  # object
-            # self.child.grandchildren.append(grandchild_revised)  # append the grandchild to the grandchildren
-        return self
+# class ClassRuleRight(ClassClauses):  # right side of a rule
+#     """Right side of a rule.
+#
+#     Attributes:
+#         child (ClassRuleRightChild): child of the right side clause.
+#     """
+#     def __init__(self):
+#         """Initialize ClassRuleRight class.
+#         """
+#         super().__init__()
+#         # self.child = ClassRuleRightChild()  # right side clause has one child, which in turn has one or more grandchild
+#
+#     def build(self, graph: Graph, right_side_for_child):  # executed at the initial stage
+#         """Build the right side clause of a rule.
+#         Executed at the initial stage.
+#
+#         Args:
+#             graph (Graph):
+#             right_side_for_child:
+#
+#         Returns:
+#
+#         """
+#         # print('CHILD RULE: ' + str(right_side_for_child[0]))  # debug
+#         query_for_child = f"""SELECT ?o WHERE {{ <{str(right_side_for_child[0])}> <{uri_ref("child")}> ?o .}} """
+#         results_of_right_side_child = graph.query(query_for_child)  # query by the child name
+#
+#         self.child.build(graph, results_of_right_side_child.bindings[0])  # build a child from the query results
+#         return self
+#
+#     def revise(self, right_clauses, bindings):  # bindingsは辞書型
+#         """
+#
+#         Args:
+#             right_clauses:
+#             bindings (dict[str, str]):
+#
+#         Returns:
+#
+#         """
+#         for grandchild in right_clauses.child.grandchildren:
+#             pass
+#             # grandchild_revised = ClassRightGrandChild()  # create a new grandchild
+#             # new_term = grandchild.triple.subject.revise(bindings)
+#             # grandchild_revised.triple.subject.build(new_term)  # subject
+#             # new_term = grandchild.triple.predicate.revise(bindings)
+#             # grandchild_revised.triple.predicate.build(new_term)  # predicate
+#             # new_term = grandchild.triple.object.revise(bindings)
+#             # grandchild_revised.triple.object.build(new_term)  # object
+#             # self.child.grandchildren.append(grandchild_revised)  # append the grandchild to the grandchildren
+#         return self
 
 
 # class ClassRuleRightChild:  # right side child of a rule
@@ -1338,20 +1388,20 @@ class ClassTriple:  # triple class
         self.predicate.build(triple['p'])
         self.object.build(triple['o'])
 
-    def build_from_spo(self, subject, predicate, object):
+    def build_from_spo(self, subject, predicate, object_):
         """
 
         Args:
             subject:
             predicate:
-            object:
+            object_:
 
         Returns:
 
         """
         self.subject.build(subject)
         self.predicate.build(predicate)
-        self.object.build(object)
+        self.object.build(object_)
 
     def apply_bindings(self, bindings: dict[str, str]):
         """
@@ -1564,7 +1614,7 @@ class ClassSparqlQuery:  # Sparql Query Class
         query:
         list_of_rdfs: rdfs is an array of clauses
         list_of_variables: list of variables
-        rule (ClassRule): empty rule
+        # rule (ClassRule): empty rule
     """
     cons_number = 10000  # unique number for every cons object.
 
@@ -1689,223 +1739,223 @@ class ClassSparqlQuery:  # Sparql Query Class
             logging.debug(f'Something has happened in ClassSparqlQuery.build_query(). {e}')
             pass
 
-    def direct_search(self):  # find a triple in the graph that directly matches the query
-        """Find a triple in the graph that directly matches the query.
+    # def direct_search(self):  # find a triple in the graph that directly matches the query
+    #     """Find a triple in the graph that directly matches the query.
+    #
+    #     Args:
+    #         # graph (Graph): an RDF graph holding all the info of facts and rules.
+    #
+    #     Returns:
+    #         bool: True, if search is successful.
+    #         list[]: a list of bindings.
+    #
+    #     """
+    #
+    #     results = ClassRules.graph.query(self.query)  # execute a query
+    #     if len(results) > 0:  # direct search detected candidates. results.bindings are a list of dict
+    #         def build_bindings(bindings_of_direct_search):
+    #             print('BINDINGS OF DIRECT SEARCH: ', str(bindings_of_direct_search))  # debug
+    #             logging.debug(f'BINDINGS OF DIRECT SEARCH: {str(bindings_of_direct_search)}')  # debug
+    #             success = False  # assume a failure
+    #             direct_search_bindings = []  # initialize the returned value
+    #             for binding_of_direct_search in bindings_of_direct_search:  # extract an element in the list
+    #                 success_for_each = True  # assume a success
+    #                 return_bindings_temp = {}  # temporary bindings to be returned
+    #                 for key in binding_of_direct_search:  # get a key in dict
+    #                     key_string = str(key)  # get a key string
+    #                     if isinstance(key, rdflib.term.Variable):  # in the case of a variable
+    #                         key_string = '?' + key_string.replace('?', '')  # the key was a variable
+    #                     my_value = str(binding_of_direct_search[key])  # get a value
+    #                     if my_value.find('?') < 0:  # in the case the value is not a variable
+    #                         my_value = '<' + my_value.replace('<', '').replace('>', '') + '>'  # convert to uri
+    #                         # not a variable, change to uri
+    #                         if my_value.find('variable.org') >= 0:  # value is a variable, not a true uri
+    #                             success_for_each = False  # failed
+    #                             break  # exit the for loop
+    #                     return_bindings_temp[key_string] = my_value  # store in a dictionary
+    #                 if success_for_each:
+    #                     return_bindings = {}  # bindings to be returned
+    #                     for key, value in return_bindings_temp.items():
+    #                         return_bindings[key] = value  # copy the dict
+    #                     direct_search_bindings.append(return_bindings)  # add to the list
+    #                     success = True  # at least one element is succeeded
+    #             return success, direct_search_bindings
+    #
+    #         succeeded, bindings = build_bindings(results.bindings)  # create bindings to be returned
+    #         return succeeded, bindings
+    #     else:  # len(results) == 0
+    #         found_cons = True  # try creating cons node  # 2023/11/10
+    #         var_x = None
+    #         var_y = None
+    #         var_z = None
+    #         for rdf in self.list_of_rdfs:
+    #             if rdf.predicate.term_text == 'http://value.org/operation':
+    #                 if rdf.object.term_text != 'http://value.org/cons':
+    #                     found_cons = False
+    #                     break
+    #             if rdf.predicate.term_text == 'http://value.org/variable_x':
+    #                 if rdf.object.is_variable:
+    #                     found_cons = False
+    #                     break
+    #                 else:
+    #                     var_x = rdf.object.to_uriref()
+    #             if rdf.predicate.term_text == 'http://value.org/variable_y':
+    #                 if rdf.object.is_variable:
+    #                     found_cons = False
+    #                     break
+    #                 else:
+    #                     var_y = rdf.object.to_uriref()
+    #             if rdf.predicate.term_text == 'http://value.org/variable_z':
+    #                 if not rdf.object.is_variable:
+    #                     found_cons = False
+    #                     break
+    #                 else:
+    #                     var_z = rdf.object.to_var_string()
+    #         if found_cons:
+    #
+    #             cons_node = URIRef(f'http://value.org/cons_node{ClassSparqlQuery.cons_number}')
+    #             cons_list = URIRef(f'http://value.org/cons_list{ClassSparqlQuery.cons_number}')
+    #             ClassSparqlQuery.cons_number += 1  # update the unique number for cons
+    #
+    #             ClassRules.graph.add((cons_node, URIRef('http://value.org/operation'), URIRef('http://value.org/cons')))
+    #             ClassRules.graph.add((cons_node, URIRef('http://value.org/variable_x'), var_x))
+    #             ClassRules.graph.add((cons_node, URIRef('http://value.org/variable_y'), var_y))
+    #             ClassRules.graph.add((cons_node, URIRef('http://value.org/variable_z'), cons_list))
+    #             return True, [{var_z: f'<{str(cons_list)}>'}]
+    #
+    #         return False, []  # no direct match was found. return False (Not Found) and an empty list
 
-        Args:
-            # graph (Graph): an RDF graph holding all the info of facts and rules.
-
-        Returns:
-            bool: True, if search is successful.
-            list[]: a list of bindings.
-
-        """
-
-        results = ClassRules.graph.query(self.query)  # execute a query
-        if len(results) > 0:  # direct search detected candidates. results.bindings are a list of dict
-            def build_bindings(bindings_of_direct_search):
-                print('BINDINGS OF DIRECT SEARCH: ', str(bindings_of_direct_search))  # debug
-                logging.debug(f'BINDINGS OF DIRECT SEARCH: {str(bindings_of_direct_search)}')  # debug
-                success = False  # assume a failure
-                direct_search_bindings = []  # initialize the returned value
-                for binding_of_direct_search in bindings_of_direct_search:  # extract an element in the list
-                    success_for_each = True  # assume a success
-                    return_bindings_temp = {}  # temporary bindings to be returned
-                    for key in binding_of_direct_search:  # get a key in dict
-                        key_string = str(key)  # get a key string
-                        if isinstance(key, rdflib.term.Variable):  # in the case of a variable
-                            key_string = '?' + key_string.replace('?', '')  # the key was a variable
-                        my_value = str(binding_of_direct_search[key])  # get a value
-                        if my_value.find('?') < 0:  # in the case the value is not a variable
-                            my_value = '<' + my_value.replace('<', '').replace('>', '') + '>'  # convert to uri
-                            # not a variable, change to uri
-                            if my_value.find('variable.org') >= 0:  # value is a variable, not a true uri
-                                success_for_each = False  # failed
-                                break  # exit the for loop
-                        return_bindings_temp[key_string] = my_value  # store in a dictionary
-                    if success_for_each:
-                        return_bindings = {}  # bindings to be returned
-                        for key, value in return_bindings_temp.items():
-                            return_bindings[key] = value  # copy the dict
-                        direct_search_bindings.append(return_bindings)  # add to the list
-                        success = True  # at least one element is succeeded
-                return success, direct_search_bindings
-
-            succeeded, bindings = build_bindings(results.bindings)  # create bindings to be returned
-            return succeeded, bindings
-        else:  # len(results) == 0
-            found_cons = True  # try creating cons node  # 2023/11/10
-            var_x = None
-            var_y = None
-            var_z = None
-            for rdf in self.list_of_rdfs:
-                if rdf.predicate.term_text == 'http://value.org/operation':
-                    if rdf.object.term_text != 'http://value.org/cons':
-                        found_cons = False
-                        break
-                if rdf.predicate.term_text == 'http://value.org/variable_x':
-                    if rdf.object.is_variable:
-                        found_cons = False
-                        break
-                    else:
-                        var_x = rdf.object.to_uriref()
-                if rdf.predicate.term_text == 'http://value.org/variable_y':
-                    if rdf.object.is_variable:
-                        found_cons = False
-                        break
-                    else:
-                        var_y = rdf.object.to_uriref()
-                if rdf.predicate.term_text == 'http://value.org/variable_z':
-                    if not rdf.object.is_variable:
-                        found_cons = False
-                        break
-                    else:
-                        var_z = rdf.object.to_var_string()
-            if found_cons:
-
-                cons_node = URIRef(f'http://value.org/cons_node{ClassSparqlQuery.cons_number}')
-                cons_list = URIRef(f'http://value.org/cons_list{ClassSparqlQuery.cons_number}')
-                ClassSparqlQuery.cons_number += 1  # update the unique number for cons
-
-                ClassRules.graph.add((cons_node, URIRef('http://value.org/operation'), URIRef('http://value.org/cons')))
-                ClassRules.graph.add((cons_node, URIRef('http://value.org/variable_x'), var_x))
-                ClassRules.graph.add((cons_node, URIRef('http://value.org/variable_y'), var_y))
-                ClassRules.graph.add((cons_node, URIRef('http://value.org/variable_z'), cons_list))
-                return True, [{var_z: f'<{str(cons_list)}>'}]
-
-            return False, []  # no direct match was found. return False (Not Found) and an empty list
-
-    def find_applicable_rules(self, rules):  # find rules applicable to this query
-        """Find rules applicable to this query.
-
-        Args:
-            rules (ClassRules): a class holding info of rules.
-
-        Returns:
-
-        """
-        list_of_rdfs: list[list[ClassTerm]] = convert_question(self.query)  # convert query to a list of triples
-        len_effective_rdfs = 0
-        g_temp: Graph = Graph()  # temporary graph for storing the query
-        g_temp_debug: list[tuple[URIRef, URIRef, URIRef]] = []
-        predicate_object_dict: dict[str, str] = {}
-        set_of_variables_in_query: set[tuple[str, str]] = set()
-        operation_name_uri: str = ''
-
-        for clause in list_of_rdfs:  # repeat for the triples
-            if len(clause) == 3:  # clause is indeed a triple
-                subj = clause[0]  # .to_uri(drop=True)  # clause[0].replace('<', '').replace('>', '')
-                pred = clause[1]  # .to_uri(drop=True)  # clause[1].replace('<', '').replace('>', '')
-                obje = clause[2]  # .to_uri(drop=True)  # clause[2].replace('<', '').replace('>', '')
-                subj_uri = subj.to_uri(drop=True)
-                pred_uri = pred.to_uri(drop=True)
-                obje_uri = obje.to_uri(drop=True)
-                g_temp.add((URIRef(subj_uri), URIRef(pred_uri), URIRef(obje_uri)))
-                g_temp_debug.append((URIRef(subj_uri), URIRef(pred_uri), URIRef(obje_uri)))
-                predicate_object_dict[pred_uri] = obje_uri
-                len_effective_rdfs += 1
-                if not obje.is_variable:  # .find('http://variable.org/') < 0:  # skip if the object is a variable
-                    # g_temp.add((URIRef(subj), URIRef(pred), URIRef(obje)))
-                    # g_temp_debug.append((URIRef(subj), URIRef(pred), URIRef(obje)))
-                    # len_effective_rdfs += 1
-                    pass
-                else:
-                    set_of_variables_in_query.add((obje_uri, pred_uri))
-                # g_temp.add((URIRef(clause[0].replace('<', '').replace('>', '')),
-                #             URIRef(clause[1].replace('<', '').replace('>', '')),
-                #             URIRef(clause[2].replace('<', '').replace('>', ''))))  # store the triple into the graph
-                if pred_uri == 'http://value.org/operation':
-                    operation_name = obje_uri.replace('http://value.org/', '')
-                    operation_name_uri = uri_ref(operation_name)
-
-        # list_of_applicable_rules = []  # start building a list of applicable rules
-        # for rule in rules.list_of_rules:  # rules.list_of_rules contains all the rules
-        #     # results_for_left = g_temp.query(rule.rule_left.content)  # query against the temporary graph
-        #     match = True
-        #     forward_bindings = {}
-        #     backward_bindings = {}
-        #     for rule_predicate, rule_object0 in rule.rule_left.predicate_object_dict.items():
-        #         rule_object = rule_object0.replace('<', '').replace('>', '')
-        #         try:
-        #             query_object = predicate_object_dict[str(rule_predicate)]
-        #             if rule_object.find('http://value.org') >= 0:  # const
-        #                 if query_object.find('http://value.org') >= 0:  # const
-        #                     if rule_object == query_object:
-        #                         pass
-        #                     else:
-        #                         match = False
-        #                         continue
-        #                 else:  # object in query is variable
-        #                     backward_bindings['?'+query_object.replace('http://variable.org/', '')] = f'<{rule_object}>'
-        #             else:  # rule object is variable
-        #                 forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/', ''))] = query_object
-        #         except KeyError:
-        #             match = False
-        #             continue
-        #
-        #     # if len(results_for_left) > 0:  # applicable rule exists
-        #     #     # if len(results_for_left.bindings[0]) == len_effective_rdfs:
-        #     #     forward_bindings = results_for_left.bindings[0]
-        #     #     backward_bindings = {}
-        #     #     dict_of_rule_left = {}
-        #     #     for variable in set_of_variables_in_query:
-        #     #         pred = variable[1]
-        #     #         obje_in_rule_left = rule.rule_left.predicate_object_dict[URIRef(pred)]
-        #     #         backward_bindings['?'+variable[0]] = obje_in_rule_left
-        #     if match:
-        #         rule.rule_left.forward_bindings = forward_bindings
-        #         rule.rule_left.backward_bindings = backward_bindings
-        #         list_of_applicable_rules.append(rule)  # append the found rule
-        #         print('LIST OF APPLICABLE RULES: ', str(rule.label))  # print the rule on the console
-
-        # THe code below causes error in pytest. The reason is unknown. 2023/11/7.
-        list_of_applicable_rules2 = []  # start building a list of applicable rules
-        try:
-            set_of_rules = rules.dict_of_rules[operation_name_uri]
-            for rule in list(set_of_rules):  # rules.list_of_rules contains all the rules
-                # results_for_left = g_temp.query(rule.rule_left.content)  # query against the temporary graph
-                match = True
-                forward_bindings = {}
-                backward_bindings = {}
-                for rule_predicate, rule_object0 in rule.rule_left.predicate_object_dict.items():
-                    rule_object = rule_object0.replace('<', '').replace('>', '')
-                    try:
-                        query_object = predicate_object_dict[str(rule_predicate)]
-                        if rule_object.find('http://value.org') >= 0:  # const
-                            if query_object.find('http://value.org') >= 0:  # const
-                                if rule_object == query_object:
-                                    pass
-                                else:
-                                    match = False
-                                    continue
-                            else:  # object in query is variable
-                                backward_bindings['?'+query_object.replace('http://variable.org/', '')] = f'<{rule_object}>'
-                        else:  # rule object is variable
-                            forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/', ''))] = query_object
-                    except KeyError:
-                        match = False
-                        continue
-                if match:
-                    rule.rule_left.forward_bindings = forward_bindings
-                    rule.rule_left.backward_bindings = backward_bindings
-                    list_of_applicable_rules2.append(rule)  # append the found rule
-                    print('LIST OF APPLICABLE RULES: ', str(rule.label))  # print the rule on the console
-                    logging.debug(f'LIST OF APPLICABLE RULES: {str(rule.label)}')  # print the rule on the console
-                    if str(rule.label).find('list_number_add_x_y_z') >= 0:  # debug
-                        pass  # debug
-        except KeyError:
-            pass  # operation_name not found in dict_of_rules
-        # if len(list_of_applicable_rules) != len(list_of_applicable_rules2):
-        #     print(list_of_applicable_rules, list_of_applicable_rules2)
-        #     pass  # debug
-        #     sys.exit(-1)
-        # else:
-        #     for rule1, rule2 in zip(list_of_applicable_rules, list_of_applicable_rules2):
-        #         if rule1.label != rule2.label:
-        #             print(rule1.label, rule2.label)
-        #             pass  # debug
-        #             sys.exit(-2)
-        return list_of_applicable_rules2  # return the applicable rules
+    # def find_applicable_rules(self, rules):  # find rules applicable to this query
+    #     """Find rules applicable to this query.
+    #
+    #     Args:
+    #         rules (ClassRules): a class holding info of rules.
+    #
+    #     Returns:
+    #
+    #     """
+    #     list_of_rdfs: list[list[ClassTerm]] = convert_question(self.query)  # convert query to a list of triples
+    #     len_effective_rdfs = 0
+    #     g_temp: Graph = Graph()  # temporary graph for storing the query
+    #     g_temp_debug: list[tuple[URIRef, URIRef, URIRef]] = []
+    #     predicate_object_dict: dict[str, str] = {}
+    #     set_of_variables_in_query: set[tuple[str, str]] = set()
+    #     operation_name_uri: str = ''
+    #
+    #     for clause in list_of_rdfs:  # repeat for the triples
+    #         if len(clause) == 3:  # clause is indeed a triple
+    #             subj = clause[0]  # .to_uri(drop=True)  # clause[0].replace('<', '').replace('>', '')
+    #             predicate = clause[1]  # .to_uri(drop=True)  # clause[1].replace('<', '').replace('>', '')
+    #             object_ = clause[2]  # .to_uri(drop=True)  # clause[2].replace('<', '').replace('>', '')
+    #             subj_uri = subj.to_uri(drop=True)
+    #             predicate_uri = predicate.to_uri(drop=True)
+    #             object_uri = object_.to_uri(drop=True)
+    #             g_temp.add((URIRef(subj_uri), URIRef(predicate_uri), URIRef(object_uri)))
+    #             g_temp_debug.append((URIRef(subj_uri), URIRef(predicate_uri), URIRef(object_uri)))
+    #             predicate_object_dict[predicate_uri] = object_uri
+    #             len_effective_rdfs += 1
+    #             if not object_.is_variable:  # .find('http://variable.org/') < 0:  # skip if the object is a variable
+    #                 # g_temp.add((URIRef(subj), URIRef(predicate), URIRef(object_)))
+    #                 # g_temp_debug.append((URIRef(subj), URIRef(predicate), URIRef(object_)))
+    #                 # len_effective_rdfs += 1
+    #                 pass
+    #             else:
+    #                 set_of_variables_in_query.add((object_uri, predicate_uri))
+    #             # g_temp.add((URIRef(clause[0].replace('<', '').replace('>', '')),
+    #             #             URIRef(clause[1].replace('<', '').replace('>', '')),
+    #             #             URIRef(clause[2].replace('<', '').replace('>', ''))))  # store the triple into the graph
+    #             if predicate_uri == 'http://value.org/operation':
+    #                 operation_name = object_uri.replace('http://value.org/', '')
+    #                 operation_name_uri = uri_ref(operation_name)
+    #
+    #     # list_of_applicable_rules = []  # start building a list of applicable rules
+    #     # for rule in rules.list_of_rules:  # rules.list_of_rules contains all the rules
+    #     #     # results_for_left = g_temp.query(rule.rule_left.content)  # query against the temporary graph
+    #     #     match = True
+    #     #     forward_bindings = {}
+    #     #     backward_bindings = {}
+    #     #     for rule_predicate, rule_object0 in rule.rule_left.predicate_object_dict.items():
+    #     #         rule_object = rule_object0.replace('<', '').replace('>', '')
+    #     #         try:
+    #     #             query_object = predicate_object_dict[str(rule_predicate)]
+    #     #             if rule_object.find('http://value.org') >= 0:  # const
+    #     #                 if query_object.find('http://value.org') >= 0:  # const
+    #     #                     if rule_object == query_object:
+    #     #                         pass
+    #     #                     else:
+    #     #                         match = False
+    #     #                         continue
+    #     #                 else:  # object in query is variable
+    #     #                     backward_bindings['?'+query_object.replace('http://variable.org/', '')] = f'<{rule_object}>'
+    #     #             else:  # rule object is variable
+    #     #                 forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/', ''))] = query_object
+    #     #         except KeyError:
+    #     #             match = False
+    #     #             continue
+    #     #
+    #     #     # if len(results_for_left) > 0:  # applicable rule exists
+    #     #     #     # if len(results_for_left.bindings[0]) == len_effective_rdfs:
+    #     #     #     forward_bindings = results_for_left.bindings[0]
+    #     #     #     backward_bindings = {}
+    #     #     #     dict_of_rule_left = {}
+    #     #     #     for variable in set_of_variables_in_query:
+    #     #     #         predicate = variable[1]
+    #     #     #         object_in_rule_left = rule.rule_left.predicate_object_dict[URIRef(predicate)]
+    #     #     #         backward_bindings['?'+variable[0]] = object_in_rule_left
+    #     #     if match:
+    #     #         rule.rule_left.forward_bindings = forward_bindings
+    #     #         rule.rule_left.backward_bindings = backward_bindings
+    #     #         list_of_applicable_rules.append(rule)  # append the found rule
+    #     #         print('LIST OF APPLICABLE RULES: ', str(rule.label))  # print the rule on the console
+    #
+    #     # THe code below causes error in pytest. The reason is unknown. 2023/11/7.
+    #     list_of_applicable_rules2 = []  # start building a list of applicable rules
+    #     try:
+    #         set_of_rules = rules.dict_of_rules[operation_name_uri]
+    #         for rule in list(set_of_rules):  # rules.list_of_rules contains all the rules
+    #             # results_for_left = g_temp.query(rule.rule_left.content)  # query against the temporary graph
+    #             match = True
+    #             forward_bindings = {}
+    #             backward_bindings = {}
+    #             for rule_predicate, rule_object0 in rule.rule_left.predicate_object_dict.items():
+    #                 rule_object = rule_object0.replace('<', '').replace('>', '')
+    #                 try:
+    #                     query_object = predicate_object_dict[str(rule_predicate)]
+    #                     if rule_object.find('http://value.org') >= 0:  # const
+    #                         if query_object.find('http://value.org') >= 0:  # const
+    #                             if rule_object == query_object:
+    #                                 pass
+    #                             else:
+    #                                 match = False
+    #                                 continue
+    #                         else:  # object in query is variable
+    #                             backward_bindings['?'+query_object.replace('http://variable.org/', '')] = f'<{rule_object}>'
+    #                     else:  # rule object is variable
+    #                         forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/', ''))] = query_object
+    #                 except KeyError:
+    #                     match = False
+    #                     continue
+    #             if match:
+    #                 rule.rule_left.forward_bindings = forward_bindings
+    #                 rule.rule_left.backward_bindings = backward_bindings
+    #                 list_of_applicable_rules2.append(rule)  # append the found rule
+    #                 print('LIST OF APPLICABLE RULES: ', str(rule.label))  # print the rule on the console
+    #                 logging.debug(f'LIST OF APPLICABLE RULES: {str(rule.label)}')  # print the rule on the console
+    #                 if str(rule.label).find('list_number_add_x_y_z') >= 0:  # debug
+    #                     pass  # debug
+    #     except KeyError:
+    #         pass  # operation_name not found in dict_of_rules
+    #     # if len(list_of_applicable_rules) != len(list_of_applicable_rules2):
+    #     #     print(list_of_applicable_rules, list_of_applicable_rules2)
+    #     #     pass  # debug
+    #     #     sys.exit(-1)
+    #     # else:
+    #     #     for rule1, rule2 in zip(list_of_applicable_rules, list_of_applicable_rules2):
+    #     #         if rule1.label != rule2.label:
+    #     #             print(rule1.label, rule2.label)
+    #     #             pass  # debug
+    #     #             sys.exit(-2)
+    #     return list_of_applicable_rules2  # return the applicable rules
 
     def build_rule(self):  # build the right side of a rule
         """Build the right side of a rule.
@@ -1916,7 +1966,7 @@ class ClassSparqlQuery:  # Sparql Query Class
 
         """
         for clause in self.list_of_rdfs:
-            rule_right = ClassClauses()  # create right side of a rule
+            # rule_right = ClassClauses()  # create right side of a rule
             for triple in clause:
                 gc = ClassClause()  # create a grandchild
                 tp = ClassTriple()  # create a triple

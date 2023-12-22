@@ -484,6 +484,16 @@ def main():
            ?s2 <http://value.org/variable_z> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
+
+        # factorial(4, ?ans) -> ?ans = 24
+        my_question = f"""
+           SELECT ?ans WHERE {{
+           ?s <http://value.org/operation> <http://value.org/factorial> .
+           ?s <http://value.org/variable_x> <http://value.org/4> .
+           ?s <http://value.org/variable_fact> ?ans .
+           }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
 
         pass

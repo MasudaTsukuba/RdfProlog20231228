@@ -6,18 +6,18 @@ T. Masuda
 """
 
 import os
-import rdflib.term
-from rdflib import Graph, URIRef, BNode, Variable
+from rdflib import BNode  # , Graph, URIRef, Variable
 from src.RdfClass import *  # ClassClauses, ClassClause, ClassRule, ClassRules, ClassRuleRight, ClassSparqlQuery, ClassTerm
 
 
 class RdfProlog:  # Prolog Class, prepare a graph and available rules
-    """Prolog Class, prepare a graph and available rules, and also execute query.
+    """Prolog Class
+    Prepare a graph and available rules, and also execute a query.
 
     Attributes:
-        find_all (bool): stop the search if the first result is obtained.
+        # find_all (bool): stop the search if the first result is obtained.
         facts (ClassFacts): facts
-        rules (ClassRules): set the rules in ClassRules class
+        # rules (ClassRules): set the rules in ClassRules class
         controls (ClassControls): controls
         applications (ClassApplications): applications
 
@@ -57,8 +57,9 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
                 oo = f'http://value.org/{str(oo)}'
             graph.add((URIRef(ss), URIRef(pp), URIRef(oo)))
         self.facts: ClassFacts = ClassFacts(graph)  # facts
-        self.rules: ClassRules = ClassRules(graph)  # set the rules in ClassRules class
+        # self.rules: ClassRules = ClassRules(graph)  # set the rules in ClassRules class
         self.controls: ClassControls = ClassControls(graph)  # controls
+        self.functions: ClassFunctions = ClassFunctions(graph, rules_folder)
         self.applications: ClassApplications = ClassApplications(graph)  # applications
         print('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')  # debug
         logging.debug('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')  # debug
@@ -169,56 +170,56 @@ class Reasoner:
         success_out = False  # flag for success
         print('first clause: ', first_clause.predicate_object_dict)  # debug
 
-        def try_facts(first_clause, rest_clauses, depth, success_out, list_of_bindings_return):
+        def try_facts(first_clause_, rest_clauses_, depth_, success_out_, list_of_bindings_return_):
             # try facts
-            list_of_bindings_current = first_clause.search_facts(self.rdf_prolog)  # find facts that match the first clause
+            list_of_bindings_current = first_clause_.search_facts(self.rdf_prolog)  # find facts that match the first clause
             print('search facts: ', len(list_of_bindings_current), list_of_bindings_current)  # debug
             for bindings_current in list_of_bindings_current:  # repeat for multiple possibilities
-                rest_clauses_applied = rest_clauses.apply_bindings(bindings_current)  # apply the bindings to the remainder of clauses
-                success, list_of_bindings_fact = self.reasoner(rest_clauses_applied, depth)  # recursive call
+                rest_clauses_applied = rest_clauses_.apply_bindings(bindings_current)  # apply the bindings to the remainder of clauses
+                success, list_of_bindings_fact = self.reasoner(rest_clauses_applied, depth_)  # recursive call
                 if success:  # find some results
-                    success_out = True  # at least one trial is successful
+                    success_out_ = True  # at least one trial is successful
                     list_of_bindings_out = [{**bindings_current, **bindings_fact} for bindings_fact in list_of_bindings_fact]  # combine the bindings
-                    list_of_bindings_return += list_of_bindings_out  # add to the list
+                    list_of_bindings_return_ += list_of_bindings_out  # add to the list
                     # if not self.find_all:  # at least one trial is successful
                     if self.number_of_results_obtained >= self.results_limit:  # 2023/12/19
-                        return success_out, list_of_bindings_return  # return the answer
-            return success_out, list_of_bindings_return
+                        return success_out_, list_of_bindings_return_  # return the answer
+            return success_out_, list_of_bindings_return_
 
         success_out, list_of_bindings_return = try_facts(first_clause, rest_clauses, depth, success_out, list_of_bindings_return)
 
-        def try_applications(first_clause, rest_clauses, depth, success_out, list_of_bindings_return):
+        def try_applications(first_clause_, rest_clauses_, depth_, success_out_, list_of_bindings_return_):
             # try applications
             print('trying applications')
-            applications = []  # start the rule search
+            # applications = []  # start the rule search
             try:
-                applications = self.rdf_prolog.applications.operation_names_dict[first_clause.operation_name_uri]  # possible rules are already summarized in ClassRules object
+                applications = self.rdf_prolog.applications.operation_names_dict[first_clause_.operation_name_uri]  # possible rules are already summarized in ClassRules object
                 print('number of applications: ', len(applications))
                 for application in applications:  # repeat for each rule
-                    matched, list_of_application_clauses, list_of_bindings_forward, list_of_bindings_backward = first_clause.match_application(application)  # match the rule against the query
+                    matched, list_of_application_clauses, list_of_bindings_forward, list_of_bindings_backward = first_clause_.match_application(self.rdf_prolog, application)  # match the rule against the query
                     index = 0
                     for bindings_forward, bindings_backward in zip(list_of_bindings_forward, list_of_bindings_backward):
                         try:
                             application_clauses = list_of_application_clauses[index]
-                            combined_clauses = application_clauses.combine(rest_clauses)  # combine the clauses
+                            combined_clauses = application_clauses.combine(rest_clauses_)  # combine the clauses
                         except IndexError:  # 2023/12/21
-                            combined_clauses = rest_clauses
+                            combined_clauses = rest_clauses_
 
                         application_clauses_applied = combined_clauses.apply_bindings({**bindings_forward, **bindings_backward})  # apply the bindings
                         for clause in application_clauses_applied.list_of_clauses:  # debug
                             print(clause.predicate_object_dict)
-                        success, list_of_bindings_application = self.reasoner(application_clauses_applied, depth+1)  # recursive call with +1 depth
+                        success, list_of_bindings_application = self.reasoner(application_clauses_applied, depth_ + 1)  # recursive call with +1 depth
                         if success:
-                            success_out = True
+                            success_out_ = True
                             list_of_bindings_out = [{**bindings_forward, **bindings_backward, **bindings_application} for bindings_application in list_of_bindings_application]
-                            list_of_bindings_return += list_of_bindings_out
+                            list_of_bindings_return_ += list_of_bindings_out
                             # if not self.find_all:
                         if self.number_of_results_obtained >= self.results_limit:  # 2023/12/19
-                            return True, list_of_bindings_return
+                            return True, list_of_bindings_return_
                         index += 1
             except KeyError as e:
                 print('applications not found', e)
-            return success_out, list_of_bindings_return
+            return success_out_, list_of_bindings_return_
 
         success_out, list_of_bindings_return = try_applications(first_clause, rest_clauses, depth, success_out, list_of_bindings_return)
         print('return, depth=', depth)
@@ -548,7 +549,7 @@ def main():
     Returns:
 
     """
-    rdf_prolog = RdfProlog()
+    # rdf_prolog = RdfProlog()
 
     # next(1, ?ans)
     my_question = f"""

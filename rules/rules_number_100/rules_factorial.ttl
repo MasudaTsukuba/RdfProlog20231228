@@ -1,0 +1,49 @@
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+##################################################################
+# rules
+
+##################################################################
+# controls
+
+##################################################################
+# functions
+
+VAL:function_factorial_x_fact
+    VAL:type VAL:function ;
+    VAL:left_side [
+        VAL:operation VAL:factorial ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_fact VAR:_fact ] ;
+    VAL:right_side [
+        VAL:priority "1" ;
+        VAL:child [
+            VAL:operation VAL:factorial ;
+            VAL:variable_x SOME:_x ;
+            VAL:variable_fact VAR:_fact ] ] ;
+
+    VAL:priority "1" .
+
+##################################################################
+# applications
+
+VAL:application_factorial_x_fact
+    VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+        VAL:operation VAL:factorial ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_fact VAR:_fact ] ;
+    VAL:use [
+        VAL:function VAL:function_factorial_x_fact ;
+        VAL:priority "1" ] ;
+    VAL:priority "1".
+
+
+##################################################################
+# inferences
