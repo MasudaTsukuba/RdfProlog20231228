@@ -1,6 +1,6 @@
 """Test function call.
 test_059_RdfProlog_function_100.py
-test for function call
+Test for function call.
 T. Masuda, 2023/12/21
 """
 

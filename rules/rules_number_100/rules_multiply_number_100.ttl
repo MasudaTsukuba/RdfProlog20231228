@@ -1,3 +1,6 @@
+# rules_multiply_number_100.ttl
+# T. Masuda, 2023/12/22
+
 @prefix VAL: <http://value.org/> .
 @prefix VAR: <http://variable.org/> .
 @prefix SOME: <http://some.org/> .
