@@ -463,7 +463,7 @@ def main():
            ?s <http://value.org/variable_x2> ?ans2 .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
+        resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
         # xxx = resolve_bindings[0]['?ans']
 
         # solve_simultaneous_linear_equation(2, 3, 12, 1, 1, 5, ?ans1, ?ans2), add(?ans1, ?ans2, ?ans) .
@@ -494,7 +494,7 @@ def main():
            ?s <http://value.org/variable_fact> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
 
         pass
 

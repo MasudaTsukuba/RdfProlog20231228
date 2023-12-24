@@ -591,18 +591,18 @@ class ClassClause:
 
                     """
                     code_to_execute: str = function_.code  # code contains teh Python code to be executed.
-                    local_vars = {}  # variable bindings
-                    for key1, value1 in forward_binding_.items():
-                        key_modified = key1.replace('http://some.org/_', '').replace('http://variable.org/_', '')  # -> x
-                        value_modified = value1.replace('http://value.org/', '').replace('http://variable.org/', '')
-                        local_vars[key_modified] = value_modified  # arguments for exec
+                    local_vars = {'bindings': forward_binding_}  # variable bindings
+                    # for key1, value1 in forward_binding_.items():
+                    #     key_modified = key1.replace('http://some.org/_', '').replace('http://variable.org/_', '')  # -> x
+                    #     value_modified = value1.replace('http://value.org/', '').replace('http://variable.org/', '')
+                    #     local_vars[key_modified] = value_modified  # arguments for exec
                     exec(code_to_execute, {}, local_vars)  # execution of Python code
-                    result_bindings_: dict[str, str] = local_vars.get('result', None)  # the results are contained in result variable as dict object
-                    return_bindings: dict[str, str] = {}
-                    for key2, value2 in result_bindings_.items():  # convert back to uri representations
-                        key_modified = f'http://variable.org/{key2}'
-                        value_modified = f'http://value.org/{str(value2)}'
-                        return_bindings[key_modified] = value_modified
+                    # result_bindings_: dict[str, str] = local_vars.get('result', None)  # the results are contained in result variable as dict object
+                    return_bindings: dict[str, str] = local_vars.get('results', None)  # the results are contained in result variable as dict object
+                    # for key2, value2 in result_bindings_.items():  # convert back to uri representations
+                    #     key_modified = f'http://variable.org/{key2}'
+                    #     value_modified = f'http://value.org/{str(value2)}'
+                    #     return_bindings[key_modified] = value_modified
                     return return_bindings  # end and return of exec_function
                     pass
 
