@@ -12,7 +12,7 @@ from src.RdfClass import ClassSparqlQuery
 from src.RdfResolution import RdfProlog
 
 # set up the log file
-log_file_path = 'debug.log'
+log_file_path = '../logs/debug.log'
 if os.path.exists(log_file_path):
     os.remove(log_file_path)
 logging.basicConfig(filename=log_file_path, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')

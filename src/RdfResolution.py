@@ -116,19 +116,18 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
                     # print(e)
                     print_and_log(str(e))
                     pass
-            # print('Depth reached: ', reasoner.depth_reached)  # record the depth reached during the search  # 2023/12/19
-            print_and_log(f'Depth reached: {reasoner.depth_reached}')  # record the depth reached during the search
-            # print('===================================================================================================')
-            print_and_log('===================================================================================================')
-            return resolve_bindings
         else:  # reasoner failed
             # print('answer_complex_question: RESOLVE FAILED xxxxxxxxxxxxx')
             print_and_log('answer_complex_question: RESOLVE FAILED xxxxxxxxxxxxx')
             # print('resolve_bindings: ', resolve_bindings)
             print_and_log(f'resolve_bindings: {resolve_bindings}')
-            # print('===================================================================================================')
-            print_and_log('===================================================================================================')
-            return []
+            resolve_bindings = []
+
+        # print('Depth reached: ', reasoner.depth_reached)  # record the depth reached during the search  # 2023/12/19
+        print_and_log(f'Depth reached: {reasoner.depth_reached}')  # record the depth reached during the search
+        # print('===================================================================================================')
+        print_and_log('===================================================================================================')
+        return resolve_bindings
 
 
 class Reasoner:

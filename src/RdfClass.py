@@ -950,7 +950,7 @@ class ClassControl:
         right_sides (list[int]): list of ids of rule's right sides
 
     """
-    def __init__(self, rdf_prolog: 'RdfProlog', graph: Graph, subject: rdflib.term.URIRef, rule: rdflib.term.URIRef):
+    def __init__(self, rdf_prolog, graph: Graph, subject: rdflib.term.URIRef, rule: rdflib.term.URIRef):
         self.control_uri: str = str(subject)
         self.rule = rdf_prolog.rules.dict_of_rules[str(rule)]
         self.left_side: dict[str, str] = {}
@@ -1153,7 +1153,7 @@ class ClassRule:  # class for individual rule
         try:
             subject_left = results_for_rule_left.bindings[0][Variable('left_side')]
             clause = ClassClause()  # create a new instance
-            self.left_side = clause.from_query(graph, subject_left)  # create the left side
+            self.left_side = clause.from_query(graph, URIRef(subject_left))  # create the left side
             self.right_sides = ClassClauses()  # create the right sides
             query_for_rule_right = f"""
             SELECT ?child ?id WHERE {{ 
@@ -1179,30 +1179,30 @@ class ClassRule:  # class for individual rule
         # self.build(graph, subject)
         pass  # end of __init__ of ClassRule
 
-    def build(self, graph, rule_label):
-        """Build a rule from rule label and rule left label.
-
-        Args:
-            graph: RDF graph holding all info of rules
-            rule_label: label of this rule
-            # rule_left_label: label of the left part of the rule
-
-        Returns:
-            ClassRule: return the self as a ClassRule
-        """
-        # print('DETECTED RULE: ', rule_label)  # left side rule returned as an object  # debug
-        self.label = rule_label
-        self.rule_left.build(graph, rule_left_label)  # build the left parts of the rule from the left label.
-        self.rule_right = []
-        # get the right parts of the rule while considering the priorities to apply the sub goal.
-        query = f'SELECT ?o WHERE {{ <{self.label}> <{uri_ref("right_side")}> ?o . ' \
-                f'?o <{uri_ref("priority")}> ?priority . }} ORDER BY (?priority) '
-        results = graph.query(query)
-        # print('NUMBER OF CHILD RULES: ' + str(len(results)))  # debug
-        for result in results:
-            right_clause = ClassClauses().build(graph, result)  # build the right side part of the rule
-            self.rule_right.append(right_clause)  # save into a list
-        return self
+    # def build(self, graph, rule_label):
+    #     """Build a rule from rule label and rule left label.
+    #
+    #     Args:
+    #         graph: RDF graph holding all info of rules
+    #         rule_label: label of this rule
+    #         # rule_left_label: label of the left part of the rule
+    #
+    #     Returns:
+    #         ClassRule: return the self as a ClassRule
+    #     """
+    #     # print('DETECTED RULE: ', rule_label)  # left side rule returned as an object  # debug
+    #     self.label = rule_label
+    #     self.rule_left.build(graph, rule_left_label)  # build the left parts of the rule from the left label.
+    #     self.rule_right = []
+    #     # get the right parts of the rule while considering the priorities to apply the sub goal.
+    #     query = f'SELECT ?o WHERE {{ <{self.label}> <{uri_ref("right_side")}> ?o . ' \
+    #             f'?o <{uri_ref("priority")}> ?priority . }} ORDER BY (?priority) '
+    #     results = graph.query(query)
+    #     # print('NUMBER OF CHILD RULES: ' + str(len(results)))  # debug
+    #     for result in results:
+    #         right_clause = ClassClauses().build(graph, result)  # build the right side part of the rule
+    #         self.rule_right.append(right_clause)  # save into a list
+    #     return self
 
     # def modify_variables(self):  # x -> x1000, etc.
     #     """Modify a variable name by appending a unique serial number.
@@ -1237,18 +1237,18 @@ class ClassRule:  # class for individual rule
     #     ClassRule.serial_number += 1  # update the serial number to prepare for the next conversion
     #     pass
 
-    def rule_right_clauses(self):
-        """
-
-        Returns:
-
-        """
-        clauses = []
-        for right_clause in self.rule_right:
-            clause = ClassClause()
-            clause.list_of_triple = [triple for triple in right_clause.child.grandchildren]
-            clauses.append(clause)
-        return clauses
+    # def rule_right_clauses(self):
+    #     """
+    #
+    #     Returns:
+    #
+    #     """
+    #     clauses = []
+    #     for right_clause in self.rule_right:
+    #         clause = ClassClause()
+    #         clause.list_of_triple = [triple for triple in right_clause.child.grandchildren]
+    #         clauses.append(clause)
+    #     return clauses
 
 
 class ClassRuleLeft(ClassClause):  # left side of a rule
@@ -1321,8 +1321,8 @@ class ClassRuleLeft(ClassClause):  # left side of a rule
         # self.var_list.append('?s')  # also store the variables in a list
         sparql_query = f"""SELECT VAR_LIST WHERE {{ """  # VAR_LIST will be replaced at the end
         for bindings_for_left_content in results_for_left_content.bindings:  # analyze the query results
-            triple_predicate = bindings_for_left_content['p']  # predicate part of the left side of a rule
-            triple_object0 = bindings_for_left_content['o']  # object part of the left side of a rule
+            triple_predicate = bindings_for_left_content[Variable('p')]  # predicate part of the left side of a rule
+            triple_object0 = bindings_for_left_content[Variable('o')]  # object part of the left side of a rule
             triple_object = f'<{triple_object0}>'  # convert object to URI string
             self.predicate_object_dict[triple_predicate] = triple_object
             try:
@@ -1346,116 +1346,116 @@ class ClassRuleLeft(ClassClause):  # left side of a rule
         return self
 
 
-class ClassRuleRight:  # right side of a rule
-    """Right side of a rule.
+# class ClassRuleRight:  # right side of a rule
+#     """Right side of a rule.
+#
+#     Attributes:
+#         child (ClassRuleRightChild): child of the right side clause.
+#     """
+#     def __init__(self):
+#         """Initialize ClassRuleRight class.
+#         """
+#         super().__init__()
+#         self.child = ClassRuleRightChild()  # right side clause has one child, which in turn has one or more grandchild
+#
+#     def build(self, graph: Graph, right_side_for_child):  # executed at the initial stage
+#         """Build the right side clause of a rule.
+#         Executed at the initial stage.
+#
+#         Args:
+#             graph (Graph):
+#             right_side_for_child:
+#
+#         Returns:
+#
+#         """
+#         # print('CHILD RULE: ' + str(right_side_for_child[0]))  # debug
+#         query_for_child = f"""SELECT ?o WHERE {{ <{str(right_side_for_child[0])}> <{uri_ref("child")}> ?o .}} """
+#         results_of_right_side_child = graph.query(query_for_child)  # query by the child name
+#
+#         self.child.build(graph, results_of_right_side_child.bindings[0])  # build a child from the query results
+#         return self
+#
+#     def revise(self, right_clauses, bindings):  # bindingsは辞書型
+#         """
+#
+#         Args:
+#             right_clauses:
+#             bindings (dict[str, str]):
+#
+#         Returns:
+#
+#         """
+#         for grandchild in right_clauses.child.grandchildren:
+#             pass
+#             # grandchild_revised = ClassRightGrandChild()  # create a new grandchild
+#             # new_term = grandchild.triple.subject.revise(bindings)
+#             # grandchild_revised.triple.subject.build(new_term)  # subject
+#             # new_term = grandchild.triple.predicate.revise(bindings)
+#             # grandchild_revised.triple.predicate.build(new_term)  # predicate
+#             # new_term = grandchild.triple.object.revise(bindings)
+#             # grandchild_revised.triple.object.build(new_term)  # object
+#             # self.child.grandchildren.append(grandchild_revised)  # append the grandchild to the grandchildren
+#         return self
 
-    Attributes:
-        child (ClassRuleRightChild): child of the right side clause.
-    """
-    def __init__(self):
-        """Initialize ClassRuleRight class.
-        """
-        super().__init__()
-        self.child = ClassRuleRightChild()  # right side clause has one child, which in turn has one or more grandchild
 
-    def build(self, graph: Graph, right_side_for_child):  # executed at the initial stage
-        """Build the right side clause of a rule.
-        Executed at the initial stage.
-
-        Args:
-            graph (Graph):
-            right_side_for_child:
-
-        Returns:
-
-        """
-        # print('CHILD RULE: ' + str(right_side_for_child[0]))  # debug
-        query_for_child = f"""SELECT ?o WHERE {{ <{str(right_side_for_child[0])}> <{uri_ref("child")}> ?o .}} """
-        results_of_right_side_child = graph.query(query_for_child)  # query by the child name
-
-        self.child.build(graph, results_of_right_side_child.bindings[0])  # build a child from the query results
-        return self
-
-    def revise(self, right_clauses, bindings):  # bindingsは辞書型
-        """
-
-        Args:
-            right_clauses:
-            bindings (dict[str, str]):
-
-        Returns:
-
-        """
-        for grandchild in right_clauses.child.grandchildren:
-            pass
-            # grandchild_revised = ClassRightGrandChild()  # create a new grandchild
-            # new_term = grandchild.triple.subject.revise(bindings)
-            # grandchild_revised.triple.subject.build(new_term)  # subject
-            # new_term = grandchild.triple.predicate.revise(bindings)
-            # grandchild_revised.triple.predicate.build(new_term)  # predicate
-            # new_term = grandchild.triple.object.revise(bindings)
-            # grandchild_revised.triple.object.build(new_term)  # object
-            # self.child.grandchildren.append(grandchild_revised)  # append the grandchild to the grandchildren
-        return self
-
-
-class ClassRuleRightChild:  # right side child of a rule
-    """
-    right side child of a rule
-
-    Attributes:
-        clause (ClassClause): triples contained in this right child
-
-    """
-    def __init__(self):  # child has grandchildren
-        """
-        child has a list of grandchildren
-        """
-        self.clause: ClassClause | None = None
-
-    def build(self, graph, result_for_clause):  # build the right side of a rule
-        """Build the right side of a rule
-
-        Args:
-            graph:
-            result_for_clause:
-
-        Returns:
-            self:
-        """
-        self.clause = None
-        query_for_clause = f'SELECT ?s ?p ?o WHERE ' \
-                               f'{{ <{result_for_clause["o"]}> ?p ?o . }}'  # find grandchildren of a rule
-        results_for_clause = graph.query(query_for_clause)  # execute the query
-        # get grand child rules from grand child name
-        # print('NUMBER OF GRAND CHILD RULES: ' + str(len(results_for_grandchild)))  # debug
-        for triple_for_grandchild in results_for_clause:
-            # print('PREDICATE AND OBJECT OF GRAND CHILD RULE WERE: '
-            #       + str(triple_for_grandchild['p']) + ' '
-            #       + str(triple_for_grandchild['o']))  # debug
-            triple = {'s': result_for_clause["o"], 'p': triple_for_grandchild['p'], 'o': triple_for_grandchild['o']}
-            grandchild = ClassRightGrandChild().build(triple)  # build a grandchild from the triple
-            self.grandchildren.append(grandchild)  # append the grandchild to the grandchildren
-        return self
-
-    def revise(self, clause, bindings):  # revise the right side of a rule
-        """
-        revise the right side of a rule
-
-        Args:
-            clause:
-            bindings:
-
-        Returns:
-            self:
-        """
-        for grandchild in clause.child.grandchildren:
-            grandchild_revised = ClassRightGrandChild()  # create a new grandchild
-            new_term = grandchild.triple.subject.revise(bindings)
-            grandchild_revised.triple.subject.build(new_term)  # revise the subject
-            grandchild_revised.triple.predicate.build(grandchild.triple.predicate.revise(bindings))  # predicate
-            grandchild_revised.triple.object.build(grandchild.triple.object.revise(bindings))  # object
-            self.grandchildren.append(grandchild_revised)  # append the revised grandchild
+# class ClassRuleRightChild:  # right side child of a rule
+#     """
+#     right side child of a rule
+#
+#     Attributes:
+#         clause (ClassClause): triples contained in this right child
+#
+#     """
+#     def __init__(self):  # child has grandchildren
+#         """
+#         child has a list of grandchildren
+#         """
+#         self.clause: ClassClause | None = None
+#
+#     def build(self, graph, result_for_clause):  # build the right side of a rule
+#         """Build the right side of a rule
+#
+#         Args:
+#             graph:
+#             result_for_clause:
+#
+#         Returns:
+#             self:
+#         """
+#         self.clause = None
+#         query_for_clause = f'SELECT ?s ?p ?o WHERE ' \
+#                                f'{{ <{result_for_clause["o"]}> ?p ?o . }}'  # find grandchildren of a rule
+#         results_for_clause = graph.query(query_for_clause)  # execute the query
+#         # get grand child rules from grand child name
+#         # print('NUMBER OF GRAND CHILD RULES: ' + str(len(results_for_grandchild)))  # debug
+#         for triple_for_grandchild in results_for_clause:
+#             # print('PREDICATE AND OBJECT OF GRAND CHILD RULE WERE: '
+#             #       + str(triple_for_grandchild['p']) + ' '
+#             #       + str(triple_for_grandchild['o']))  # debug
+#             triple = {'s': result_for_clause["o"], 'p': triple_for_grandchild['p'], 'o': triple_for_grandchild['o']}
+#             grandchild = ClassRightGrandChild().build(triple)  # build a grandchild from the triple
+#             self.grandchildren.append(grandchild)  # append the grandchild to the grandchildren
+#         return self
+#
+#     def revise(self, clause, bindings):  # revise the right side of a rule
+#         """
+#         revise the right side of a rule
+#
+#         Args:
+#             clause:
+#             bindings:
+#
+#         Returns:
+#             self:
+#         """
+#         for grandchild in clause.child.grandchildren:
+#             grandchild_revised = ClassRightGrandChild()  # create a new grandchild
+#             new_term = grandchild.triple.subject.revise(bindings)
+#             grandchild_revised.triple.subject.build(new_term)  # revise the subject
+#             grandchild_revised.triple.predicate.build(grandchild.triple.predicate.revise(bindings))  # predicate
+#             grandchild_revised.triple.object.build(grandchild.triple.object.revise(bindings))  # object
+#             self.grandchildren.append(grandchild_revised)  # append the revised grandchild
 
 
 # class ClassRightGrandChild:  # grandchild of a rule having one triple
