@@ -36,12 +36,14 @@ VAL:rule_grandfather_father_father
         VAL:child [
             VAL:operation VAL:father ;
             VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_u ] ] ;
+            VAL:variable_y VAR:_u ] ;
+        VAL:id "1" ] ;
     VAL:right_side [
         VAL:child [
              VAL:operation VAL:father ;
              VAL:variable_x VAR:_u ;
-             VAL:variable_y VAR:_y ] ] .
+             VAL:variable_y VAR:_y ] ;
+        VAL:id "2" ] .
 
 VAL:rule_grandfather_mother_father
     VAL:type VAL:rule ;
@@ -53,53 +55,41 @@ VAL:rule_grandfather_mother_father
         VAL:child [
             VAL:operation VAL:mother ;
             VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_u ] ] ;
+            VAL:variable_y VAR:_u ] ;
+        VAL:id "1" ] ;
     VAL:right_side [
         VAL:child [
             VAL:operation VAL:father ;
             VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_y ] ] .
+            VAL:variable_y VAR:_y ] ;
+        VAL:id "2" ] .
 
 ##################################################################
 # controls
 
 VAL:control_grandfather_father_father
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_grandfather_father_father ;
     VAL:left_side [
-        VAL:operation VAL:grandfather ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y VAR:_y ] ;
+         ] ;
     VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:father ;
-            VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_u ] ] ;
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
     VAL:right_side [
-        VAL:priority "2" ;
-        VAL:child [
-             VAL:operation VAL:father ;
-             VAL:variable_x VAR:_u ;
-             VAL:variable_y VAR:_y ] ] .
+        VAL:id "2" ;
+        VAL:priority "2" ] .
 
 VAL:control_grandfather_mother_father
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_grandfather_mother_father ;
     VAL:left_side [
-        VAL:operation VAL:grandfather ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y VAR:_y ] ;
+         ] ;
     VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:mother ;
-            VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_u ] ] ;
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
     VAL:right_side [
-        VAL:priority "2" ;
-        VAL:child [
-            VAL:operation VAL:father ;
-            VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_y ] ] .
+        VAL:id "2" ;
+        VAL:priority "2" ] .
 
 ##################################################################
 # applications

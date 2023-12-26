@@ -1,3 +1,7 @@
+# rules_list_number_math/rules_list_number.ttl
+#
+# T. Masuda, 2023/12/26
+
 @prefix VAL: <http://value.org/> .
 @prefix VAR: <http://variable.org/> .
 @prefix SOME: <http://some.org/> .
@@ -11,6 +15,13 @@ VAL:node_minus_one
     VAL:variable_x VAL:minus_one ;
     VAL:variable_y VAL:nil ;
     VAL:variable_z VAL:list_minus_one .
+
+VAL:node_zero
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:zero ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_zero .
 
 VAL:node_one
     VAL:type VAL:fact ;

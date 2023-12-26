@@ -89,7 +89,7 @@ def test_answer_question5_divide_ans_2_3():
         ?s <http://value.org/variable_z> <http://value.org/3> .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=20)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
     assert resolve_bindings[0]['?ans'] == f'http://value.org/6'
 
 
@@ -103,7 +103,7 @@ def test_answer_question6_divide_12_ans_3():
         ?s <http://value.org/variable_z> <http://value.org/3> .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=30)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
     assert resolve_bindings[0]['?ans'] == f'http://value.org/4'
 
 

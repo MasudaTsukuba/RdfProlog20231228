@@ -22,7 +22,7 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
     Attributes:
         # find_all (bool): stop the search if the first result is obtained.
         facts (ClassFacts): facts
-        # rules (ClassRules): set the rules in ClassRules class
+        rules (ClassRules): set the rules in ClassRules class
         controls (ClassControls): controls
         functions (ClassFunctions): functions
         applications (ClassApplications): applications
@@ -63,9 +63,9 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
                 oo = f'http://value.org/{str(oo)}'
             graph.add((URIRef(ss), URIRef(pp), URIRef(oo)))  # finally store in an RDF graph.
         self.facts: ClassFacts = ClassFacts(graph)  # facts
-        # self.rules: ClassRules = ClassRules(graph)  # set the rules in ClassRules class
-        self.controls: ClassControls = ClassControls(graph)  # controls
-        self.functions: ClassFunctions = ClassFunctions(graph, rules_folder)  # functions
+        self.rules: ClassRules = ClassRules(graph)  # set the rules in ClassRules class
+        self.controls: ClassControls = ClassControls(self, graph)  # controls
+        self.functions: ClassFunctions = ClassFunctions(self, graph, rules_folder)  # functions
         self.applications: ClassApplications = ClassApplications(graph)  # applications
         # print('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')  # debug
         print_and_log('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')  # debug
@@ -175,7 +175,7 @@ class Reasoner:
         list_of_bindings_return = []  # list of bindings to be returned
         success_out = False  # flag for success
         # print('first clause: ', first_clause.predicate_object_dict)  # debug
-        print_and_log(f'first clause: {first_clause.predicate_object_dict}')  # debug
+        print_and_log(f'first clause: {dict(sorted(first_clause.predicate_object_dict.items()))}')  # debug
 
         def try_facts(first_clause_, rest_clauses_, depth_, success_out_, list_of_bindings_return_):
             # try facts
@@ -184,7 +184,7 @@ class Reasoner:
             print_and_log(f'search facts: {len(list_of_bindings_current)}, {list_of_bindings_current}')  # debug
             for bindings_current in list_of_bindings_current:  # repeat for multiple possibilities
                 rest_clauses_applied = rest_clauses_.apply_bindings(bindings_current)  # apply the bindings to the remainder of clauses
-                success, list_of_bindings_fact = self.reasoner(rest_clauses_applied, depth_)  # recursive call
+                success, list_of_bindings_fact = self.reasoner(rest_clauses_applied, depth_ + 1)  # recursive call
                 if success:  # find some results
                     success_out_ = True  # at least one trial is successful
                     list_of_bindings_out = [{**bindings_current, **bindings_fact} for bindings_fact in list_of_bindings_fact]  # combine the bindings
@@ -218,7 +218,7 @@ class Reasoner:
                         application_clauses_applied = combined_clauses.apply_bindings({**bindings_forward, **bindings_backward})  # apply the bindings
                         for clause in application_clauses_applied.list_of_clauses:  # debug
                             # print(clause.predicate_object_dict)
-                            print_and_log(clause.predicate_object_dict)  # debug
+                            print_and_log(dict(sorted(clause.predicate_object_dict.items())))  # debug
                         success, list_of_bindings_application = self.reasoner(application_clauses_applied, depth_ + 1)  # recursive call with +1 depth
                         if success:  # reasoner succeeded
                             success_out_ = True  # success flag for return

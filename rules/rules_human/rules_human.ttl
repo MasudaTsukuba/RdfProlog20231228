@@ -21,21 +21,19 @@ VAL:rule_human_mortal
     VAL:right_side [
         VAL:child [
             VAL:operation VAL:human ;
-            VAL:variable_x VAR:_x ] ] .
+            VAL:variable_x VAR:_x ] ;
+        VAL:id "1" ] .
 
 ##################################################################
 # controls
 
 VAL:control_human_mortal
     VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:mortal ;
-        VAL:variable_x VAR:_x ] ;
+    VAL:rule VAL:rule_human_mortal ;
+    VAL:left_side [ ] ;
     VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:human ;
-            VAL:variable_x VAR:_x ] ] .
+        VAL:id "1" ;
+        VAL:priority "1" ] .
 
 ##################################################################
 # applications

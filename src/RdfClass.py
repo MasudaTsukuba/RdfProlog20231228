@@ -140,6 +140,7 @@ class ClassClause:
         set_of_variables_in_query (set[tuple[str, str]]): [(object_variable, predicate)]
         set_of_half_variables (set[tuple[str, str]]): SOME:x
         variables_of_interest (set[str]):
+        id (int): id of this clause
     """
     def __init__(self):
         self.list_of_triple: list[ClassTriple] = []
@@ -148,6 +149,7 @@ class ClassClause:
         self.set_of_variables_in_query: set[tuple[str, str]] = set()  # [(object_variable, predicate)]
         self.set_of_half_variables: set[tuple[str, str]] = set()  # SOME:x
         self.variables_of_interest: set[str] = set()
+        self.id: int = 0  # id of this clause
 
     def from_triples(self, list_of_triple):
         """Create a ClassClause from a list of triples.
@@ -184,17 +186,19 @@ class ClassClause:
                 operation_name = object_uri.replace('http://value.org/', '')  # extract operation name
                 self.operation_name_uri = uri_ref(operation_name)  # keep it as URIRef
 
-    def from_query(self, graph: Graph, subject: rdflib.term.URIRef):
+    def from_query(self, graph: Graph, subject: rdflib.term.URIRef, id_: rdflib.term.URIRef = URIRef('0')):
         """Create a ClassClause from a SPARQL query.
 
         Args:
             graph (Graph): RDF graph.
             subject (rdflib.term.URIRef): subject term common to triples.
+            id_ (rdflib.term.URIRef): id of this clause.
 
         Returns:
             self (ClassClause): return the self (instance of ClassClause)
 
         """
+        self.id = int(id_)
         query_for_clause = f"""
             SELECT ?p ?o WHERE {{ <{subject}> ?p ?o . }}
         """
@@ -520,7 +524,8 @@ class ClassClause:
                 controls = application.list_of_controls  # names (uri) of controls
                 for control_uri in controls:  # try each control
                     control: ClassControl = rdf_prolog.controls.operation_name_dict[control_uri]  # get the ClassControl instance from its name
-                    left_side = control.left_side.update_variables()  # update variable name ?x -> ?x1000, etc. before establishing bindings
+                    left_side: ClassClause = control.rule.left_side.update_variables()  # update variable name ?x -> ?x1000, etc. before establishing bindings
+                    restrictions = control.left_side
                     forward_binding_control_multiple: dict[str, list[str]] = {}
                     backward_binding_control_multiple: dict[str, list[str]] = {}
                     match_control = True  # assume a success
@@ -529,11 +534,16 @@ class ClassClause:
                             try:
                                 left_value = left_side.predicate_object_dict[key_]
                                 if left_value.find('http://variable.org/') >= 0:  # control side is also a variable
-                                    # forward_binding_control[left_value] = value
-                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
-                                elif left_value.find('http://some.org/') >= 0:  # control side is a semi-variable
-                                    match_control = False  # semi-variable only matches a constant
-                                    break  # match failed, no further matching in useless
+                                    try:
+                                        restriction = restrictions[key_]
+                                        match_control = False  # semi-variable only matches a constant
+                                        break  # match failed, no further matching in useless
+                                    except KeyError:
+                                        # forward_binding_control[left_value] = value
+                                        forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
+                                # elif left_value.find('http://some.org/') >= 0:  # control side is a semi-variable
+                                #     match_control = False  # semi-variable only matches a constant
+                                #     break  # match failed, no further matching in useless
                                 else:  # control side is a constant
                                     # backward_binding_control[value] = left_value
                                     backward_binding_control_multiple = append_to_bindings(backward_binding_control_multiple, value_, left_value)  # 2023/12/12
@@ -544,11 +554,16 @@ class ClassClause:
                             try:
                                 left_value = left_side.predicate_object_dict[key_]  # control side
                                 if left_value.find('http://variable.org/') >= 0:  # is variable
-                                    # forward_binding_control[left_value] = value
-                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
-                                elif left_value.find('http://some.org/') >= 0:  # semi-variable
-                                    # forward_binding_control[left_value] = value
-                                    forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
+                                    try:
+                                        restriction = restrictions[key_]
+                                        # forward_binding_control[left_value] = value
+                                        forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
+                                    except KeyError:
+                                        # forward_binding_control[left_value] = value
+                                        forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
+                                # elif left_value.find('http://some.org/') >= 0:  # semi-variable
+                                #     # forward_binding_control[left_value] = value
+                                #     forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
                                 else:  # constant
                                     if left_value == value_:  # same value
                                         pass  # if the constant has the same value, match is OK.
@@ -564,7 +579,13 @@ class ClassClause:
                             matched_ = True  # return value
                             list_of_forward_bindings.append({**forward_binding, **forward_binding_control})
                             list_of_backward_bindings.append({**backward_binding, **backward_binding_control})
-                            list_of_clauses.append(control.right_sides.update_variables())
+                            clauses = ClassClauses()
+                            for index in control.right_sides:
+                                right: ClassClause = control.rule.right_sides.list_of_clauses[index-1]
+                                right_updated: ClassClause = right.update_variables()
+                                clauses.list_of_clauses.append(right_updated)
+                            list_of_clauses.append(clauses)
+                            ClassClauses.variable_modifier += 1
                 return matched_
 
             matched = try_controls(matched)  # try controls
@@ -607,9 +628,10 @@ class ClassClause:
                     pass
 
                 functions = application.list_of_functions  # get a list of function name uri
-                for function_uri in functions:
+                for function_uri in functions:  # try each function
                     function: ClassFunction = rdf_prolog.functions.operation_name_dict[URIRef(function_uri)]  # get the ClassFunction instance from uri name
-                    left_side = function.left_side  # .update_variables()  # ?x -> ?x1000, etc.
+                    left_side: ClassClause = function.rule.left_side  # .update_variables()  # ?x -> ?x1000, etc.
+                    restrictions = function.left_side
                     forward_binding_function_multiple = {}
                     backward_binding_function_multiple = {}
                     match_function = True  # assume a success
@@ -618,11 +640,16 @@ class ClassClause:
                             try:
                                 left_value = left_side.predicate_object_dict[key_]  # get the corresponding value in function
                                 if left_value.find('http://variable.org/') >= 0:  # function side is a variable
-                                    # forward_binding_function[left_value] = value
-                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
-                                elif left_value.find('http://some.org/') >= 0:  # function side is a semi-variable
-                                    match_function = False  # semi-variable only matches with a constant
-                                    break  # match failed, no further matching in useless
+                                    try:
+                                        restriction = restrictions[key_]
+                                        match_function = False  # semi-variable only matches with a constant
+                                        break  # match failed, no further matching in useless
+                                    except KeyError:
+                                        # forward_binding_function[left_value] = value
+                                        forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
+                                # elif left_value.find('http://some.org/') >= 0:  # function side is a semi-variable
+                                #     match_function = False  # semi-variable only matches with a constant
+                                #     break  # match failed, no further matching in useless
                                 else:  # function side is a constant
                                     # backward_binding_control[value] = left_value
                                     backward_binding_function_multiple = append_to_bindings(backward_binding_function_multiple, value_, left_value)  # 2023/12/12
@@ -633,11 +660,16 @@ class ClassClause:
                             try:
                                 left_value = left_side.predicate_object_dict[key_]
                                 if left_value.find('http://variable.org/') >= 0:  # function side is a variable
-                                    # forward_binding_control[left_value] = value
-                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
-                                elif left_value.find('http://some.org/') >= 0:  # function side is a semi-variable
-                                    # forward_binding_control[left_value] = value
-                                    forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
+                                    try:
+                                        restriction = restrictions[key_]
+                                        # forward_binding_control[left_value] = value
+                                        forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
+                                    except KeyError:
+                                        # forward_binding_control[left_value] = value
+                                        forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
+                                # elif left_value.find('http://some.org/') >= 0:  # function side is a semi-variable
+                                #     # forward_binding_control[left_value] = value
+                                #     forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
                                 else:    # function side is a constant
                                     if left_value == value_:
                                         pass  # if the constant has the same value, match is OK.
@@ -880,28 +912,30 @@ class ClassControls:
     """Class for handling controls.
 
     Attributes:
-        controls (list[ClassControl]):
-        operation_name_dict (dict[str, str]):
+        list_of_controls (list[ClassControl]):
+        operation_name_dict (dict[str, ClassControl]):
     """
-    def __init__(self, graph: Graph):
-        self.controls: list[ClassControl] = []  # controls has a list of ClassControl
-        self.operation_name_dict: dict[str, ClassControl] = {}  # also has a dict object to store
+    def __init__(self, rdf_prolog, graph: Graph):
+        self.list_of_controls: list[ClassControl] = []  # controls has a list of ClassControl
+        # self.operation_name_dict: dict[str, set[ClassControl]] = {}  # also has a dict object to store
+        self.operation_name_dict: dict[str, ClassControl] = {}  # also has a dict object to store, operation name is unique to each control
         query_for_controls = f"""
-            SELECT ?s WHERE {{
+            SELECT ?s ?rule_name WHERE {{
             ?s {uri_ref_ext('type')} {uri_ref_ext('control')} . 
+            ?s {uri_ref_ext('rule')} ?rule_name . 
             OPTIONAL {{ ?s {uri_ref_ext('priority')} ?priority . }}
             }} ORDER BY ?priority
         """
         results_for_controls = graph.query(query_for_controls)
         for binding in results_for_controls.bindings:
-            control: ClassControl = ClassControl(graph, URIRef(binding[Variable('s')]))  # create an instance of ClassControl
-            self.controls.append(control)  # register to the list
+            control: ClassControl = ClassControl(rdf_prolog, graph, URIRef(binding[Variable('s')]), URIRef(binding[Variable('rule_name')]))  # create an instance of ClassControl
+            self.list_of_controls.append(control)  # register to the list
             operation_name: str = control.control_uri
             # try:
-            #     self.operation_name_dict[operation_name].append(control)
+            #     self.operation_name_dict[operation_name].add(control)
             # except Exception as e:
-            #     self.operation_name_dict[operation_name] = []
-            #     self.operation_name_dict[operation_name].append(control)
+            #     self.operation_name_dict[operation_name] = set()
+            #     self.operation_name_dict[operation_name].add(control)
             self.operation_name_dict[operation_name] = control
         pass  # end of __init__ of ClassControls
 
@@ -910,36 +944,46 @@ class ClassControl:
     """Class for handling a control object.
 
     Attributes:
+        control_uri (str): subject of this control
+        rule (ClassRule): rule
+        left_side (dict[str, str]): left side of a control, variable restriction, VAL:variable_x "some".
+        right_sides (list[int]): list of ids of rule's right sides
 
     """
-    def __init__(self, graph, subject: rdflib.term.URIRef):
+    def __init__(self, rdf_prolog: 'RdfProlog', graph: Graph, subject: rdflib.term.URIRef, rule: rdflib.term.URIRef):
         self.control_uri: str = str(subject)
+        self.rule = rdf_prolog.rules.dict_of_rules[str(rule)]
+        self.left_side: dict[str, str] = {}
         query_for_control_left = f"""
-        SELECT ?left_side  WHERE {{ <{subject}> {uri_ref_ext('left_side')} ?left_side . }}
+        SELECT ?var ?restriction  WHERE {{ 
+        <{subject}> {uri_ref_ext('left_side')} ?left_side . 
+        ?left_side ?var ?restriction .
+        }}
         """
         results_for_control_left = graph.query(query_for_control_left)  # get the left side of a control
         try:
-            subject_left = results_for_control_left.bindings[0]['left_side']
-            clause = ClassClause()  # create a new instance
-            self.left_side = clause.from_query(graph, subject_left)  # create the left side
-            self.right_sides = ClassClauses()  # create the right sides
-            query_for_control_right = f"""
-            SELECT ?child  WHERE {{ 
+            for binding in results_for_control_left.bindings:
+                self.left_side[binding[Variable('var')]] = binding[Variable('restriction')]  # create the left side
+            self.right_sides: list[int] = []  # create the right sides
+            query_for_control_right: str = f"""
+            SELECT ?id WHERE {{ 
             <{subject}> {uri_ref_ext('right_side')} ?right_side . 
-            ?right_side {uri_ref_ext('child')} ?child .
-            OPTIONAL {{ ?right_side {uri_ref_ext('priority')} ?priority . }}
+            ?right_side {uri_ref_ext('id')} ?id . 
+            ?right_side {uri_ref_ext('priority')} ?priority . 
             }} ORDER BY ?priority
             """
             results_for_control_right = graph.query(query_for_control_right)  # get the right side
+            if len(results_for_control_right.bindings) == 1:
+                pass
             for binding in results_for_control_right.bindings:
-                clause = ClassClause()  # create a new instance
-                right_side = clause.from_query(graph, binding['child'])
-                self.right_sides.list_of_clauses.append(right_side)  # append to the right sides
+                # clause = ClassClause()  # create a new instance
+                # right_side = clause.from_query(graph, binding['child'])
+                self.right_sides.append(int(binding[Variable('id')]))  #.list_of_clauses.append(right_side)  # append to the right sides
         except KeyError:
             pass  # error
-        except Exception:  # unknown and unexpected exception
+        except Exception as e:  # unknown and unexpected exception
             pass  # error
-        pass
+        pass  # end of __init__ of ClassControl
 
 
 class ClassFunctions:
@@ -947,10 +991,10 @@ class ClassFunctions:
 
     Attributes:
         functions (list[ClassFunction]):
-        operation_name_dict:
+        operation_name_dict (dict[str,ClassFunction]): dict for retrieving ClassFunction instance from its label.
 
     """
-    def __init__(self, graph: Graph, rules_folder: str):
+    def __init__(self, rdf_prolog, graph: Graph, rules_folder: str):
         """
 
         Args:
@@ -959,18 +1003,19 @@ class ClassFunctions:
 
         """
         self.functions: list[ClassFunction] = []
-        self.operation_name_dict = {}
+        self.operation_name_dict: dict[str, ClassFunction] = {}
         query_for_functions = f"""
-             SELECT ?s WHERE {{
+             SELECT ?s ?rule_name WHERE {{
              ?s {uri_ref_ext('type')} {uri_ref_ext('function')} . 
+             ?s {uri_ref_ext('rule')} ?rule_name . 
              OPTIONAL {{ ?s {uri_ref_ext('priority')} ?priority . }}
              }} ORDER BY ?priority
          """
-        results_for_functions = graph.query(query_for_functions)
+        results_for_functions = graph.query(query_for_functions)  # execute query
         for binding in results_for_functions.bindings:
-            function: ClassFunction = ClassFunction(graph, URIRef(binding[Variable('s')]))
+            function: ClassFunction = ClassFunction(rdf_prolog, graph, URIRef(binding[Variable('s')]), URIRef(binding[Variable('rule_name')]))
             self.functions.append(function)
-            # operation_name = function.left_side.operation_name_uri
+            # operation_name_dict = function.left_side.operation_name_uri
             function_uri: str = function.function_uri
             # try:
             #     self.operation_name_dict[function_uri].append(function)
@@ -979,12 +1024,12 @@ class ClassFunctions:
             #     self.operation_name_dict[function_uri].append(function)
             self.operation_name_dict[function_uri] = function
         for function in self.functions:  # read the function codes
-            function_name: str = function.left_side.operation_name_uri
+            function_name: str = function.rule.left_side.operation_name_uri
             function_name: str = f'function_{function_name.replace("http://value.org/", "")}.py'
             with open(f'{rules_folder}/{function_name}', 'r') as function_file:
                 code: str = function_file.read()
                 function.code = code
-        pass  # end of __init__
+        pass  # end of __init__ of ClassFUnctions
     pass  # end of ClassFunctions
 
 
@@ -992,386 +1037,427 @@ class ClassFunction:
     """Class for handling a function object.
 
     Attributes:
+        code (str): Python code string of function.
+        function_uri (str): subject of this function.
+        rule (ClassRule): rule for this function.
+        left_side (dict[str, str]): left side of a control, variable restriction, VAL:variable_x "some".
+        right_sides (list[int]): list of ids of rule's right sides
 
     """
-    def __init__(self, graph, function_uri: rdflib.term.URIRef):
+    def __init__(self, rdf_prolog, graph, function_uri: rdflib.term.URIRef, rule_name: rdflib.term.URIRef):
         self.code: str = ''  # Python code string
+        self.function_uri = function_uri
+        self.rule = rdf_prolog.rules.dict_of_rules[str(rule_name)]  # set the rule for this function
+        self.left_side = {}
         query_for_function_left: str = f"""
-        SELECT ?left_side  WHERE {{ <{function_uri}> {uri_ref_ext('left_side')} ?left_side . }}
+        SELECT ?var ?restriction  WHERE {{ 
+        <{function_uri}> {uri_ref_ext('left_side')} ?left_side . 
+        ?left_side ?var ?restriction . 
+        }}
         """
-        results_for_function_left = graph.query(query_for_function_left)
-        function_left = None
+        results_for_function_left = graph.query(query_for_function_left)  # get the left side of a function
+
         try:
-            function_left = results_for_function_left.bindings[0]['left_side']
+            for binding in results_for_function_left.bindings:
+                self.left_side[binding[Variable('var')]] = binding[Variable('restriction')]  # create the left side
+            self.right_sides: list[int] = []  # create the right sides
+            query_for_function_right: str = f"""
+                        SELECT ?child ?id WHERE {{ 
+                        <{function_uri}> {uri_ref_ext('right_side')} ?right_side . 
+                        ?right_side {uri_ref_ext('id')} ?id . 
+                        ?right_side {uri_ref_ext('priority')} ?priority . 
+                        }} ORDER BY ?priority
+                        """
+            results_for_function_right = graph.query(query_for_function_right)  # get the right side
+            for binding in results_for_function_right.bindings:
+                self.right_sides.append(
+                    int(binding[Variable('id')]))  # .list_of_clauses.append(right_side)  # append to the right sides
         except KeyError:
             pass  # error
         except Exception:
             pass  # error
-        clause = ClassClause()  # create a new instance
-        self.function_uri: str = function_uri
-        self.left_side = clause.from_query(graph, function_left)
 
-        self.right_sides: ClassClauses = ClassClauses()  # create a right sides
-        query_for_function_right = f"""
-        SELECT ?child  WHERE {{ 
-        <{function_uri}> {uri_ref_ext('right_side')} ?right_side . 
-        ?right_side {uri_ref_ext('child')} ?child .
-        OPTIONAL {{ ?right_side {uri_ref_ext('priority')} ?priority . }}
-        }} ORDER BY ?priority
-        """
-        results_for_function_right = graph.query(query_for_function_right)
-        for binding in results_for_function_right.bindings:
-            clause: ClassClause = ClassClause()  # create a new instance
-            right_side = clause.from_query(graph, binding['child'])
-            self.right_sides.list_of_clauses.append(right_side)  # append to the right sides
         pass  # end of __init__
 
 
-# class ClassRules:  # list of rules
-#     """Class for handling rules.
-#     Holds a list of all rules.
-#
-#     Attributes:
-#         list_of_rules (list[ClassRule]): List of rule instances.
-#         dict_of_rules (dict[str, set[ClassRule]]): dict of rule instances.
-#     """
-#     graph = None
-#
-#     def __init__(self, graph: Graph):
-#         """Initialize ClassRules class.
-#
-#         Args:
-#             graph (Graph):
-#         """
-#         ClassRules.graph = graph
-#         self.list_of_rules = []
-#         # query_for_rules = SELECT ?s ?left WHERE {{ ' \
-#         #                   ?s <{uri_ref("left_side")}> ?left .
-#         #                   f'OPTIONAL {{ ?s <{uri_ref("priority")}> ?priority .}} }}' \
-#         #                   f'ORDER BY ?priority '  # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
-#         # results_for_rule_left = graph.query(query_for_rules)  # execute query and extract
-#         # for binding_for_left in results_for_rule_left.bindings:
-#         #     instance_rule = ClassRule()  # create a rule instance
-#         #     instance_rule.build(graph, binding_for_left['s'], binding_for_left['left'])  # s: rule id, o: rule pattern
-#         #     self.list_of_rules.append(instance_rule)  # append the rule to the list
-#
-#         self.dict_of_rules = {}  # dict of rules. operation name as a key
-#         query_for_rules = f"""
-#             SELECT ?rule WHERE {{ ?rule {uri_ref_ext('type')} {uri_ref_ext('rule')} }}
-#             """ # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
-#         results_for_rule = graph.query(query_for_rules)  # execute query and extract
-#         for binding in results_for_rule.bindings:
-#             subject = binding['rule']
-#             instance_rule = ClassRule(graph, subject)  # create a rule instance
-#             operation_name = instance_rule.rule_left.operation_name_uri
-#             try:
-#                 self.dict_of_rules[operation_name].add(instance_rule)
-#             except KeyError:
-#                 self.dict_of_rules[operation_name] = set()
-#                 self.dict_of_rules[operation_name].add(instance_rule)
-#         pass
+class ClassRules:  # list of rules
+    """Class for handling rules.
+    Holds a list of all rules.
+
+    Attributes:
+        list_of_rules (list[ClassRule]): List of rule instances.
+        dict_of_rules (dict[str, ClassRule]):
+        operation_name_dict (dict[str, set[ClassRule]]): dict of rule instances with the operation names as keys.
+    """
+    # graph = None
+
+    def __init__(self, graph: Graph):
+        """Initialize ClassRules class.
+
+        Args:
+            graph (Graph): RDF graph containing all the info on rules.
+        """
+        # ClassRules.graph = graph
+        self.list_of_rules: list[ClassRule] = []
+        # query_for_rules = SELECT ?s ?left WHERE {{ ' \
+        #                   ?s <{uri_ref("left_side")}> ?left .
+        #                   f'OPTIONAL {{ ?s <{uri_ref("priority")}> ?priority .}} }}' \
+        #                   f'ORDER BY ?priority '  # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
+        # results_for_rule_left = graph.query(query_for_rules)  # execute query and extract
+        # for binding_for_left in results_for_rule_left.bindings:
+        #     instance_rule = ClassRule()  # create a rule instance
+        #     instance_rule.build(graph, binding_for_left['s'], binding_for_left['left'])  # s: rule id, o: rule pattern
+        #     self.list_of_rules.append(instance_rule)  # append the rule to the list
+        self.dict_of_rules: dict[str, ClassRule] = {}
+        self.operation_name_dict: dict[str, set[ClassRule]] = {}  # dict of rules. operation name as a key
+        query_for_rules = f"""
+            SELECT ?rule_subject WHERE {{ ?rule_subject {uri_ref_ext('type')} {uri_ref_ext('rule')} }}
+            """ # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
+        results_for_rules = graph.query(query_for_rules)  # execute query and extract
+        for binding in results_for_rules.bindings:
+            rule_subject = URIRef(binding[Variable('rule_subject')])
+            rule_instance: ClassRule = ClassRule(graph, rule_subject)  # create a rule instance
+            self.list_of_rules.append(rule_instance)  # append the rule to the list
+            self.dict_of_rules[str(rule_subject)] = rule_instance
+            operation_name: str = rule_instance.left_side.operation_name_uri  # rule_left.operation_name_uri
+            try:
+                self.operation_name_dict[operation_name].add(rule_instance)
+            except KeyError:
+                self.operation_name_dict[operation_name] = set()
+                self.operation_name_dict[operation_name].add(rule_instance)
+        pass  # end of __init__ of ClassRules
 
 
-# class ClassRule:  # class for individual rule
-#     """Class for an individual rule.
-#
-#     Attributes:
-#         label (str): label of the rule
-#         rule_left (ClassRuleLeft): left part of the rule
-#         rule_right (list[ClassRuleRight]): right part of the class consisting of a list of ClassRuleRight
-#         variables_dict (dict[str, str]): dict of the variables in the rule
-#     """
-#     serial_number: int = 1000  # a variable to convert variables: x -> x1000
-#
-#     def __init__(self, graph, subject):
-#         """Initialize ClassRule class.
-#         """
-#         self.label: str = ''
-#         self.rule_left: ClassRuleLeft = ClassRuleLeft(graph, subject)
-#         # self.rule_right: ClassRuleRight = ClassRuleRight()
-#         self.variables_dict: dict[str, str] = {}
-#         # self.build(graph, subject)
-#
-#     # def build(self, graph, rule_label):
-#     #     """
-#     #     build a rule from rule label and rule left label.
-#     #
-#     #     Args:
-#     #         graph: RDF graph holding all info of rules
-#     #         rule_label: label of this rule
-#     #         rule_left_label: label of the left part of the rule
-#     #
-#     #     Returns:
-#     #         ClassRule: return the self as a ClassRule
-#     #     """
-#     #     # print('DETECTED RULE: ', rule_label)  # left side rule returned as an object  # debug
-#     #     self.label = rule_label
-#     #     self.rule_left.build(graph, rule_left_label)  # build the left parts of the rule from the left label.
-#     #     self.rule_right = []
-#     #     # get the right parts of the rule while considering the priorities to apply the sub goal.
-#     #     query = SELECT ?o WHERE {{ <{self.label}> <{uri_ref("right_side")}> ?o .
-#     #             f'?o <{uri_ref("priority")}> ?priority . }} ORDER BY (?priority) '
-#     #     results = graph.query(query)
-#     #     # print('NUMBER OF CHILD RULES: ' + str(len(results)))  # debug
-#     #     for result in results:
-#     #         right_clause = ClassClauses().build(graph, result)  # build the right side part of the rule
-#     #         self.rule_right.append(right_clause)  # save into a list
-#     #     return self
-#
-#     def modify_variables(self):  # x -> x1000, etc.
-#         """Modify a variable name by appending a unique serial number.
-#         x -> x1000, etc.
-#         This function is used to avoid confusion between classes that have variables with the same name.
-#
-#         Returns:
-#             None: This function just modifies the internal variables of a class instance.
-#         """
-#         self.variables_dict = {}  # The variables are held in this list.
-#         for var in self.rule_left.set_of_variables_in_query:
-#             self.variables_dict[var] = var + str(ClassRule.serial_number)  # x -> x1000
-#         for right_clause in self.rule_right:
-#             for grand_child in right_clause.child.grandchildren:
-#                 triple = grand_child.triple
-#                 if triple.subject.is_variable:  # subject
-#                     var = triple.subject.to_var_string()  # rdflib.term.Variable -> ?x
-#                     try:
-#                         value = self.variables_dict[var]  # already registered
-#                         triple.subject.build(value)
-#                     except KeyError:
-#                         self.variables_dict[var] = var + str(ClassRule.serial_number)  # convert free variable
-#                         triple.subject.build(self.variables_dict[var])
-#                 if triple.object.is_variable:  # object
-#                     var = triple.object.to_var_string()
-#                     try:
-#                         value = self.variables_dict[var]  # already registered
-#                         triple.object.build(value)
-#                     except KeyError:
-#                         self.variables_dict[var] = var + str(ClassRule.serial_number)  # convert free variable
-#                         triple.object.build(self.variables_dict[var])
-#         ClassRule.serial_number += 1  # update the serial number to prepare for the next conversion
-#         pass
-#
-#     def rule_right_clauses(self):
-#         """
-#
-#         Returns:
-#
-#         """
-#         clauses = []
-#         for right_clause in self.rule_right:
-#             clause = ClassClause()
-#             clause.list_of_triple = [triple for triple in right_clause.child.grandchildren]
-#             clauses.append(clause)
-#         return clauses
+class ClassRule:  # class for individual rule
+    """Class for an individual rule.
+
+    Attributes:
+        rule_uri (str): subject of this rule.
+        left_side (ClassClause): left side of a rule.
+        right_sides (ClassClauses): right sides of a rule.
+        # label (str): label of the rule
+        # rule_left (ClassRuleLeft): left part of the rule
+        # rule_right (list[ClassRuleRight]): right part of the class consisting of a list of ClassRuleRight
+        # variables_dict (dict[str, str]): dict of the variables in the rule
+    """
+    # serial_number: int = 1000  # a variable to convert variables: x -> x1000
+
+    def __init__(self, graph: Graph, subject: rdflib.term.URIRef):
+        """Initialize ClassRule class.
+        """
+        self.rule_uri: str = str(subject)
+        query_for_rule_left = f"""
+        SELECT ?left_side  WHERE {{ <{subject}> {uri_ref_ext('left_side')} ?left_side . }}
+        """
+        results_for_rule_left = graph.query(query_for_rule_left)  # get the left side of a control
+        try:
+            subject_left = results_for_rule_left.bindings[0][Variable('left_side')]
+            clause = ClassClause()  # create a new instance
+            self.left_side = clause.from_query(graph, subject_left)  # create the left side
+            self.right_sides = ClassClauses()  # create the right sides
+            query_for_rule_right = f"""
+            SELECT ?child ?id WHERE {{ 
+            <{subject}> {uri_ref_ext('right_side')} ?right_side . 
+            ?right_side {uri_ref_ext('child')} ?child .
+            ?right_side {uri_ref_ext('id')} ?id . }}
+            ORDER BY ?id
+            """
+            results_for_rule_right = graph.query(query_for_rule_right)  # get the right side
+            for binding in results_for_rule_right.bindings:
+                clause = ClassClause()  # create a new instance
+                right_side = clause.from_query(graph, URIRef(binding[Variable('child')]), URIRef(binding[Variable('id')]))
+                self.right_sides.list_of_clauses.append(right_side)  # append to the right sides
+        except KeyError:
+            pass  # error
+        except Exception:  # unknown and unexpected exception
+            pass  # error
+
+        # self.label: str = ''
+        # self.rule_left: ClassRuleLeft = ClassRuleLeft(graph, subject)
+        # self.rule_right: ClassRuleRight = ClassRuleRight()
+        # self.variables_dict: dict[str, str] = {}
+        # self.build(graph, subject)
+        pass  # end of __init__ of ClassRule
+
+    def build(self, graph, rule_label):
+        """Build a rule from rule label and rule left label.
+
+        Args:
+            graph: RDF graph holding all info of rules
+            rule_label: label of this rule
+            # rule_left_label: label of the left part of the rule
+
+        Returns:
+            ClassRule: return the self as a ClassRule
+        """
+        # print('DETECTED RULE: ', rule_label)  # left side rule returned as an object  # debug
+        self.label = rule_label
+        self.rule_left.build(graph, rule_left_label)  # build the left parts of the rule from the left label.
+        self.rule_right = []
+        # get the right parts of the rule while considering the priorities to apply the sub goal.
+        query = f'SELECT ?o WHERE {{ <{self.label}> <{uri_ref("right_side")}> ?o . ' \
+                f'?o <{uri_ref("priority")}> ?priority . }} ORDER BY (?priority) '
+        results = graph.query(query)
+        # print('NUMBER OF CHILD RULES: ' + str(len(results)))  # debug
+        for result in results:
+            right_clause = ClassClauses().build(graph, result)  # build the right side part of the rule
+            self.rule_right.append(right_clause)  # save into a list
+        return self
+
+    # def modify_variables(self):  # x -> x1000, etc.
+    #     """Modify a variable name by appending a unique serial number.
+    #     x -> x1000, etc.
+    #     This function is used to avoid confusion between classes that have variables with the same name.
+    #
+    #     Returns:
+    #         None: This function just modifies the internal variables of a class instance.
+    #     """
+    #     self.variables_dict = {}  # The variables are held in this list.
+    #     for var in self.rule_left.set_of_variables_in_query:
+    #         self.variables_dict[var] = var + str(ClassRule.serial_number)  # x -> x1000
+    #     for right_clause in self.rule_right:
+    #         for grand_child in right_clause.child.grandchildren:
+    #             triple = grand_child.triple
+    #             if triple.subject.is_variable:  # subject
+    #                 var = triple.subject.to_var_string()  # rdflib.term.Variable -> ?x
+    #                 try:
+    #                     value = self.variables_dict[var]  # already registered
+    #                     triple.subject.build(value)
+    #                 except KeyError:
+    #                     self.variables_dict[var] = var + str(ClassRule.serial_number)  # convert free variable
+    #                     triple.subject.build(self.variables_dict[var])
+    #             if triple.object.is_variable:  # object
+    #                 var = triple.object.to_var_string()
+    #                 try:
+    #                     value = self.variables_dict[var]  # already registered
+    #                     triple.object.build(value)
+    #                 except KeyError:
+    #                     self.variables_dict[var] = var + str(ClassRule.serial_number)  # convert free variable
+    #                     triple.object.build(self.variables_dict[var])
+    #     ClassRule.serial_number += 1  # update the serial number to prepare for the next conversion
+    #     pass
+
+    def rule_right_clauses(self):
+        """
+
+        Returns:
+
+        """
+        clauses = []
+        for right_clause in self.rule_right:
+            clause = ClassClause()
+            clause.list_of_triple = [triple for triple in right_clause.child.grandchildren]
+            clauses.append(clause)
+        return clauses
 
 
-# class ClassRuleLeft(ClassClause):  # left side of a rule
-#     """Left side of a rule.
-#
-#     Attributes:
-#         label: id for the left part of the rule
-#         content: sparql query for finding applicable rules
-#         bindings:
-#         var_list: a list of variables in the triple
-#         const_dict: dict of constants in object with the correspondent predicate
-#         predicate_object_dict: dict for finding object from predicate as a key
-#         forward_bindings:
-#         backward_bindings:
-#     """
-#     def __init__(self, graph, subject):
-#         """
-#         Initialize ClassRuleLeft class.
-#         """
-#         super().__init__()
-#         self.list_of_triples: list[ClassTriple] = []
-#         self.operation_name_uri: str = ''  # ex. http://value.org/add_number
-#         self.predicate_object_dict: dict[str, str] = {}  # subject is unnamed and common among triples
-#         self.set_of_variables_in_query: set[tuple[str, str]] = set()  # [(object_variable, predicate)]
-#         self.set_of_half_variables: set[tuple[str, str]] = set()  # SOME:x
-#         self.variables_of_interest: set[str] = set()
-#
-#         self.label = None  # id for the left part of the rule
-#         self.content = None  # sparql query for finding applicable rules
-#         self.bindings = {}
-#         # self.var_list = []  # a list of variables in the triple
-#         self.const_dict = {}  # dict of constants in object with the correspondent predicate
-#         self.forward_bindings = {}
-#         self.backward_bindings = {}
-#         query_for_rule_left = f"""
-#             SELECT ?left WHERE {{ <{subject}> {uri_ref_ext('left_side')} ?left }}
-#         """
-#         results_for_rule_left = graph.query(query_for_rule_left)
-#         bindings = results_for_rule_left.bindings
-#         if len(bindings) > 0:
-#             self.from_query(graph, bindings[0]['left'])
-#         pass
-#
-#     def build(self, graph: Graph, rule_left_label):  # executed at the initial stage
-#         """Build the left side part of a rule from the label.
-#         Executed at the initial stage.
-#
-#         Args:
-#             graph (Graph):
-#             rule_left_label:
-#
-#         Returns:
-#
-#         """
-#         self.label = None  # label for the left side part of a rule
-#         self.content = None
-#         self.bindings = {}
-#         self.var_list = []
-#         self.const_dict = {}  # dict of constants in object with the corresponding predicate
-#         self.predicate_object_dict = {}  # dict for finding object from predicate as a key
-#
-#         # print('DETECTED LEFT RULE: ', rule_left_label)  # left side rule in returned as an object  # debug
-#         # get the actual rules of the left side
-#         query_for_left_content = f"""
-#             SELECT ?p ?o WHERE {{
-#             <{str(rule_left_label)}> ?p ?o . }}"""  # extract content of left side rule from the label
-#         results_for_left_content = graph.query(query_for_left_content)  # execute a query
-#
-#         var_list_string = '?s '  # build VAR_LIST of sparql query for left side rule
-#         # self.var_list.append('?s')  # also store the variables in a list
-#         sparql_query = f"""SELECT VAR_LIST WHERE {{ """  # VAR_LIST will be replaced at the end
-#         for bindings_for_left_content in results_for_left_content.bindings:  # analyze the query results
-#             triple_predicate = bindings_for_left_content['p']  # predicate part of the left side of a rule
-#             triple_object0 = bindings_for_left_content['o']  # object part of the left side of a rule
-#             triple_object = f'<{triple_object0}>'  # convert object to URI string
-#             self.predicate_object_dict[triple_predicate] = triple_object
-#             try:
-#                 if triple_object.find('http://variable.org/') >= 0:
-#                     triple_object = triple_object.replace('<http://variable.org/', '?').replace('>', '')
-#                     var_list_string += str(triple_object) + ' '  # register the variable to a list
-#                     # self.var_list.append(str(triple_object))  # also append the variable to a list
-#                 else:
-#                     self.const_dict[triple_predicate] = triple_object
-#             except KeyError:
-#                 pass  # object is not a variable
-#             if triple_predicate.find('http://value.org/operation') >= 0 or triple_object.find('?') >= 0:
-#                 sparql_query += f""" ?s <{triple_predicate}> {triple_object} . """
-#
-#         sparql_query += f'}}'  # close the sparql query
-#         sparql_query = sparql_query.replace('VAR_LIST', var_list_string)  # insert variables list
-#         self.label = str(rule_left_label)
-#         self.var_list = var_list_string.strip().split(' ')
-#         self.content = sparql_query
-#         self.bindings = results_for_left_content.bindings
-#         return self
+class ClassRuleLeft(ClassClause):  # left side of a rule
+    """Left side of a rule.
+
+    Attributes:
+        label: id for the left part of the rule
+        content: sparql query for finding applicable rules
+        bindings:
+        var_list: a list of variables in the triple
+        const_dict: dict of constants in object with the correspondent predicate
+        predicate_object_dict: dict for finding object from predicate as a key
+        forward_bindings:
+        backward_bindings:
+    """
+    def __init__(self, graph, subject):
+        """
+        Initialize ClassRuleLeft class.
+        """
+        super().__init__()
+        self.list_of_triples: list[ClassTriple] = []
+        self.operation_name_uri: str = ''  # ex. http://value.org/add_number
+        self.predicate_object_dict: dict[str, str] = {}  # subject is unnamed and common among triples
+        self.set_of_variables_in_query: set[tuple[str, str]] = set()  # [(object_variable, predicate)]
+        self.set_of_half_variables: set[tuple[str, str]] = set()  # SOME:x
+        self.variables_of_interest: set[str] = set()
+
+        self.label = None  # id for the left part of the rule
+        self.content = None  # sparql query for finding applicable rules
+        self.bindings = {}
+        # self.var_list = []  # a list of variables in the triple
+        self.const_dict = {}  # dict of constants in object with the correspondent predicate
+        self.forward_bindings = {}
+        self.backward_bindings = {}
+        query_for_rule_left = f"""
+            SELECT ?left WHERE {{ <{subject}> {uri_ref_ext('left_side')} ?left }}
+        """
+        results_for_rule_left = graph.query(query_for_rule_left)
+        bindings = results_for_rule_left.bindings
+        if len(bindings) > 0:
+            self.from_query(graph, bindings[0]['left'])
+        pass
+
+    def build(self, graph: Graph, rule_left_label):  # executed at the initial stage
+        """Build the left side part of a rule from the label.
+        Executed at the initial stage.
+
+        Args:
+            graph (Graph):
+            rule_left_label:
+
+        Returns:
+
+        """
+        self.label = None  # label for the left side part of a rule
+        self.content = None
+        self.bindings = {}
+        self.var_list = []
+        self.const_dict = {}  # dict of constants in object with the corresponding predicate
+        self.predicate_object_dict = {}  # dict for finding object from predicate as a key
+
+        # print('DETECTED LEFT RULE: ', rule_left_label)  # left side rule in returned as an object  # debug
+        # get the actual rules of the left side
+        query_for_left_content = f"""
+            SELECT ?p ?o WHERE {{
+            <{str(rule_left_label)}> ?p ?o . }}"""  # extract content of left side rule from the label
+        results_for_left_content = graph.query(query_for_left_content)  # execute a query
+
+        var_list_string = '?s '  # build VAR_LIST of sparql query for left side rule
+        # self.var_list.append('?s')  # also store the variables in a list
+        sparql_query = f"""SELECT VAR_LIST WHERE {{ """  # VAR_LIST will be replaced at the end
+        for bindings_for_left_content in results_for_left_content.bindings:  # analyze the query results
+            triple_predicate = bindings_for_left_content['p']  # predicate part of the left side of a rule
+            triple_object0 = bindings_for_left_content['o']  # object part of the left side of a rule
+            triple_object = f'<{triple_object0}>'  # convert object to URI string
+            self.predicate_object_dict[triple_predicate] = triple_object
+            try:
+                if triple_object.find('http://variable.org/') >= 0:
+                    triple_object = triple_object.replace('<http://variable.org/', '?').replace('>', '')
+                    var_list_string += str(triple_object) + ' '  # register the variable to a list
+                    # self.var_list.append(str(triple_object))  # also append the variable to a list
+                else:
+                    self.const_dict[triple_predicate] = triple_object
+            except KeyError:
+                pass  # object is not a variable
+            if triple_predicate.find('http://value.org/operation') >= 0 or triple_object.find('?') >= 0:
+                sparql_query += f""" ?s <{triple_predicate}> {triple_object} . """
+
+        sparql_query += f'}}'  # close the sparql query
+        sparql_query = sparql_query.replace('VAR_LIST', var_list_string)  # insert variables list
+        self.label = str(rule_left_label)
+        self.var_list = var_list_string.strip().split(' ')
+        self.content = sparql_query
+        self.bindings = results_for_left_content.bindings
+        return self
 
 
-# class ClassRuleRight(ClassClauses):  # right side of a rule
-#     """Right side of a rule.
-#
-#     Attributes:
-#         child (ClassRuleRightChild): child of the right side clause.
-#     """
-#     def __init__(self):
-#         """Initialize ClassRuleRight class.
-#         """
-#         super().__init__()
-#         # self.child = ClassRuleRightChild()  # right side clause has one child, which in turn has one or more grandchild
-#
-#     def build(self, graph: Graph, right_side_for_child):  # executed at the initial stage
-#         """Build the right side clause of a rule.
-#         Executed at the initial stage.
-#
-#         Args:
-#             graph (Graph):
-#             right_side_for_child:
-#
-#         Returns:
-#
-#         """
-#         # print('CHILD RULE: ' + str(right_side_for_child[0]))  # debug
-#         query_for_child = f"""SELECT ?o WHERE {{ <{str(right_side_for_child[0])}> <{uri_ref("child")}> ?o .}} """
-#         results_of_right_side_child = graph.query(query_for_child)  # query by the child name
-#
-#         self.child.build(graph, results_of_right_side_child.bindings[0])  # build a child from the query results
-#         return self
-#
-#     def revise(self, right_clauses, bindings):  # bindingsは辞書型
-#         """
-#
-#         Args:
-#             right_clauses:
-#             bindings (dict[str, str]):
-#
-#         Returns:
-#
-#         """
-#         for grandchild in right_clauses.child.grandchildren:
-#             pass
-#             # grandchild_revised = ClassRightGrandChild()  # create a new grandchild
-#             # new_term = grandchild.triple.subject.revise(bindings)
-#             # grandchild_revised.triple.subject.build(new_term)  # subject
-#             # new_term = grandchild.triple.predicate.revise(bindings)
-#             # grandchild_revised.triple.predicate.build(new_term)  # predicate
-#             # new_term = grandchild.triple.object.revise(bindings)
-#             # grandchild_revised.triple.object.build(new_term)  # object
-#             # self.child.grandchildren.append(grandchild_revised)  # append the grandchild to the grandchildren
-#         return self
+class ClassRuleRight:  # right side of a rule
+    """Right side of a rule.
+
+    Attributes:
+        child (ClassRuleRightChild): child of the right side clause.
+    """
+    def __init__(self):
+        """Initialize ClassRuleRight class.
+        """
+        super().__init__()
+        self.child = ClassRuleRightChild()  # right side clause has one child, which in turn has one or more grandchild
+
+    def build(self, graph: Graph, right_side_for_child):  # executed at the initial stage
+        """Build the right side clause of a rule.
+        Executed at the initial stage.
+
+        Args:
+            graph (Graph):
+            right_side_for_child:
+
+        Returns:
+
+        """
+        # print('CHILD RULE: ' + str(right_side_for_child[0]))  # debug
+        query_for_child = f"""SELECT ?o WHERE {{ <{str(right_side_for_child[0])}> <{uri_ref("child")}> ?o .}} """
+        results_of_right_side_child = graph.query(query_for_child)  # query by the child name
+
+        self.child.build(graph, results_of_right_side_child.bindings[0])  # build a child from the query results
+        return self
+
+    def revise(self, right_clauses, bindings):  # bindingsは辞書型
+        """
+
+        Args:
+            right_clauses:
+            bindings (dict[str, str]):
+
+        Returns:
+
+        """
+        for grandchild in right_clauses.child.grandchildren:
+            pass
+            # grandchild_revised = ClassRightGrandChild()  # create a new grandchild
+            # new_term = grandchild.triple.subject.revise(bindings)
+            # grandchild_revised.triple.subject.build(new_term)  # subject
+            # new_term = grandchild.triple.predicate.revise(bindings)
+            # grandchild_revised.triple.predicate.build(new_term)  # predicate
+            # new_term = grandchild.triple.object.revise(bindings)
+            # grandchild_revised.triple.object.build(new_term)  # object
+            # self.child.grandchildren.append(grandchild_revised)  # append the grandchild to the grandchildren
+        return self
 
 
-# class ClassRuleRightChild:  # right side child of a rule
-#     """
-#     right side child of a rule
-#
-#     Attributes:
-#         grandchildren:
-#     """
-#     def __init__(self):  # child has grandchildren
-#         """
-#         child has a list of grandchildren
-#         """
-#         self.grandchildren = []
-#
-#     def build(self, graph, result_for_grandchild):  # build the right side of a rule
-#         """
-#         build the right side of a rule
-#
-#         Args:
-#             graph:
-#             result_for_grandchild:
-#
-#         Returns:
-#             self:
-#         """
-#         self.grandchildren = []
-#         query_for_grandchild = SELECT ?s ?p ?o WHERE ' \
-#                                f'{{ <{result_for_grandchild["o"]}> ?p ?o . }}'  # find grandchildren of a rule
-#         results_for_grandchild = graph.query(query_for_grandchild)  # execute the query
-#         # get grand child rules from grand child name
-#         # print('NUMBER OF GRAND CHILD RULES: ' + str(len(results_for_grandchild)))  # debug
-#         for triple_for_grandchild in results_for_grandchild:
-#             # print('PREDICATE AND OBJECT OF GRAND CHILD RULE WERE: '
-#             #       + str(triple_for_grandchild['p']) + ' '
-#             #       + str(triple_for_grandchild['o']))  # debug
-#             triple = {'s': result_for_grandchild["o"], 'p': triple_for_grandchild['p'], 'o': triple_for_grandchild['o']}
-#             grandchild = ClassRightGrandChild().build(triple)  # build a grandchild from the triple
-#             self.grandchildren.append(grandchild)  # append the grandchild to the grandchildren
-#         return self
-#
-#     def revise(self, clause, bindings):  # revise the right side of a rule
-#         """
-#         revise the right side of a rule
-#
-#         Args:
-#             clause:
-#             bindings:
-#
-#         Returns:
-#             self:
-#         """
-#         for grandchild in clause.child.grandchildren:
-#             grandchild_revised = ClassRightGrandChild()  # create a new grandchild
-#             new_term = grandchild.triple.subject.revise(bindings)
-#             grandchild_revised.triple.subject.build(new_term)  # revise the subject
-#             grandchild_revised.triple.predicate.build(grandchild.triple.predicate.revise(bindings))  # predicate
-#             grandchild_revised.triple.object.build(grandchild.triple.object.revise(bindings))  # object
-#             self.grandchildren.append(grandchild_revised)  # append the revised grandchild
-#
-#
+class ClassRuleRightChild:  # right side child of a rule
+    """
+    right side child of a rule
+
+    Attributes:
+        clause (ClassClause): triples contained in this right child
+
+    """
+    def __init__(self):  # child has grandchildren
+        """
+        child has a list of grandchildren
+        """
+        self.clause: ClassClause | None = None
+
+    def build(self, graph, result_for_clause):  # build the right side of a rule
+        """Build the right side of a rule
+
+        Args:
+            graph:
+            result_for_clause:
+
+        Returns:
+            self:
+        """
+        self.clause = None
+        query_for_clause = f'SELECT ?s ?p ?o WHERE ' \
+                               f'{{ <{result_for_clause["o"]}> ?p ?o . }}'  # find grandchildren of a rule
+        results_for_clause = graph.query(query_for_clause)  # execute the query
+        # get grand child rules from grand child name
+        # print('NUMBER OF GRAND CHILD RULES: ' + str(len(results_for_grandchild)))  # debug
+        for triple_for_grandchild in results_for_clause:
+            # print('PREDICATE AND OBJECT OF GRAND CHILD RULE WERE: '
+            #       + str(triple_for_grandchild['p']) + ' '
+            #       + str(triple_for_grandchild['o']))  # debug
+            triple = {'s': result_for_clause["o"], 'p': triple_for_grandchild['p'], 'o': triple_for_grandchild['o']}
+            grandchild = ClassRightGrandChild().build(triple)  # build a grandchild from the triple
+            self.grandchildren.append(grandchild)  # append the grandchild to the grandchildren
+        return self
+
+    def revise(self, clause, bindings):  # revise the right side of a rule
+        """
+        revise the right side of a rule
+
+        Args:
+            clause:
+            bindings:
+
+        Returns:
+            self:
+        """
+        for grandchild in clause.child.grandchildren:
+            grandchild_revised = ClassRightGrandChild()  # create a new grandchild
+            new_term = grandchild.triple.subject.revise(bindings)
+            grandchild_revised.triple.subject.build(new_term)  # revise the subject
+            grandchild_revised.triple.predicate.build(grandchild.triple.predicate.revise(bindings))  # predicate
+            grandchild_revised.triple.object.build(grandchild.triple.object.revise(bindings))  # object
+            self.grandchildren.append(grandchild_revised)  # append the revised grandchild
+
+
 # class ClassRightGrandChild:  # grandchild of a rule having one triple
 #     """
 #     grandchild of a rule having one triple

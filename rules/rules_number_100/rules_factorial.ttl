@@ -12,6 +12,19 @@
 ##################################################################
 # rules
 
+VAL:rule_factorial_x_fact
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:factorial ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_fact VAR:_fact ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:factorial ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_fact VAR:_fact ] ;
+        VAL:id "1" ] .
+
 ##################################################################
 # controls
 
@@ -20,18 +33,12 @@
 
 VAL:function_factorial_x_fact
     VAL:type VAL:function ;
+    VAL:rule VAL:rule_factorial_x_fact ;
     VAL:left_side [
-        VAL:operation VAL:factorial ;
-        VAL:variable_x SOME:_x ;
-        VAL:variable_fact VAR:_fact ] ;
+        VAL:variable_x "some" ] ;
     VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:factorial ;
-            VAL:variable_x SOME:_x ;
-            VAL:variable_fact VAR:_fact ] ] ;
-
-    VAL:priority "1" .
+        VAL:id "1" ;
+        VAL:priority "1" ] .
 
 ##################################################################
 # applications

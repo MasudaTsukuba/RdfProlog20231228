@@ -9,63 +9,95 @@
 ##################################################################
 # rules
 
-##################################################################
-# controls
-
-VAL:control_fibonacci_number_1_1
-    VAL:type VAL:control ;
+VAL:rule_fibonacci_number_1_1
+    VAL:type VAL:rule ;
     VAL:left_side [
         VAL:operation VAL:fibonacci_number ;
         VAL:variable_x VAL:list_one ;
         VAL:variable_y VAL:list_one ] ;
-    VAL:priority "1" .
+    VAL:id "1" .
 
-VAL:control_fibonacci_number_2_1
-    VAL:type VAL:control ;
+VAL:rule_fibonacci_number_2_1
+    VAL:type VAL:rule ;
     VAL:left_side [
         VAL:operation VAL:fibonacci_number ;
         VAL:variable_x VAL:list_two ;
         VAL:variable_y VAL:list_one ] ;
-    VAL:priority "2" .
+    VAL:id "1" .
 
-VAL:control_fibonacci_number_sx_y
-    VAL:type VAL:control ;
+VAL:rule_fibonacci_number_sx_y
+    VAL:type VAL:rule ;
     VAL:left_side [
         VAL:operation VAL:fibonacci_number ;
-        VAL:variable_x SOME:_sx ;
+        VAL:variable_x VAR:_x ;
         VAL:variable_y VAR:_y ] ;
     VAL:right_side [
-        VAL:priority "1" ;
+        VAL:id "1" ;
         VAL:child [
             VAL:operation VAL:next_list_number ;
             VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_sx ] ] ;
+            VAL:variable_y VAR:_x ] ] ;
     VAL:right_side [
-        VAL:priority "2" ;
+        VAL:id "2" ;
         VAL:child [
             VAL:operation VAL:next_list_number ;
             VAL:variable_x VAR:_v ;
             VAL:variable_y VAR:_u ] ] ;
     VAL:right_side [
-        VAL:priority "3" ;
+        VAL:id "3" ;
         VAL:child [
             VAL:operation VAL:fibonacci_number ;
             VAL:variable_x VAR:_u ;
             VAL:variable_y VAR:_uf ] ] ;
     VAL:right_side [
-        VAL:priority "4" ;
+        VAL:id "4" ;
         VAL:child [
             VAL:operation VAL:fibonacci_number ;
             VAL:variable_x VAR:_v ;
             VAL:variable_y VAR:_vf ] ] ;
     VAL:right_side [
-        VAL:priority "5" ;
+        VAL:id "5" ;
         VAL:child [
-            VAL:operation VAL:add_number ;
+            VAL:operation VAL:list_add ;
             VAL:variable_x VAR:_uf ;
             VAL:variable_y VAR:_vf ;
-            VAL:variable_z VAR:_y ] ] ;
-    VAL:priority "3" .
+            VAL:variable_z VAR:_y ] ] .
+
+##################################################################
+# controls
+
+VAL:control_fibonacci_number_1_1
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_fibonacci_number_1_1 ;
+    VAL:left_side [
+        ] .
+
+VAL:control_fibonacci_number_2_1
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_fibonacci_number_2_1 ;
+    VAL:left_side [
+        ] .
+
+VAL:control_fibonacci_number_sx_y
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_fibonacci_number_sx_y ;
+    VAL:left_side [
+        VAL:variable_x "some" ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "3" ] ;
+    VAL:right_side [
+        VAL:id "4" ;
+        VAL:priority "4" ] ;
+    VAL:right_side [
+        VAL:id "5" ;
+        VAL:priority "5" ] .
 
 ##################################################################
 # applications

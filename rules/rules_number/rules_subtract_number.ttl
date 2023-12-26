@@ -27,24 +27,20 @@ VAL:rule_subtract_number_x_y_z
             VAL:operation VAL:add_number ;
             VAL:variable_x VAR:_y ;
             VAL:variable_y VAR:_z ;
-            VAL:variable_z VAR:_x ] ].
+            VAL:variable_z VAR:_x ] ;
+        VAL:id "1" ].
 
 ##################################################################
 # controls
 
 VAL:control_subtract_number_x_y_z
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_subtract_number_x_y_z ;
     VAL:left_side [
-        VAL:operation VAL:subtract_number ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y VAR:_y ;
-        VAL:variable_z VAR:_z ] ;
+     ] ;
     VAL:right_side [
-        VAL:child [
-            VAL:operation VAL:add_number ;
-            VAL:variable_x VAR:_y ;
-            VAL:variable_y VAR:_z ;
-            VAL:variable_z VAR:_x ] ].
+        VAL:id "1" ;
+        VAL:priority "1" ].
 
 ##################################################################
 # applications

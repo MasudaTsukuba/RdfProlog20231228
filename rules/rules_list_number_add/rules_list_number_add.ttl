@@ -1,0 +1,170 @@
+# rules_list_number_add.ttl
+#
+# T. Masuda, 2023/12/26
+
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+################################################################################
+# facts
+
+VAL:node_one
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:one ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_one .
+
+VAL:node_two
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:two ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_two .
+
+VAL:node_three
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:three ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_three .
+
+VAL:node_four
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:four ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_four .
+
+VAL:node_five
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:five ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_five .
+
+VAL:node_six
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:six ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_six .
+
+VAL:node_seven
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:seven ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_seven .
+
+VAL:node_eight
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:eight ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_eight .
+
+VAL:node_nine
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:nine ;
+    VAL:variable_y VAL:nil ;
+    VAL:variable_z VAL:list_nine .
+
+VAL:node_ten
+    VAL:type VAL:fact ;
+    VAL:operation VAL:cons ;
+    VAL:variable_x VAL:zero ;
+    VAL:variable_y VAL:list_one ;
+    VAL:variable_z VAL:list_ten .
+
+################################################################################
+# rules
+
+VAL:rule_list_number_add_x_1_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:list_add ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAL:list_one ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:next_list_number ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_z ] ;
+        VAL:id "1" ] .
+
+VAL:rule_list_number_add_x_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:list_add ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:next_list_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ;
+        VAL:id "1" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:list_add ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_v ] ;
+        VAL:id "2" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:next_list_number ;
+            VAL:variable_x VAR:_v ;
+            VAL:variable_y VAR:_z ] ;
+        VAL:id "3" ] .
+
+################################################################################
+# controls
+
+VAL:control_list_number_add_x_1_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_list_number_add_x_1_z ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] .
+
+VAL:control_list_number_add_x_y_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_list_number_add_x_y_z ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "3" ] .
+
+##################################################################
+# applications
+
+VAL:application_list_add_x_y_z
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:list_add ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_list_number_add_x_1_z ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_list_number_add_x_y_z ;
+        VAL:priority "2" ] ;
+    VAL:priority "1" .

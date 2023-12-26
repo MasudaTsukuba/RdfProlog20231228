@@ -1,5 +1,5 @@
-# rules_fibonacchi_number_100.ttl
-# rules for calculating fibonacchi numbers.
+# rules_fibonacci_number_100.ttl
+# rules for calculating fibonacci numbers.
 # T. Masuda, 2023/12/14
 
 @prefix VAL: <http://value.org/> .
@@ -12,129 +12,112 @@
 ##################################################################
 # rules
 
-VAL:rule_fibonacchi_number_1_1
+VAL:rule_fibonacci_number_1_1
     VAL:type VAL:rule ;
     VAL:left_side [
-        VAL:operation VAL:fibonacchi_number ;
+        VAL:operation VAL:fibonacci_number ;
         VAL:variable_x VAL:1 ;
         VAL:variable_y VAL:1 ] .
 
-VAL:rule_fibonacchi_number_2_1
+VAL:rule_fibonacci_number_2_1
     VAL:type VAL:rule ;
     VAL:left_side [
-        VAL:operation VAL:fibonacchi_number ;
+        VAL:operation VAL:fibonacci_number ;
         VAL:variable_x VAL:2 ;
         VAL:variable_y VAL:1 ] .
 
-VAL:rule_fibonacchi_number_x_y
+VAL:rule_fibonacci_number_x_y
     VAL:type VAL:rule ;
     VAL:left_side [
-        VAL:operation VAL:fibonacchi_number ;
+        VAL:operation VAL:fibonacci_number ;
         VAL:variable_x VAR:_x ;
         VAL:variable_y VAR:_y ] ;
     VAL:right_side [
         VAL:child [
             VAL:operation VAL:next_number ;
             VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_x ] ] ;
+            VAL:variable_y VAR:_x ] ;
+        VAL:id "1" ] ;
     VAL:right_side [
         VAL:child [
             VAL:operation VAL:next_number ;
             VAL:variable_x VAR:_v ;
-            VAL:variable_y VAR:_u ] ] ;
+            VAL:variable_y VAR:_u ] ;
+        VAL:id "2" ] ;
     VAL:right_side [
         VAL:child [
-            VAL:operation VAL:fibonacchi_number ;
+            VAL:operation VAL:fibonacci_number ;
             VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_uf ] ] ;
+            VAL:variable_y VAR:_uf ] ;
+        VAL:id "3" ] ;
     VAL:right_side [
         VAL:child [
-            VAL:operation VAL:fibonacchi_number ;
+            VAL:operation VAL:fibonacci_number ;
             VAL:variable_x VAR:_v ;
-            VAL:variable_y VAR:_vf ] ] ;
+            VAL:variable_y VAR:_vf ] ;
+        VAL:id "4" ] ;
     VAL:right_side [
         VAL:child [
             VAL:operation VAL:add_number ;
             VAL:variable_x VAR:_uf ;
             VAL:variable_y VAR:_vf ;
-            VAL:variable_z VAR:_y ] ] .
+            VAL:variable_z VAR:_y ] ;
+        VAL:id "5" ] .
 
 ##################################################################
 # controls
 
-VAL:control_fibonacchi_number_1_1
+VAL:control_fibonacci_number_1_1
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_fibonacci_number_1_1 ;
     VAL:left_side [
-        VAL:operation VAL:fibonacchi_number ;
-        VAL:variable_x VAL:1 ;
-        VAL:variable_y VAL:1 ] ;
-    VAL:priority "1" .
+        ] .
 
-VAL:control_fibonacchi_number_2_1
+VAL:control_fibonacci_number_2_1
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_fibonacci_number_2_1 ;
     VAL:left_side [
-        VAL:operation VAL:fibonacchi_number ;
-        VAL:variable_x VAL:2 ;
-        VAL:variable_y VAL:1 ] ;
-    VAL:priority "2" .
+        ] .
 
-VAL:control_fibonacchi_number_sx_y
+VAL:control_fibonacci_number_sx_y
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_fibonacci_number_x_y ;
     VAL:left_side [
-        VAL:operation VAL:fibonacchi_number ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y VAR:_y ] ;
+        VAL:variable_x "some" ] ;
     VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:next_number ;
-            VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_sx ] ] ;
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
     VAL:right_side [
-        VAL:priority "2" ;
-        VAL:child [
-            VAL:operation VAL:next_number ;
-            VAL:variable_x VAR:_v ;
-            VAL:variable_y VAR:_u ] ] ;
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
     VAL:right_side [
-        VAL:priority "3" ;
-        VAL:child [
-            VAL:operation VAL:fibonacchi_number ;
-            VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_uf ] ] ;
+        VAL:id "3" ;
+        VAL:priority "3" ] ;
     VAL:right_side [
-        VAL:priority "4" ;
-        VAL:child [
-            VAL:operation VAL:fibonacchi_number ;
-            VAL:variable_x VAR:_v ;
-            VAL:variable_y VAR:_vf ] ] ;
+        VAL:id "4" ;
+        VAL:priority "4" ] ;
     VAL:right_side [
-        VAL:priority "5" ;
-        VAL:child [
-            VAL:operation VAL:add_number ;
-            VAL:variable_x VAR:_uf ;
-            VAL:variable_y VAR:_vf ;
-            VAL:variable_z VAR:_y ] ] ;
-    VAL:priority "3" .
+        VAL:id "5" ;
+        VAL:priority "5" ] .
 
 ##################################################################
 # applications
 
-VAL:application_fibonacchi_number_sx_y
+VAL:application_fibonacci_number_sx_y
    VAL:type VAL:application ;
     VAL:program VAL:true ;
     VAL:pattern [
-        VAL:operation VAL:fibonacchi_number ;
+        VAL:operation VAL:fibonacci_number ;
         VAL:variable_x SOME:_x ;
         VAL:variable_y VAR:_y ] ;
     VAL:use [
-        VAL:control VAL:control_fibonacchi_number_1_1 ;
+        VAL:control VAL:control_fibonacci_number_1_1 ;
         VAL:priority "1" ] ;
     VAL:use [
-        VAL:control VAL:control_fibonacchi_number_2_1 ;
+        VAL:control VAL:control_fibonacci_number_2_1 ;
         VAL:priority "2" ] ;
    VAL:use [
-        VAL:control VAL:control_fibonacchi_number_sx_y ;
+        VAL:control VAL:control_fibonacci_number_sx_y ;
         VAL:priority "3" ] ;
     VAL:priority "1".
 

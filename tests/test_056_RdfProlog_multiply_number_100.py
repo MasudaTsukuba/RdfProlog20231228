@@ -89,7 +89,7 @@ def test_answer_question5_multiply_ans_2_6():
         ?s <http://value.org/variable_z> <http://value.org/6> .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=10)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=20)
     assert resolve_bindings[0]['?ans'] == f'http://value.org/3'
 
 
@@ -103,7 +103,7 @@ def test_answer_question6_multiply_3_ans_12():
         ?s <http://value.org/variable_z> <http://value.org/12> .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=30)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=40)
     assert resolve_bindings[0]['?ans'] == f'http://value.org/4'
 
 
@@ -138,7 +138,7 @@ def test_answer_complex_question2():
         ?s2 <http://value.org/variable_z> ?ans .
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=200)
     assert resolve_bindings[0]['?ans'] == f'http://value.org/30'
 
 

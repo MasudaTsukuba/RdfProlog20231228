@@ -1,4 +1,4 @@
-# rules_list_number_math.ttl
+# rules_list_number_math/rules_list_number_math.ttl
 # rules for add, subtract, multiply and divide for list numbers
 # T. Masuda, 2023/12/22
 
@@ -12,379 +12,191 @@
 ################################################################################
 # rules
 
-VAL:rule_list_number_add_x_1_z
+VAL:rule_list_number_subtract_x_y_z
     VAL:type VAL:rule ;
     VAL:left_side [
-        VAL:operation VAL:list_add ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y VAL:list_one ;
-        VAL:variable_z VAR:_z ] ;
-    VAL:right_side [
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_z ] ] .
-
-VAL:rule_list_number_add_x_y_z
-    VAL:type VAL:rule ;
-    VAL:left_side [
-        VAL:operation VAL:list_add ;
+        VAL:operation VAL:list_subtract ;
         VAL:variable_x VAR:_x ;
         VAL:variable_y VAR:_y ;
         VAL:variable_z VAR:_z ] ;
     VAL:right_side [
+        VAL:id "1" ;
+        VAL:child [
+            VAL:operation VAL:list_add ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_z ;
+            VAL:variable_z VAR:_x ] ] .
+
+VAL:rule_list_number_multiply_x_1_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:list_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAL:list_one ;
+        VAL:variable_z VAR:_x ] .
+
+VAL:rule_list_number_multiply_1_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:list_multiply ;
+        VAL:variable_x VAL:list_one ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_y ] .
+
+VAL:rule_list_number_multiply_sx_sy_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:list_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:id "1" ;
         VAL:child [
             VAL:operation VAL:next_list_number ;
             VAL:variable_x VAR:_u ;
             VAL:variable_y VAR:_y ] ] ;
     VAL:right_side [
-        VAL:child [
-            VAL:operation VAL:list_add ;
-            VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_u ;
-            VAL:variable_z VAR:_v ] ] ;
-    VAL:right_side [
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_v ;
-            VAL:variable_y VAR:_z ] ] .
-
-################################################################################
-# controls
-
-VAL:control_list_number_add_x_1_z
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_add ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y VAL:list_one ;
-        VAL:variable_z VAR:_z ] ;
-    VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_z ] ] .
-
-VAL:control_list_number_add_1_y_z
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_add ;
-        VAL:variable_x VAL:list_one ;
-        VAL:variable_y VAR:_y ;
-        VAL:variable_z VAR:_z ] ;
-    VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_y ;
-            VAL:variable_y VAR:_z ] ] .
-
-VAL:control_list_number_add_sx_sy_z
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_add ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y SOME:_sy ;
-        VAL:variable_z VAR:_z ] ;
-    VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_sy ] ] ;
-    VAL:right_side [
-        VAL:priority "2" ;
-        VAL:child [
-            VAL:operation VAL:list_add ;
-            VAL:variable_x VAR:_sx ;
-            VAL:variable_y VAR:_u ;
-            VAL:variable_z VAR:_v ] ] ;
-    VAL:right_side [
-        VAL:priority "3" ;
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_v ;
-            VAL:variable_y VAR:_z ] ] .
-
-VAL:control_list_number_add_sx_y_sz
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_add ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y VAR:_y ;
-        VAL:variable_z SOME:_sz ] ;
-    VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_sx ] ] ;
-    VAL:right_side [
-        VAL:priority "2" ;
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_v ;
-            VAL:variable_y VAR:_sz ] ] ;
-    VAL:right_side [
-        VAL:priority "3" ;
-        VAL:child [
-            VAL:operation VAL:list_add ;
-            VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_y ;
-            VAL:variable_z VAR:_v ] ] .
-
-VAL:control_list_number_add_x_sy_sz
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_add ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y SOME:_sy ;
-        VAL:variable_z SOME:_sz ] ;
-    VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_sy ] ] ;
-    VAL:right_side [
-        VAL:priority "2" ;
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_v ;
-            VAL:variable_y VAR:_sz ] ] ;
-    VAL:right_side [
-        VAL:priority "3" ;
-        VAL:child [
-            VAL:operation VAL:list_add ;
-            VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_u ;
-            VAL:variable_z VAR:_v ] ] .
-
-VAL:control_list_number_subtract_sx_sy_z
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_subtract ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y SOME:_sy ;
-        VAL:variable_z VAR:_z ] ;
-    VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:list_add ;
-            VAL:variable_x VAR:_sy ;
-            VAL:variable_y VAR:_z ;
-            VAL:variable_z VAR:_sx ] ] .
-
-VAL:control_list_number_subtract_sx_y_sz
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_subtract ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y VAR:_y ;
-        VAL:variable_z SOME:_sz ] ;
-    VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:list_subtract ;
-            VAL:variable_x VAR:_sx ;
-            VAL:variable_y VAR:_sz ;
-            VAL:variable_z VAR:_y ] ] .
-
-VAL:control_list_number_subtract_x_sy_sz
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_subtract ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y SOME:_sy ;
-        VAL:variable_z SOME:_sz ] ;
-    VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:list_add ;
-            VAL:variable_x VAR:_sy ;
-            VAL:variable_y VAR:_sz ;
-            VAL:variable_z VAR:_x ] ] .
-
-VAL:control_list_number_multiply_x_1_z
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_multiply ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y VAL:list_one ;
-        VAL:variable_z VAR:_x ] ;
-    VAL:right_side [
-        VAL:priority "1" ] .
-
-VAL:control_list_number_multiply_1_y_z
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_multiply ;
-        VAL:variable_x VAL:list_one ;
-        VAL:variable_y VAR:_y ;
-        VAL:variable_z VAR:_y ] ;
-    VAL:right_side [
-        VAL:priority "1" ] .
-
-VAL:control_list_number_multiply_sx_sy_z
-    VAL:type VAL:control ;
-    VAL:left_side [
-        VAL:operation VAL:list_multiply ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y SOME:_sy ;
-        VAL:variable_z VAR:_z ] ;
-    VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:next_list_number ;
-            VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_sy ] ] ;
-    VAL:right_side [
-        VAL:priority "2" ;
+        VAL:id "2" ;
         VAL:child [
             VAL:operation VAL:list_multiply ;
-            VAL:variable_x VAR:_sx ;
+            VAL:variable_x VAR:_x ;
             VAL:variable_y VAR:_u ;
             VAL:variable_z VAR:_v ] ] ;
     VAL:right_side [
-        VAL:priority "3" ;
+        VAL:id "3" ;
         VAL:child [
             VAL:operation VAL:list_add ;
-            VAL:variable_x VAR:_sx ;
+            VAL:variable_x VAR:_x ;
             VAL:variable_y VAR:_v ;
             VAL:variable_z VAR:_z ] ] .
 
-VAL:control_list_number_multiply_sx_y_sz
-    VAL:type VAL:control ;
+VAL:rule_list_number_multiply_sx_y_sz
+    VAL:type VAL:rule ;
     VAL:left_side [
         VAL:operation VAL:list_multiply ;
-        VAL:variable_x SOME:_sx ;
+        VAL:variable_x VAR:_x ;
         VAL:variable_y VAR:_y ;
-        VAL:variable_z SOME:_sz ] ;
+        VAL:variable_z VAR:_z ] ;
     VAL:right_side [
-        VAL:priority "1" ;
+        VAL:id "1" ;
         VAL:child [
             VAL:operation VAL:list_subtract ;
-            VAL:variable_x VAR:_sz ;
-            VAL:variable_y VAR:_sx ;
+            VAL:variable_x VAR:_z ;
+            VAL:variable_y VAR:_x ;
             VAL:variable_z VAR:_u] ] ;
     VAL:right_side [
-        VAL:priority "2" ;
+        VAL:id "2" ;
         VAL:child [
             VAL:operation VAL:list_multiply ;
-            VAL:variable_x VAR:_sx ;
+            VAL:variable_x VAR:_x ;
             VAL:variable_y VAR:_v ;
             VAL:variable_z VAR:_u ] ] ;
     VAL:right_side [
-        VAL:priority "3" ;
+        VAL:id "3" ;
         VAL:child [
             VAL:operation VAL:next_list_number ;
             VAL:variable_x VAR:_v ;
             VAL:variable_y VAR:_y ] ] .
 
-VAL:control_list_number_divide_sx_sy_z
-    VAL:type VAL:control ;
+VAL:rule_list_number_divide_sx_sy_z
+    VAL:type VAL:rule ;
     VAL:left_side [
         VAL:operation VAL:list_divide ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y SOME:_sy ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
         VAL:variable_z VAR:_z ] ;
     VAL:right_side [
-        VAL:priority "1" ;
+        VAL:id "1" ;
         VAL:child [
             VAL:operation VAL:list_multiply ;
-            VAL:variable_x VAR:_sy ;
+            VAL:variable_x VAR:_y ;
             VAL:variable_y VAR:_z ;
-            VAL:variable_z VAR:_sx ] ] .
+            VAL:variable_z VAR:_x ] ] .
+
+################################################################################
+# controls
+
+VAL:control_list_number_subtract_x_y_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_list_number_subtract_x_y_z ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] .
+
+VAL:control_list_number_multiply_x_1_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_list_number_multiply_x_1_z ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        ] .
+
+VAL:control_list_number_multiply_1_y_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_list_number_multiply_1_y_z ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        ] .
+
+VAL:control_list_number_multiply_sx_sy_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_list_number_multiply_sx_sy_z ;
+    VAL:left_side [
+        VAL:variable_x "some" ;
+        VAL:variable_y "some" ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "3" ] .
+
+VAL:control_list_number_multiply_sx_y_sz
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_list_number_multiply_sx_y_sz ;
+    VAL:left_side [
+        VAL:variable_x "some" ;
+        VAL:variable_z "some" ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "3" ] .
+
+VAL:control_list_number_divide_sx_sy_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_list_number_divide_sx_sy_z ;
+    VAL:left_side [
+        VAL:variable_x "some" ;
+        VAL:variable_y "some" ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] .
 
 ##################################################################
 # applications
 
-VAL:application_list_add_sx_sy_z
-    VAL:type VAL:application ;
-    VAL:program VAL:false ;
-    VAL:pattern [
-        VAL:operation VAL:list_add ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y SOME:_sy ;
-        VAL:variable_z VAR:_z ] ;
-    VAL:use [
-        VAL:control VAL:control_list_number_add_x_1_z ;
-        VAL:priority "1" ] ;
-    VAL:use [
-        VAL:control VAL:control_list_number_add_sx_sy_z ;
-        VAL:priority "2" ] ;
-    VAL:priority "1" .
-
-VAL:application_list_add_sx_y_sz
-    VAL:type VAL:application ;
-    VAL:program VAL:false ;
-    VAL:pattern [
-        VAL:operation VAL:list_add ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y VAR:_y ;
-        VAL:variable_z SOME:_sz ] ;
-    VAL:use [
-        VAL:control VAL:control_list_number_add_1_y_z ;
-        VAL:priority "1" ] ;
-    VAL:use [
-        VAL:control VAL:control_list_number_add_sx_y_sz ;
-        VAL:priority "2" ] ;
-    VAL:priority "1" .
-
-VAL:application_list_add_x_sy_sz
-    VAL:type VAL:application ;
-    VAL:program VAL:false ;
-    VAL:pattern [
-        VAL:operation VAL:list_add ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y SOME:_sy ;
-        VAL:variable_z SOME:_sz ] ;
-    VAL:use [
-        VAL:control VAL:control_list_number_add_x_1_z ;
-        VAL:priority "1" ] ;
-    VAL:use [
-        VAL:control VAL:control_list_number_add_x_sy_sz ;
-        VAL:priority "2" ] ;
-    VAL:priority "1" .
-
-VAL:application_list_subtract_sx_sy_z
-    VAL:type VAL:application ;
-    VAL:program VAL:false ;
-    VAL:pattern [
-        VAL:operation VAL:list_subtract ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y SOME:_sy ;
-        VAL:variable_z VAR:_z ] ;
-    VAL:use [
-        VAL:control VAL:control_list_number_subtract_sx_sy_z ;
-        VAL:priority "1" ] ;
-    VAL:priority "1" .
-
-VAL:application_list_subtract_sx_y_sz
-    VAL:type VAL:application ;
-    VAL:program VAL:false ;
-    VAL:pattern [
-        VAL:operation VAL:list_subtract ;
-        VAL:variable_x SOME:_sx ;
-        VAL:variable_y VAR:_y ;
-        VAL:variable_z SOME:_sz ] ;
-    VAL:use [
-        VAL:control VAL:control_list_number_subtract_sx_y_sz ;
-        VAL:priority "1" ] ;
-    VAL:priority "1" .
-
-
-VAL:application_list_subtract_x_sy_sz
+VAL:application_list_subtract_x_y_z
     VAL:type VAL:application ;
     VAL:program VAL:false ;
     VAL:pattern [
         VAL:operation VAL:list_subtract ;
         VAL:variable_x VAR:_x ;
-        VAL:variable_y SOME:_sy ;
-        VAL:variable_z SOME:_sz ] ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
     VAL:use [
-        VAL:control VAL:control_list_number_subtract_x_sy_sz ;
+        VAL:control VAL:control_list_number_subtract_x_y_z ;
         VAL:priority "1" ] ;
     VAL:priority "1" .
 

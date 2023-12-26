@@ -1,3 +1,7 @@
+# rules for addition of symbolic numbers
+# rules_add_number.ttl
+# T. Masuda, 2023/12/25
+
 @prefix VAL: <http://value.org/> .
 @prefix VAR: <http://variable.org/> .
 @prefix SOME: <http://some.org/> .
@@ -19,7 +23,8 @@ VAL:rule_add_number_x_1_z
         VAL:child [
             VAL:operation VAL:next_number ;
             VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_z ] ] .
+            VAL:variable_y VAR:_z ]  ;
+        VAL:id "1" ] .
 
 VAL:rule_add_number_x_y_z
     VAL:type VAL:rule ;
@@ -32,64 +37,48 @@ VAL:rule_add_number_x_y_z
         VAL:child [
             VAL:operation VAL:next_number ;
             VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_y ] ] ;
+            VAL:variable_y VAR:_y ] ;
+        VAL:id "1" ] ;
     VAL:right_side [
         VAL:child [
             VAL:operation VAL:add_number ;
             VAL:variable_x VAR:_x ;
             VAL:variable_y VAR:_u ;
-            VAL:variable_z VAR:_v ] ] ;
+            VAL:variable_z VAR:_v ] ;
+        VAL:id "2" ] ;
     VAL:right_side [
         VAL:child [
             VAL:operation VAL:next_number ;
             VAL:variable_x VAR:_v ;
-            VAL:variable_y VAR:_z ] ] .
+            VAL:variable_y VAR:_z ] ;
+        VAL:id "3" ] .
 
 ##################################################################
 # controls
 
 VAL:control_add_number_x_1_z
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_add_number_x_1_z ;
     VAL:left_side [
-        VAL:operation VAL:add_number ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y VAL:one ;
-        VAL:variable_z VAR:_z ] ;
+         ] ;
     VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:next_number ;
-            VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_z ] ] ;
-    VAL:priority "1" .
+        VAL:id "1" ;
+        VAL:priority "1" ] .
 
 VAL:control_add_number_x_y_z
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_add_number_x_y_z ;
     VAL:left_side [
-        VAL:operation VAL:add_number ;
-        VAL:variable_x VAR:_x ;
-        VAL:variable_y VAR:_y ;
-        VAL:variable_z VAR:_z ] ;
+         ] ;
     VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:next_number ;
-            VAL:variable_x VAR:_u ;
-            VAL:variable_y VAR:_y ] ] ;
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
     VAL:right_side [
-        VAL:priority "2" ;
-        VAL:child [
-            VAL:operation VAL:add_number ;
-            VAL:variable_x VAR:_x ;
-            VAL:variable_y VAR:_u ;
-            VAL:variable_z VAR:_v ] ] ;
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
     VAL:right_side [
-        VAL:priority "3" ;
-        VAL:child [
-            VAL:operation VAL:next_number ;
-            VAL:variable_x VAR:_v ;
-            VAL:variable_y VAR:_z ] ] ;
-    VAL:priority "2" .
+        VAL:id "3" ;
+        VAL:priority "3" ] .
 
 ##################################################################
 # applications

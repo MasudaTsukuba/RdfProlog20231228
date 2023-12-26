@@ -42,7 +42,8 @@ VAL:rule_knows
         VAL:child [
             VAL:operation VAL:knows_indirect ;
             VAL:variable_x VAR:x ;
-            VAL:variable_y VAR:y ] ] .
+            VAL:variable_y VAR:y ] ;
+        VAL:id "1" ] .
 
 VAL:rule_knows_indirect1
     VAL:type VAL:rule ;
@@ -54,7 +55,8 @@ VAL:rule_knows_indirect1
         VAL:child [
             VAL:operation VAL:knows_direct ;
             VAL:variable_x VAR:x ;
-            VAL:variable_y VAR:y ] ] .
+            VAL:variable_y VAR:y ] ;
+        VAL:id "1" ] .
 
 VAL:rule_knows_indirect2
     VAL:type VAL:rule ;
@@ -66,60 +68,47 @@ VAL:rule_knows_indirect2
         VAL:child [
             VAL:operation VAL:knows_direct ;
             VAL:variable_x VAR:x ;
-            VAL:variable_y VAR:u ] ] ;
+            VAL:variable_y VAR:u ] ;
+        VAL:id "1" ] ;
     VAL:right_side [
         VAL:child [
             VAL:operation VAL:knows_indirect ;
             VAL:variable_x VAR:u ;
-            VAL:variable_y VAR:y ] ] .
+            VAL:variable_y VAR:y ] ;
+        VAL:id "2" ] .
 
 ##################################################################
 # controls
 
 VAL:control_knows
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_knows ;
     VAL:left_side [
-        VAL:operation VAL:knows ;
-        VAL:variable_x VAR:x ;
-        VAL:variable_y VAR:y ] ;
+         ] ;
     VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:knows_indirect ;
-            VAL:variable_x VAR:x ;
-            VAL:variable_y VAR:y ] ] .
+        VAL:id "1" ;
+        VAL:priority "1" ] .
 
 VAL:control_knows_indirect1
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_knows_indirect1 ;
     VAL:left_side [
-        VAL:operation VAL:knows_indirect ;
-        VAL:variable_x VAR:x ;
-        VAL:variable_y VAR:y ] ;
+         ] ;
     VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:knows_direct ;
-            VAL:variable_x VAR:x ;
-            VAL:variable_y VAR:y ] ] .
+        VAL:id "1" ;
+        VAL:priority "1" ] .
 
 VAL:control_knows_indirect2
     VAL:type VAL:control ;
+    VAL:rule VAL:rule_knows_indirect2 ;
     VAL:left_side [
-        VAL:operation VAL:knows_indirect ;
-        VAL:variable_x VAR:x ;
-        VAL:variable_y VAR:y ] ;
+         ] ;
     VAL:right_side [
-        VAL:priority "1" ;
-        VAL:child [
-            VAL:operation VAL:knows_direct ;
-            VAL:variable_x VAR:x ;
-            VAL:variable_y VAR:u ] ] ;
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
     VAL:right_side [
-        VAL:priority "2" ;
-        VAL:child [
-            VAL:operation VAL:knows_indirect ;
-            VAL:variable_x VAR:u ;
-            VAL:variable_y VAR:y ] ] .
+        VAL:id "2" ;
+        VAL:priority "2" ] .
 
 ##################################################################
 # applications

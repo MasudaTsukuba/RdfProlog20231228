@@ -1,3 +1,7 @@
+# rules_list_number_math/rules_list_next_number.ttl
+#
+# T. Masuda, 2023/12/26
+
 @prefix VAL: <http://value.org/> .
 @prefix VAR: <http://variable.org/> .
 @prefix SOME: <http://some.org/> .
