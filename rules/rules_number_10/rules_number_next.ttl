@@ -1,4 +1,4 @@
-# rules_number/rules_next_number.ttl
+# rules_number_10/rules_number_next.ttl
 #
 # T. Masuda, 2023/12/26
 

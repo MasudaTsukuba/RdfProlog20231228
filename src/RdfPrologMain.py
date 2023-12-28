@@ -9,14 +9,7 @@ import os.path
 import logging
 
 from src.RdfClass import ClassSparqlQuery
-from src.RdfResolution import RdfProlog
-
-# set up the log file
-log_file_path = '../logs/debug.log'
-if os.path.exists(log_file_path):
-    os.remove(log_file_path)
-logging.basicConfig(filename=log_file_path, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-logging.debug('Starting debug log')
+from src.RdfResolution import RdfProlog, start_log
 
 
 def main():
@@ -27,6 +20,7 @@ def main():
     Returns:
 
     """
+    start_log()
 
     # next
     if True:  # next
@@ -113,7 +107,7 @@ def main():
 
     # add
     if True:
-        # rdf_prolog = RdfProlog(rules_folder='../rules/rules_number')
+        rdf_prolog = RdfProlog(rules_folder='../rules/rules_number')
 
         # add(3, 1, ?ans)
         my_question = f"""
@@ -211,17 +205,17 @@ def main():
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # rdf_prolog.answer_question(my_sparql_query)
-    #
-    #     # add(3, ?ans, 5)
-    #     my_question = f"""
-    #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s <http://value.org/variable_x> <http://value.org/three> .
-    #        ?s <http://value.org/variable_y> ?ans .
-    #        ?s <http://value.org/variable_z> <http://value.org/five> .
-    #        }}"""
-    #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # rdf_prolog.answer_question(my_sparql_query)
+
+        # add(3, ?ans, 5)
+        my_question = f"""
+           SELECT ?ans WHERE {{
+           ?s <http://value.org/operation> <http://value.org/add_number> .
+           ?s <http://value.org/variable_x> <http://value.org/three> .
+           ?s <http://value.org/variable_y> ?ans .
+           ?s <http://value.org/variable_z> <http://value.org/five> .
+           }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        rdf_prolog.answer_question(my_sparql_query)
 
         # add(1, ?y, ?z)
         my_question = f"""
@@ -892,7 +886,7 @@ def main():
 
      # list number math
     if True:
-        rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
+        # rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
 
         # next([9, 9], ?ans) = [0, 0, 1] means 100
         my_question = f"""
@@ -1063,7 +1057,7 @@ def main():
             ?s <http://value.org/variable_z> ?ans .
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=200)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=200)
 
         # fibinacci(1, ?ans) -> ?ans = 1
         my_question = f"""

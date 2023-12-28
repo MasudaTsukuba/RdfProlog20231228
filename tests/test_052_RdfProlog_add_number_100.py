@@ -211,7 +211,7 @@ def test_depth_limit_add_3_1_ans():
         ?s <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=2)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=1)
     assert len(resolve_bindings) == 0
 
 
@@ -225,6 +225,6 @@ def test_depth_limit_add_3_1_ans_2():
         ?s <http://value.org/variable_z> ?ans . 
         }}"""
     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=3)
+    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=2)
     assert len(resolve_bindings) == 1
     assert resolve_bindings[0]['?ans'] == 'http://value.org/4'
