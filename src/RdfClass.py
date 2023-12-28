@@ -13,6 +13,11 @@ from rdflib import Graph, URIRef, Variable  # , BNode
 from lark import Lark, Transformer, Token  # , Tree
 
 
+VAL = 'http://value.org/'
+VAR = 'http://variable.org/'
+SOME = 'http://some.org/'
+OPERATION = 'http://value.org/operation'
+
 def print_and_log(message: str):  # print to console and log file
     print(message)
     logging.debug(message)
@@ -31,7 +36,7 @@ def uri_ref(key_word: str, extension: bool = False, ref: bool = True) -> URIRef:
         URIRef:
 
     """
-    reference = f'http://value.org/{key_word}'
+    reference = f'{VAL}{key_word}'
     if extension:
         reference = f'<{reference}>'
     if ref:
@@ -48,7 +53,7 @@ def uri_ref_ext(key_word: str) -> URIRef:
     Returns:
 
     """
-    return URIRef(f'<http://value.org/{key_word}>')
+    return URIRef(f'<{VAL}{key_word}>')
 
 
 class ClassClauses:
@@ -178,12 +183,12 @@ class ClassClause:
             g_temp_debug.append((URIRef(subject_uri), URIRef(predicate_uri), URIRef(object_uri)))  # for debug
             self.predicate_object_dict[predicate_uri] = object_uri  # build predicate-object pairs
             len_effective_rdfs += 1
-            if not object_.is_variable:  # .find('http://variable.org/') < 0:
+            if not object_.is_variable:  # .find(VAR) < 0:
                 pass  # skip if the object is a variable
             else:  # object is a variable
                 self.set_of_variables_in_query.add((object_uri, predicate_uri))  # add as a tuple of object-predicate pair
-            if predicate_uri == 'http://value.org/operation':  # then the object is operation name
-                operation_name = object_uri.replace('http://value.org/', '')  # extract operation name
+            if predicate_uri == OPERATION:  # then the object is operation name
+                operation_name = object_uri.replace(VAL, '')  # extract operation name
                 self.operation_name_uri = uri_ref(operation_name)  # keep it as URIRef
 
     def from_query(self, graph: Graph, subject: rdflib.term.URIRef, id_: rdflib.term.URIRef = URIRef('0')):
@@ -220,12 +225,12 @@ class ClassClause:
             self.list_of_triple.append(triple)  # append to the list
             self.predicate_object_dict[predicate_uri] = object_uri  # build predicate - object pairs
             len_effective_rdfs += 1
-            if object_uri.find('http://variable.org/') >= 0:  # object is a variable
+            if object_uri.find(VAR) >= 0:  # object is a variable
                 self.set_of_variables_in_query.add((object_uri, predicate_uri))  # add the variable
-            if object_uri.find('http://some.org/') >= 0:  # object is a semi-variable
+            if object_uri.find(SOME) >= 0:  # object is a semi-variable
                 self.set_of_half_variables.add((object_uri, predicate_uri))  # add the variable
-            if predicate_uri == 'http://value.org/operation':  # operation name
-                operation_name = object_uri.replace('http://value.org/', '')  # extract operation name
+            if predicate_uri == OPERATION:  # operation name
+                operation_name = object_uri.replace(VAL, '')  # extract operation name
                 self.operation_name_uri = uri_ref(operation_name)  # keep as UriRef
         return self
 
@@ -252,7 +257,7 @@ class ClassClause:
             bindings_ = {}  # prepare the bindings
             for predicate, object_ in self.predicate_object_dict.items():
                 try:
-                    if object_.find('http://variable.org/') >= 0:  # object is a variable
+                    if object_.find(VAR) >= 0:  # object is a variable
                         bindings_[object_] = candidate_.fact.predicate_object_dict[predicate]  # correspondence against the object
                     else:
                         if candidate_.fact.predicate_object_dict[predicate] == object_:
@@ -278,7 +283,7 @@ class ClassClause:
             variable_x = self.predicate_object_dict[uri_ref('variable_x', ref=False)]  # cons must have x, y and z
             variable_y = self.predicate_object_dict[uri_ref('variable_y', ref=False)]
             variable_z = self.predicate_object_dict[uri_ref('variable_z', ref=False)]
-            if variable_x.find('http://value.org/') >= 0 and variable_y.find('http://value.org/') >= 0 and variable_z.find('http://variable.org/') >= 0:
+            if variable_x.find(VAL) >= 0 and variable_y.find(VAL) >= 0 and variable_z.find(VAR) >= 0:
                 cons_node = uri_ref(f'cons_node{str(ClassFacts.cons_number)}', ref=False)  # create cons_nodeNNNNN
                 cons_list = uri_ref(f'cons_list{str(ClassFacts.cons_number)}', ref=False)  # create cons_listNNNNN
                 ClassFacts.cons_number += 1  # update the serial number
@@ -339,10 +344,10 @@ class ClassClause:
     #                         matched = False  # if different, the match fails
     #                         continue
     #                 else:  # object in the query is a variable
-    #                     backward_bindings['?' + query_object.replace('http://variable.org/', '')] = f'<{rule_object_drop}>'
+    #                     backward_bindings['?' + query_object.replace(VAR, '')] = f'<{rule_object_drop}>'
     #             else:  # rule object is a variable
     #                 forward_bindings[
-    #                     rdflib.term.Variable(rule_object_drop.replace('http://variable.org/', ''))] = query_object
+    #                     rdflib.term.Variable(rule_object_drop.replace(VAR, ''))] = query_object
     #         except KeyError:  # rule_predicate is not in the predicate_object_dict
     #             matched = False
     #             continue
@@ -397,7 +402,7 @@ class ClassClause:
                     bool: True if constant
 
                 """
-                if term.find('http://value.org/') >= 0:
+                if term.find(VAL) >= 0:
                     return True  # constant
                 return False  # variable, not constant
 
@@ -465,13 +470,13 @@ class ClassClause:
         forward_binding_multiple = {}  # query is constant, rule is variable
         backward_binding_multiple = {}  # query is variable, rule is either constant or variable
         for key, value in self.predicate_object_dict.items():  # key: predicate, value: object
-            if value.find('http://variable.org/') >= 0:  # object of this clause is a variable
+            if value.find(VAR) >= 0:  # object of this clause is a variable
                 try:
                     pattern_value = pattern.predicate_object_dict[key]
-                    if pattern_value.find('http://variable.org/') >= 0:  # application side is also a variable
+                    if pattern_value.find(VAR) >= 0:  # application side is also a variable
                         # forward_binding[pattern_value] = value
                         forward_binding_multiple = append_to_bindings(forward_binding_multiple, pattern_value, value)  # 2023/12/12
-                    elif pattern_value.find('http://some.org/') >= 0:  # application side is a semi-variable
+                    elif pattern_value.find(SOME) >= 0:  # application side is a semi-variable
                         matched = False  # a semi-variable only matches with a constant
                         break
                     else:  # application side is a constant
@@ -483,10 +488,10 @@ class ClassClause:
             else:  # object of this clause is a constant
                 try:
                     pattern_value = pattern.predicate_object_dict[key]
-                    if pattern_value.find('http://variable.org/') >= 0:  # application side is a variable
+                    if pattern_value.find(VAR) >= 0:  # application side is a variable
                         # forward_binding[pattern_value] = value
                         forward_binding_multiple = append_to_bindings(forward_binding_multiple, pattern_value, value)  # 2023/12/12
-                    elif pattern_value.find('http://some.org/') >= 0:  # application side is a semi-variable
+                    elif pattern_value.find(SOME) >= 0:  # application side is a semi-variable
                         # forward_binding[pattern_value] = value  # also create a binding
                         forward_binding_multiple = append_to_bindings(forward_binding_multiple, pattern_value, value)  # 2023/12/12
                     else:  # application side is a constant
@@ -530,10 +535,10 @@ class ClassClause:
                     backward_binding_control_multiple: dict[str, list[str]] = {}
                     match_control = True  # assume a success
                     for key_, value_ in self.predicate_object_dict.items():
-                        if value_.find('http://variable.org/') >= 0:  # object is a variable
+                        if value_.find(VAR) >= 0:  # object is a variable
                             try:
                                 left_value = left_side.predicate_object_dict[key_]
-                                if left_value.find('http://variable.org/') >= 0:  # control side is also a variable
+                                if left_value.find(VAR) >= 0:  # control side is also a variable
                                     try:
                                         restriction = restrictions[key_]
                                         match_control = False  # semi-variable only matches a constant
@@ -541,7 +546,7 @@ class ClassClause:
                                     except KeyError:
                                         # forward_binding_control[left_value] = value
                                         forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
-                                # elif left_value.find('http://some.org/') >= 0:  # control side is a semi-variable
+                                # elif left_value.find(SOME) >= 0:  # control side is a semi-variable
                                 #     match_control = False  # semi-variable only matches a constant
                                 #     break  # match failed, no further matching in useless
                                 else:  # control side is a constant
@@ -553,7 +558,7 @@ class ClassClause:
                         else:  # value in key-value pair is a constant, therefore the argument in the control must be a variable, a semi-variable or the same constant value
                             try:
                                 left_value = left_side.predicate_object_dict[key_]  # control side
-                                if left_value.find('http://variable.org/') >= 0:  # is variable
+                                if left_value.find(VAR) >= 0:  # is variable
                                     try:
                                         restriction = restrictions[key_]
                                         # forward_binding_control[left_value] = value
@@ -561,7 +566,7 @@ class ClassClause:
                                     except KeyError:
                                         # forward_binding_control[left_value] = value
                                         forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
-                                # elif left_value.find('http://some.org/') >= 0:  # semi-variable
+                                # elif left_value.find(SOME) >= 0:  # semi-variable
                                 #     # forward_binding_control[left_value] = value
                                 #     forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
                                 else:  # constant
@@ -614,15 +619,15 @@ class ClassClause:
                     code_to_execute: str = function_.code  # code contains teh Python code to be executed.
                     local_vars = {'bindings': forward_binding_}  # variable bindings
                     # for key1, value1 in forward_binding_.items():
-                    #     key_modified = key1.replace('http://some.org/_', '').replace('http://variable.org/_', '')  # -> x
-                    #     value_modified = value1.replace('http://value.org/', '').replace('http://variable.org/', '')
+                    #     key_modified = key1.replace(f'{SOME}_', '').replace(f'{VAR}_', '')  # -> x
+                    #     value_modified = value1.replace(VAL, '').replace(VAR, '')
                     #     local_vars[key_modified] = value_modified  # arguments for exec
                     exec(code_to_execute, {}, local_vars)  # execution of Python code
                     # result_bindings_: dict[str, str] = local_vars.get('result', None)  # the results are contained in result variable as dict object
                     return_bindings: dict[str, str] = local_vars.get('results', None)  # the results are contained in result variable as dict object
                     # for key2, value2 in result_bindings_.items():  # convert back to uri representations
-                    #     key_modified = f'http://variable.org/{key2}'
-                    #     value_modified = f'http://value.org/{str(value2)}'
+                    #     key_modified = f'{VAR}{key2}'
+                    #     value_modified = f'{VAL}{str(value2)}'
                     #     return_bindings[key_modified] = value_modified
                     return return_bindings  # end and return of exec_function
                     pass
@@ -636,10 +641,10 @@ class ClassClause:
                     backward_binding_function_multiple = {}
                     match_function = True  # assume a success
                     for key_, value_ in self.predicate_object_dict.items():
-                        if value_.find('http://variable.org/') >= 0:  # clause side is a variable
+                        if value_.find(VAR) >= 0:  # clause side is a variable
                             try:
                                 left_value = left_side.predicate_object_dict[key_]  # get the corresponding value in function
-                                if left_value.find('http://variable.org/') >= 0:  # function side is a variable
+                                if left_value.find(VAR) >= 0:  # function side is a variable
                                     try:
                                         restriction = restrictions[key_]
                                         match_function = False  # semi-variable only matches with a constant
@@ -647,7 +652,7 @@ class ClassClause:
                                     except KeyError:
                                         # forward_binding_function[left_value] = value
                                         forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
-                                # elif left_value.find('http://some.org/') >= 0:  # function side is a semi-variable
+                                # elif left_value.find(SOME) >= 0:  # function side is a semi-variable
                                 #     match_function = False  # semi-variable only matches with a constant
                                 #     break  # match failed, no further matching in useless
                                 else:  # function side is a constant
@@ -659,7 +664,7 @@ class ClassClause:
                         else:  # value in key-value pair is a constant, therefore the argument in the control must be a variable, a semi-variable or the same constant value
                             try:
                                 left_value = left_side.predicate_object_dict[key_]
-                                if left_value.find('http://variable.org/') >= 0:  # function side is a variable
+                                if left_value.find(VAR) >= 0:  # function side is a variable
                                     try:
                                         restriction = restrictions[key_]
                                         # forward_binding_control[left_value] = value
@@ -667,7 +672,7 @@ class ClassClause:
                                     except KeyError:
                                         # forward_binding_control[left_value] = value
                                         forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
-                                # elif left_value.find('http://some.org/') >= 0:  # function side is a semi-variable
+                                # elif left_value.find(SOME) >= 0:  # function side is a semi-variable
                                 #     # forward_binding_control[left_value] = value
                                 #     forward_binding_function_multiple = append_to_bindings(forward_binding_function_multiple, left_value, value_)  # 2023/12/12
                                 else:    # function side is a constant
@@ -710,7 +715,7 @@ class ClassClause:
             triple_applied = triple.apply_bindings(bindings)  # apply the bindings to a triple
             clause_applied.list_of_triple.append(triple_applied)  # append to the new clause to be returned
             clause_applied.predicate_object_dict[triple_applied.predicate.to_uri(drop=True)] = triple_applied.object.to_uri(drop=True)
-            if triple.predicate.to_uri(drop=True) == 'http://value.org/operation':
+            if triple.predicate.to_uri(drop=True) == OPERATION:
                 clause_applied.operation_name_uri = rdflib.term.URIRef(triple_applied.object.to_uri(drop=True))  # set the operation name
         return clause_applied
 
@@ -1025,7 +1030,7 @@ class ClassFunctions:
             self.operation_name_dict[function_uri] = function
         for function in self.functions:  # read the function codes
             function_name: str = function.rule.left_side.operation_name_uri
-            function_name: str = f'function_{function_name.replace("http://value.org/", "")}.py'
+            function_name: str = f'function_{function_name.replace(VAL, "")}.py'
             with open(f'{rules_folder}/{function_name}', 'r') as function_file:
                 code: str = function_file.read()
                 function.code = code
@@ -1326,15 +1331,15 @@ class ClassRuleLeft(ClassClause):  # left side of a rule
             triple_object = f'<{triple_object0}>'  # convert object to URI string
             self.predicate_object_dict[triple_predicate] = triple_object
             try:
-                if triple_object.find('http://variable.org/') >= 0:
-                    triple_object = triple_object.replace('<http://variable.org/', '?').replace('>', '')
+                if triple_object.find(VAR) >= 0:
+                    triple_object = triple_object.replace(f'<{VAR}', '?').replace('>', '')
                     var_list_string += str(triple_object) + ' '  # register the variable to a list
                     # self.var_list.append(str(triple_object))  # also append the variable to a list
                 else:
                     self.const_dict[triple_predicate] = triple_object
             except KeyError:
                 pass  # object is not a variable
-            if triple_predicate.find('http://value.org/operation') >= 0 or triple_object.find('?') >= 0:
+            if triple_predicate.find(OPERATION) >= 0 or triple_object.find('?') >= 0:
                 sparql_query += f""" ?s <{triple_predicate}> {triple_object} . """
 
         sparql_query += f'}}'  # close the sparql query
@@ -1586,14 +1591,14 @@ class ClassTerm:  # term is either subject, predicate or object
         """
         self.term_text = str(term_text).replace(' ', '').replace('<', '').replace('>', '')
         self.is_variable = False
-        if self.term_text.find('http://variable.org/') >= 0:  # <http://variable.org/x> -> x
+        if self.term_text.find(VAR) >= 0:  # <http://variable.org/x> -> x
             self.is_variable = True
             self.term_text = self.term_text.replace('<', '').replace('>', ''). \
-                replace('http://variable.org/', '')  # .replace('variable_', '')
-        if self.term_text.find('http://some.org/') >= 0:  # <http://some.org/x> -> x
+                replace(VAR, '')  # .replace('variable_', '')
+        if self.term_text.find(SOME) >= 0:  # <http://some.org/x> -> x
             self.is_variable = True
             self.term_text = self.term_text.replace('<', '').replace('>', ''). \
-                replace('http://some.org/', '')  # .replace('variable_', '')
+                replace(SOME, '')  # .replace('variable_', '')
         if self.term_text.find('?') >= 0:  # ?x -> x
             self.is_variable = True
             self.term_text = self.term_text.replace('?', '')
@@ -1609,7 +1614,7 @@ class ClassTerm:  # term is either subject, predicate or object
              URIRef:
         """
         if self.is_variable:
-            return URIRef('http://variable.org/' + self.term_text)  # x -> http://variable.org/x
+            return URIRef(VAR + self.term_text)  # x -> http://variable.org/x
         else:
             return URIRef(self.term_text)
 
@@ -1625,7 +1630,7 @@ class ClassTerm:  # term is either subject, predicate or object
             str: uri_string
         """
         if self.is_variable:
-            term_str = 'http://variable.org/' + self.term_text + ''  # x -> <http://variable.org/x>
+            term_str = VAR + self.term_text + ''  # x -> <http://variable.org/x>
         else:
             term_str = '' + self.term_text + ''  # http://value.org/andy -> <http://value.org/andy>
         if drop:  # drop < and >
@@ -1653,7 +1658,7 @@ class ClassTerm:  # term is either subject, predicate or object
         Returns:
             str:
         """
-        return '?' + self.term_text.replace('http://value.org/', '')  # http://value.org/x -> ?x
+        return '?' + self.term_text.replace(VAL, '')  # http://value.org/x -> ?x
 
     def revise(self, bindings: dict[str, str]):  # bindings: dict
         """Revise a term based on the bindings.
@@ -1706,10 +1711,10 @@ class ClassTerm:  # term is either subject, predicate or object
                 term_applied.is_variable = True
                 term_applied.term_text = self.term_text  # copy the current variable name
             try:
-                value: str = bindings[f'http://variable.org/{self.term_text}']  # uri variable
-                if value.find('http://variable.org/') >= 0:  # bound to a variable
+                value: str = bindings[f'{VAR}{self.term_text}']  # uri variable
+                if value.find(VAR) >= 0:  # bound to a variable
                     term_applied.is_variable = True
-                    term_applied.term_text = value.replace('http://variable.org/', '')  # remove prefix
+                    term_applied.term_text = value.replace(VAR, '')  # remove prefix
                 else:  # bound to a constant
                     term_applied.is_variable = False
                     term_applied.term_text = value
@@ -1833,8 +1838,8 @@ class ClassSparqlQuery:  # Sparql Query Class
     #                 print_and_log(f'OBJECT WAS A VARIABLE: {str(term_object.to_var_string())}')  # debug
     #                 key1 = term_object.to_uri()  # convert the object to uri
     #                 try:
-    #                     if key1.find('<http://variable.org/') >= 0:
-    #                         key1 = key1.replace('<http://variable.org/', '?').replace('>', '')  # to ?var form
+    #                     if key1.find(f'<{VAR}') >= 0:
+    #                         key1 = key1.replace(f'<{VAR}', '?').replace('>', '')  # to ?var form
     #                         term_value1 = ClassTerm().build(key1)  # new object term
     #                         # print ('(1)OBJECT VARIABLE WAS CONVERTED TO: ' + str(term_value1.to_uri()))  # debug
     #                         print_and_log(f'(1)OBJECT VARIABLE WAS CONVERTED TO: {str(term_value1.to_uri())}')  # debug
@@ -1902,7 +1907,7 @@ class ClassSparqlQuery:  # Sparql Query Class
     #                     if my_value.find('?') < 0:  # in the case the value is not a variable
     #                         my_value = '<' + my_value.replace('<', '').replace('>', '') + '>'  # convert to uri
     #                         # not a variable, change to uri
-    #                         if my_value.find('variable.org') >= 0:  # value is a variable, not a true uri
+    #                         if my_value.find(VAR) >= 0:  # value is a variable, not a true uri
     #                             success_for_each = False  # failed
     #                             break  # exit the for loop
     #                     return_bindings_temp[key_string] = my_value  # store in a dictionary
@@ -1922,23 +1927,23 @@ class ClassSparqlQuery:  # Sparql Query Class
     #         var_y = None
     #         var_z = None
     #         for rdf in self.list_of_rdfs:
-    #             if rdf.predicate.term_text == 'http://value.org/operation':
-    #                 if rdf.object.term_text != 'http://value.org/cons':
+    #             if rdf.predicate.term_text == OPERATION:
+    #                 if rdf.object.term_text != f'{VAL}cons':
     #                     found_cons = False
     #                     break
-    #             if rdf.predicate.term_text == 'http://value.org/variable_x':
+    #             if rdf.predicate.term_text == f'{VAL}variable_x':
     #                 if rdf.object.is_variable:
     #                     found_cons = False
     #                     break
     #                 else:
     #                     var_x = rdf.object.to_uriref()
-    #             if rdf.predicate.term_text == 'http://value.org/variable_y':
+    #             if rdf.predicate.term_text == f'{VAL}variable_y':
     #                 if rdf.object.is_variable:
     #                     found_cons = False
     #                     break
     #                 else:
     #                     var_y = rdf.object.to_uriref()
-    #             if rdf.predicate.term_text == 'http://value.org/variable_z':
+    #             if rdf.predicate.term_text == f'{VAL}variable_z':
     #                 if not rdf.object.is_variable:
     #                     found_cons = False
     #                     break
@@ -1946,14 +1951,14 @@ class ClassSparqlQuery:  # Sparql Query Class
     #                     var_z = rdf.object.to_var_string()
     #         if found_cons:
     #
-    #             cons_node = URIRef(f'http://value.org/cons_node{ClassSparqlQuery.cons_number}')
-    #             cons_list = URIRef(f'http://value.org/cons_list{ClassSparqlQuery.cons_number}')
+    #             cons_node = URIRef(f'{VAL}cons_node{ClassSparqlQuery.cons_number}')
+    #             cons_list = URIRef(f'{VAL}cons_list{ClassSparqlQuery.cons_number}')
     #             ClassSparqlQuery.cons_number += 1  # update the unique number for cons
     #
-    #             ClassRules.graph.add((cons_node, URIRef('http://value.org/operation'), URIRef('http://value.org/cons')))
-    #             ClassRules.graph.add((cons_node, URIRef('http://value.org/variable_x'), var_x))
-    #             ClassRules.graph.add((cons_node, URIRef('http://value.org/variable_y'), var_y))
-    #             ClassRules.graph.add((cons_node, URIRef('http://value.org/variable_z'), cons_list))
+    #             ClassRules.graph.add((cons_node, URIRef(OPERATION), URIRef('{VAL}cons')))
+    #             ClassRules.graph.add((cons_node, URIRef('{VAL}variable_x'), var_x))
+    #             ClassRules.graph.add((cons_node, URIRef('{VAL}variable_y'), var_y))
+    #             ClassRules.graph.add((cons_node, URIRef('{VAL}variable_z'), cons_list))
     #             return True, [{var_z: f'<{str(cons_list)}>'}]
     #
     #         return False, []  # no direct match was found. return False (Not Found) and an empty list
@@ -1987,7 +1992,7 @@ class ClassSparqlQuery:  # Sparql Query Class
     #             g_temp_debug.append((URIRef(subj_uri), URIRef(predicate_uri), URIRef(object_uri)))
     #             predicate_object_dict[predicate_uri] = object_uri
     #             len_effective_rdfs += 1
-    #             if not object_.is_variable:  # .find('http://variable.org/') < 0:  # skip if the object is a variable
+    #             if not object_.is_variable:  # .find(VAR) < 0:  # skip if the object is a variable
     #                 # g_temp.add((URIRef(subj), URIRef(predicate), URIRef(object_)))
     #                 # g_temp_debug.append((URIRef(subj), URIRef(predicate), URIRef(object_)))
     #                 # len_effective_rdfs += 1
@@ -1997,8 +2002,8 @@ class ClassSparqlQuery:  # Sparql Query Class
     #             # g_temp.add((URIRef(clause[0].replace('<', '').replace('>', '')),
     #             #             URIRef(clause[1].replace('<', '').replace('>', '')),
     #             #             URIRef(clause[2].replace('<', '').replace('>', ''))))  # store the triple into the graph
-    #             if predicate_uri == 'http://value.org/operation':
-    #                 operation_name = object_uri.replace('http://value.org/', '')
+    #             if predicate_uri == OPERATION:
+    #                 operation_name = object_uri.replace(VAL, '')
     #                 operation_name_uri = uri_ref(operation_name)
     #
     #     # list_of_applicable_rules = []  # start building a list of applicable rules
@@ -2011,17 +2016,17 @@ class ClassSparqlQuery:  # Sparql Query Class
     #     #         rule_object = rule_object0.replace('<', '').replace('>', '')
     #     #         try:
     #     #             query_object = predicate_object_dict[str(rule_predicate)]
-    #     #             if rule_object.find('http://value.org') >= 0:  # const
-    #     #                 if query_object.find('http://value.org') >= 0:  # const
+    #     #             if rule_object.find(VAL) >= 0:  # const
+    #     #                 if query_object.find(VAL) >= 0:  # const
     #     #                     if rule_object == query_object:
     #     #                         pass
     #     #                     else:
     #     #                         match = False
     #     #                         continue
     #     #                 else:  # object in query is variable
-    #     #                     backward_bindings['?'+query_object.replace('http://variable.org/', '')] = f'<{rule_object}>'
+    #     #                     backward_bindings['?'+query_object.replace(VAR, '')] = f'<{rule_object}>'
     #     #             else:  # rule object is variable
-    #     #                 forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/', ''))] = query_object
+    #     #                 forward_bindings[rdflib.term.Variable(rule_object.replace(VAR, ''))] = query_object
     #     #         except KeyError:
     #     #             match = False
     #     #             continue
@@ -2054,17 +2059,17 @@ class ClassSparqlQuery:  # Sparql Query Class
     #                 rule_object = rule_object0.replace('<', '').replace('>', '')
     #                 try:
     #                     query_object = predicate_object_dict[str(rule_predicate)]
-    #                     if rule_object.find('http://value.org') >= 0:  # const
-    #                         if query_object.find('http://value.org') >= 0:  # const
+    #                     if rule_object.find(VAL) >= 0:  # const
+    #                         if query_object.find(VAL) >= 0:  # const
     #                             if rule_object == query_object:
     #                                 pass
     #                             else:
     #                                 match = False
     #                                 continue
     #                         else:  # object in query is variable
-    #                             backward_bindings['?'+query_object.replace('http://variable.org/', '')] = f'<{rule_object}>'
+    #                             backward_bindings['?'+query_object.replace(VAR, '')] = f'<{rule_object}>'
     #                     else:  # rule object is variable
-    #                         forward_bindings[rdflib.term.Variable(rule_object.replace('http://variable.org/', ''))] = query_object
+    #                         forward_bindings[rdflib.term.Variable(rule_object.replace(VAR, ''))] = query_object
     #                 except KeyError:
     #                     match = False
     #                     continue
@@ -2272,8 +2277,8 @@ class MyTransformer(Transformer):
         """
         # print('¥¥¥ ', tree)  # debug
         if tree[0].type == 'VAR':
-            ret = f'<http://variable.org/{tree[0].value.replace("?", "").strip()}>'
-            # ret = tree[0].value  # '<http://value.org/subj> '
+            ret = f'<{VAR}{tree[0].value.replace("?", "").strip()}>'
+            # ret = tree[0].value  # '<{VAL}subj> '
         else:
             ret = tree[0].value  # '<http://value.org/subj> '  # tree[0].value
         self.list_of_each_triple = []  # initialize the list of a triple
@@ -2293,7 +2298,7 @@ class MyTransformer(Transformer):
             ret = tree[0].value  # TODO
         else:
             ret = tree[0].value
-        # if tree[0].value == '<http://value.org/operation> ':
+        # if tree[0].value == '<{OPERATION}> ':
         #     MyTransformer.predicate_is_operation = True
         # else:
         #     MyTransformer.predicate_is_operation = False
@@ -2312,7 +2317,7 @@ class MyTransformer(Transformer):
         my_value = tree[0].value
         ret = my_value
         if tree[0].type == 'VAR':
-            ret = f'<http://variable.org/{my_value.replace("?", "").strip()}>'  # ?ans -> <http://variable.org/ans>
+            ret = f'<{VAR}{my_value.replace("?", "").strip()}>'  # ?ans -> <http://variable.org/ans>
         self.list_of_each_triple.append(ClassTerm().build(ret.strip()))  # element holds a triple as a list # remove unnecessary spaces
         self.list_of_rdf_triples.append(self.list_of_each_triple)  # append the triple to the list
         return ret  # return value is for debug
@@ -2340,14 +2345,14 @@ def convert_question(question: str) -> list[list[ClassTerm]]:
 
 
 if __name__ == '__main__':  # This main() is for a test purpose.
-    # my_query = 'SELECT ?ss WHERE { ?ss <http://value.org/operation> <http://value.org/add_number> . ' + \
-    #            '?s <http://value.org/PP> ?o . }'
+    # my_query = 'SELECT ?ss WHERE { ?ss <{OPERATION}> <{VAL}add_number> . ' + \
+    #            '?s <{VAL}PP> ?o . }'
     # conv_query, var_dict, predicate_object_pair = convert_query(my_query)
 
-    my_question = f""" SELECT ?ans WHERE {{ ?s <http://value.org/operation> <http://value.org/add_number> . 
-                  ?s <http://value.org/variable_x> <http://value.org/three> . 
-                  ?s <http://value.org/variable_y> <http://value.org/two> . 
-                  ?s <http://value.org/variable_z> ?ans . 
+    my_question = f""" SELECT ?ans WHERE {{ ?s <{OPERATION}> <{VAL}add_number> . 
+                  ?s <{VAL}variable_x> <{VAL}three> . 
+                  ?s <{VAL}variable_y> <{VAL}two> . 
+                  ?s <{VAL}variable_z> ?ans . 
                   }}"""
     list_of_rdf_triples = convert_question(my_question)
     print_and_log(str(list_of_rdf_triples))

@@ -101,7 +101,7 @@ If the fact search is successful, search_fact() method returns a list of binding
 If the fact search fails, the list becomes empty.
 For example, grandfather(taro, Y). will be failed, because there are no such fact registered.
 The search for father(taro, U). will be succeeded, because a fact father(taro, jiro). is registered.
-The bindings becomes [{'?u': '<http://value.org/jiro>'}]
+The bindings becomes [{'?u': '<{VAL}jiro>'}]
 If the list is not empty, reasoner repeatedly applies the bindings to the rest of clauses and recursively call itself.
 
 Reasoner next checks the existence of applicable rules by comparing the name of the operation and the matching between the arguments.

@@ -5,10 +5,10 @@ Main function
 2022/12/20, 2023/3/16, 2023/10/30, 2023/11/6, 2023/11/28
 T. Masuda
 """
-import os.path
-import logging
+# import os.path
+# import logging
 
-from src.RdfClass import ClassSparqlQuery
+from src.RdfClass import *
 from src.RdfResolution import RdfProlog, start_log
 
 
@@ -28,9 +28,9 @@ def main():
         # # next(1, ?ans)
         # my_question = f"""
         #    SELECT ?ans WHERE {{
-        #    ?s <http://value.org/operation> <http://value.org/next_number> .
-        #    ?s <http://value.org/variable_x> <http://value.org/one> .
-        #    ?s <http://value.org/variable_y> ?ans .
+        #    ?s <{OPERATION}> <{VAL}next_number> .
+        #    ?s <{VAL}variable_x> <{VAL}one> .
+        #    ?s <{VAL}variable_y> ?ans .
         #    }}"""
         # my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -40,9 +40,9 @@ def main():
     #     # next(?ans, 3)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/next_number> .
-    #        ?s <http://value.org/variable_x> ?ans .
-    #        ?s <http://value.org/variable_y> <http://value.org/three> .
+    #        ?s <{OPERATION}> <{VAL}next_number> .
+    #        ?s <{VAL}variable_x> ?ans .
+    #        ?s <{VAL}variable_y> <{VAL}three> .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -51,9 +51,9 @@ def main():
     #     # next(1, 2)
     #     my_question = f"""
     #        SELECT ?s WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/next_number> .
-    #        ?s <http://value.org/variable_x> <http://value.org/one> .
-    #        ?s <http://value.org/variable_y> <http://value.org/two> .
+    #        ?s <{OPERATION}> <{VAL}next_number> .
+    #        ?s <{VAL}variable_x> <{VAL}one> .
+    #        ?s <{VAL}variable_y> <{VAL}two> .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -62,9 +62,9 @@ def main():
     #     # next(1, 3)
     #     my_question = f"""
     #        SELECT ?s WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/next_number> . 
-    #        ?s <http://value.org/variable_x> <http://value.org/one> . 
-    #        ?s <http://value.org/variable_y> <http://value.org/three> . 
+    #        ?s <{OPERATION}> <{VAL}next_number> .
+    #        ?s <{VAL}variable_x> <{VAL}one> .
+    #        ?s <{VAL}variable_y> <{VAL}three> .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -73,22 +73,22 @@ def main():
     #     # next(1, ?z),next(?z, ?ans)
     #     # my_question = f"""
     #     #    SELECT ?ans WHERE {{
-    #     #    ?s1 <http://value.org/operation> <http://value.org/next_number> . 
-    #     #    ?s1 <http://value.org/variable_x> <http://value.org/one> . 
-    #     #    ?s1 <http://value.org/variable_y> ?z . 
-    #     #    ?s2 <http://value.org/operation> <http://value.org/next_number> . 
-    #     #    ?s2 <http://value.org/variable_x> ?z . 
-    #     #    ?s2 <http://value.org/variable_y> ?ans . 
+    #     #    ?s1 <{OPERATION}> <{VAL}next_number> .
+    #     #    ?s1 <{VAL}variable_x> <{VAL}one> .
+    #     #    ?s1 <{VAL}variable_y> ?z .
+    #     #    ?s2 <{OPERATION}> <{VAL}next_number> .
+    #     #    ?s2 <{VAL}variable_x> ?z .
+    #     #    ?s2 <{VAL}variable_y> ?ans .
     #     #    }}"""
     #     # next(1, ?z),next(?z, ?x)
     #     my_question = f"""
     #        SELECT ?x WHERE {{
-    #        ?s1 <http://value.org/operation> <http://value.org/next_number> . 
-    #        ?s1 <http://value.org/variable_x> <http://value.org/one> . 
-    #        ?s1 <http://value.org/variable_y> ?z . 
-    #        ?s2 <http://value.org/operation> <http://value.org/next_number> . 
-    #        ?s2 <http://value.org/variable_x> ?z . 
-    #        ?s2 <http://value.org/variable_y> ?x . 
+    #        ?s1 <{OPERATION}> <{VAL}next_number> .
+    #        ?s1 <{VAL}variable_x> <{VAL}one> .
+    #        ?s1 <{VAL}variable_y> ?z .
+    #        ?s2 <{OPERATION}> <{VAL}next_number> .
+    #        ?s2 <{VAL}variable_x> ?z .
+    #        ?s2 <{VAL}variable_y> ?x .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -97,9 +97,9 @@ def main():
     #     # next(?x, ?y)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/next_number> . 
-    #        ?s <http://value.org/variable_x> ?x . 
-    #        ?s <http://value.org/variable_y> ?y . 
+    #        ?s <{OPERATION}> <{VAL}next_number> .
+    #        ?s <{VAL}variable_x> ?x .
+    #        ?s <{VAL}variable_y> ?y .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -112,10 +112,10 @@ def main():
         # add(3, 1, ?ans)
         my_question = f"""
            SELECT ?ans WHERE {{
-           ?s <http://value.org/operation> <http://value.org/add_number> .
-           ?s <http://value.org/variable_x> <http://value.org/three> .
-           ?s <http://value.org/variable_y> <http://value.org/one> .
-           ?s <http://value.org/variable_z> ?ans .
+           ?s <{OPERATION}> <{VAL}add_number> .
+           ?s <{VAL}variable_x> <{VAL}three> .
+           ?s <{VAL}variable_y> <{VAL}one> .
+           ?s <{VAL}variable_z> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -123,10 +123,10 @@ def main():
         # add(3, 1, ?z)
         my_question = f"""
            SELECT ?z WHERE {{
-           ?s <http://value.org/operation> <http://value.org/add_number> .
-           ?s <http://value.org/variable_x> <http://value.org/three> .
-           ?s <http://value.org/variable_y> <http://value.org/one> .
-           ?s <http://value.org/variable_z> ?z .
+           ?s <{OPERATION}> <{VAL}add_number> .
+           ?s <{VAL}variable_x> <{VAL}three> .
+           ?s <{VAL}variable_y> <{VAL}one> .
+           ?s <{VAL}variable_z> ?z .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -134,10 +134,10 @@ def main():
 
         # add(2, 2, ?ans)
         my_question = f"""
-           SELECT ?ans WHERE {{ ?s <http://value.org/operation> <http://value.org/add_number> .
-           ?s <http://value.org/variable_x> <http://value.org/two> .
-           ?s <http://value.org/variable_y> <http://value.org/two> .
-           ?s <http://value.org/variable_z> ?z .
+           SELECT ?ans WHERE {{ ?s <{OPERATION}> <{VAL}add_number> .
+           ?s <{VAL}variable_x> <{VAL}two> .
+           ?s <{VAL}variable_y> <{VAL}two> .
+           ?s <{VAL}variable_z> ?z .
            }} """
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -146,19 +146,19 @@ def main():
     #     # add(3, 2, ?ans)
     #     # my_question = f"""
     #     #    SELECT ?ans WHERE {{
-    #     #    ?s <http://value.org/operation> <http://value.org/add_number> .
-    #     #    ?s <http://value.org/variable_x> <http://value.org/three> .
-    #     #    ?s <http://value.org/variable_y> <http://value.org/two> .
-    #     #    ?s <http://value.org/variable_z> ?ans .
+    #     #    ?s <{OPERATION}> <{VAL}add_number> .
+    #     #    ?s <{VAL}variable_x> <{VAL}three> .
+    #     #    ?s <{VAL}variable_y> <{VAL}two> .
+    #     #    ?s <{VAL}variable_z> ?ans .
     #     #    }}"""
     #
     #     # add(3, 2, ?z)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s <http://value.org/variable_x> <http://value.org/three> .
-    #        ?s <http://value.org/variable_y> <http://value.org/two> .
-    #        ?s <http://value.org/variable_z> ?z .
+    #        ?s <{OPERATION}> <{VAL}add_number> .
+    #        ?s <{VAL}variable_x> <{VAL}three> .
+    #        ?s <{VAL}variable_y> <{VAL}two> .
+    #        ?s <{VAL}variable_z> ?z .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -167,13 +167,13 @@ def main():
     #     # add(3, 2, ?z), next(?z, ?ans)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s1 <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s1 <http://value.org/variable_x> <http://value.org/three> .
-    #        ?s1 <http://value.org/variable_y> <http://value.org/two> .
-    #        ?s1 <http://value.org/variable_z> ?z .
-    #        ?s2 <http://value.org/operation> <http://value.org/next_number> .
-    #        ?s2 <http://value.org/variable_x> ?z .
-    #        ?s2 <http://value.org/variable_y> ?ans .
+    #        ?s1 <{OPERATION}> <{VAL}add_number> .
+    #        ?s1 <{VAL}variable_x> <{VAL}three> .
+    #        ?s1 <{VAL}variable_y> <{VAL}two> .
+    #        ?s1 <{VAL}variable_z> ?z .
+    #        ?s2 <{OPERATION}> <{VAL}next_number> .
+    #        ?s2 <{VAL}variable_x> ?z .
+    #        ?s2 <{VAL}variable_y> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -182,14 +182,14 @@ def main():
     #     # add(3, 2, ?z), add(?z, 2, ?ans) -> 3+2+2 = 7
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s1 <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s1 <http://value.org/variable_x> <http://value.org/three> .
-    #        ?s1 <http://value.org/variable_y> <http://value.org/two> .
-    #        ?s1 <http://value.org/variable_z> ?z .
-    #        ?s2 <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s2 <http://value.org/variable_x> ?z .
-    #        ?s2 <http://value.org/variable_y> <http://value.org/two> .
-    #        ?s2 <http://value.org/variable_z> ?ans .
+    #        ?s1 <{OPERATION}> <{VAL}add_number> .
+    #        ?s1 <{VAL}variable_x> <{VAL}three> .
+    #        ?s1 <{VAL}variable_y> <{VAL}two> .
+    #        ?s1 <{VAL}variable_z> ?z .
+    #        ?s2 <{OPERATION}> <{VAL}add_number> .
+    #        ?s2 <{VAL}variable_x> ?z .
+    #        ?s2 <{VAL}variable_y> <{VAL}two> .
+    #        ?s2 <{VAL}variable_z> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -198,10 +198,10 @@ def main():
     #     # add(2, ?ans, 3)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s <http://value.org/variable_x> <http://value.org/two> .
-    #        ?s <http://value.org/variable_y> ?ans .
-    #        ?s <http://value.org/variable_z> <http://value.org/three> .
+    #        ?s <{OPERATION}> <{VAL}add_number> .
+    #        ?s <{VAL}variable_x> <{VAL}two> .
+    #        ?s <{VAL}variable_y> ?ans .
+    #        ?s <{VAL}variable_z> <{VAL}three> .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # rdf_prolog.answer_question(my_sparql_query)
@@ -209,10 +209,10 @@ def main():
         # add(3, ?ans, 5)
         my_question = f"""
            SELECT ?ans WHERE {{
-           ?s <http://value.org/operation> <http://value.org/add_number> .
-           ?s <http://value.org/variable_x> <http://value.org/three> .
-           ?s <http://value.org/variable_y> ?ans .
-           ?s <http://value.org/variable_z> <http://value.org/five> .
+           ?s <{OPERATION}> <{VAL}add_number> .
+           ?s <{VAL}variable_x> <{VAL}three> .
+           ?s <{VAL}variable_y> ?ans .
+           ?s <{VAL}variable_z> <{VAL}five> .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         rdf_prolog.answer_question(my_sparql_query)
@@ -220,10 +220,10 @@ def main():
         # add(1, ?y, ?z)
         my_question = f"""
            SELECT ?y ?z WHERE {{
-           ?s <http://value.org/operation> <http://value.org/add_number> .
-           ?s <http://value.org/variable_x> <http://value.org/one> .
-           ?s <http://value.org/variable_y> ?y .
-           ?s <http://value.org/variable_z> ?z .
+           ?s <{OPERATION}> <{VAL}add_number> .
+           ?s <{VAL}variable_x> <{VAL}one> .
+           ?s <{VAL}variable_y> ?y .
+           ?s <{VAL}variable_z> ?z .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10, depth_limit=100)
@@ -232,10 +232,10 @@ def main():
     #     # add(9, ?y, ?z)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s <http://value.org/variable_x> <http://value.org/nine> .
-    #        ?s <http://value.org/variable_y> ?y .
-    #        ?s <http://value.org/variable_z> ?z .
+    #        ?s <{OPERATION}> <{VAL}add_number> .
+    #        ?s <{VAL}variable_x> <{VAL}nine> .
+    #        ?s <{VAL}variable_y> ?y .
+    #        ?s <{VAL}variable_z> ?z .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
@@ -244,10 +244,10 @@ def main():
     #     # add(?x, 1, ?z)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s <http://value.org/variable_x> ?x .
-    #        ?s <http://value.org/variable_y> <http://value.org/one> .
-    #        ?s <http://value.org/variable_z> ?z .
+    #        ?s <{OPERATION}> <{VAL}add_number> .
+    #        ?s <{VAL}variable_x> ?x .
+    #        ?s <{VAL}variable_y> <{VAL}one> .
+    #        ?s <{VAL}variable_z> ?z .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
@@ -256,10 +256,10 @@ def main():
     #     # add(?x, 9, ?z)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s <http://value.org/variable_x> ?x .
-    #        ?s <http://value.org/variable_y> <http://value.org/nine> .
-    #        ?s <http://value.org/variable_z> ?z .
+    #        ?s <{OPERATION}> <{VAL}add_number> .
+    #        ?s <{VAL}variable_x> ?x .
+    #        ?s <{VAL}variable_y> <{VAL}nine> .
+    #        ?s <{VAL}variable_z> ?z .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
@@ -268,10 +268,10 @@ def main():
     #     # add(?x, ?y, 2)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s <http://value.org/variable_x> ?x .
-    #        ?s <http://value.org/variable_y> ?y .
-    #        ?s <http://value.org/variable_z> <http://value.org/two> .
+    #        ?s <{OPERATION}> <{VAL}add_number> .
+    #        ?s <{VAL}variable_x> ?x .
+    #        ?s <{VAL}variable_y> ?y .
+    #        ?s <{VAL}variable_z> <{VAL}two> .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
@@ -280,10 +280,10 @@ def main():
     #     # add(?x, ?y, 3)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s <http://value.org/variable_x> ?x .
-    #        ?s <http://value.org/variable_y> ?y .
-    #        ?s <http://value.org/variable_z> <http://value.org/three> .
+    #        ?s <{OPERATION}> <{VAL}add_number> .
+    #        ?s <{VAL}variable_x> ?x .
+    #        ?s <{VAL}variable_y> ?y .
+    #        ?s <{VAL}variable_z> <{VAL}three> .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=10)
@@ -292,10 +292,10 @@ def main():
     #     # add(3, 1, ?ans) depth_limit=0
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s <http://value.org/variable_x> <http://value.org/three> .
-    #        ?s <http://value.org/variable_y> <http://value.org/one> .
-    #        ?s <http://value.org/variable_z> ?ans .
+    #        ?s <{OPERATION}> <{VAL}add_number> .
+    #        ?s <{VAL}variable_x> <{VAL}three> .
+    #        ?s <{VAL}variable_y> <{VAL}one> .
+    #        ?s <{VAL}variable_z> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=1)
@@ -303,10 +303,10 @@ def main():
     #     # add(3, 1, ?ans) depth_limit=1
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s <http://value.org/variable_x> <http://value.org/three> .
-    #        ?s <http://value.org/variable_y> <http://value.org/one> .
-    #        ?s <http://value.org/variable_z> ?ans .
+    #        ?s <{OPERATION}> <{VAL}add_number> .
+    #        ?s <{VAL}variable_x> <{VAL}three> .
+    #        ?s <{VAL}variable_y> <{VAL}one> .
+    #        ?s <{VAL}variable_z> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=2)
@@ -318,10 +318,10 @@ def main():
     #     # subtract(5, 3, ?ans)
     #     my_question = f"""
     #         SELECT ?ans WHERE {{
-    #         ?s <http://value.org/operation> <http://value.org/subtract_number> .
-    #         ?s <http://value.org/variable_x> <http://value.org/five> .
-    #         ?s <http://value.org/variable_y> <http://value.org/three> .
-    #         ?s <http://value.org/variable_z> ?ans .
+    #         ?s <{OPERATION}> <{VAL}subtract_number> .
+    #         ?s <{VAL}variable_x> <{VAL}five> .
+    #         ?s <{VAL}variable_y> <{VAL}three> .
+    #         ?s <{VAL}variable_z> ?ans .
     #         }}
     #         """
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
@@ -330,10 +330,10 @@ def main():
     #     # subtract(3, 2, ?ans)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/subtract_number> .
-    #        ?s <http://value.org/variable_x> <http://value.org/three> .
-    #        ?s <http://value.org/variable_y> <http://value.org/two> .
-    #        ?s <http://value.org/variable_z> ?ans .
+    #        ?s <{OPERATION}> <{VAL}subtract_number> .
+    #        ?s <{VAL}variable_x> <{VAL}three> .
+    #        ?s <{VAL}variable_y> <{VAL}two> .
+    #        ?s <{VAL}variable_z> ?ans .
     #        }}
     #         """
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
@@ -342,14 +342,14 @@ def main():
     #     # subtract(3, 2, ?z), add(?z, 2, ?ans)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s1 <http://value.org/operation> <http://value.org/subtract_number> .
-    #        ?s1 <http://value.org/variable_x> <http://value.org/three> .
-    #        ?s1 <http://value.org/variable_y> <http://value.org/two> .
-    #        ?s1 <http://value.org/variable_z> ?z .
-    #        ?s2 <http://value.org/operation> <http://value.org/add_number> .
-    #        ?s2 <http://value.org/variable_x> ?z .
-    #        ?s2 <http://value.org/variable_y> <http://value.org/two> .
-    #        ?s2 <http://value.org/variable_z> ?ans .
+    #        ?s1 <{OPERATION}> <{VAL}subtract_number> .
+    #        ?s1 <{VAL}variable_x> <{VAL}three> .
+    #        ?s1 <{VAL}variable_y> <{VAL}two> .
+    #        ?s1 <{VAL}variable_z> ?z .
+    #        ?s2 <{OPERATION}> <{VAL}add_number> .
+    #        ?s2 <{VAL}variable_x> ?z .
+    #        ?s2 <{VAL}variable_y> <{VAL}two> .
+    #        ?s2 <{VAL}variable_z> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -361,9 +361,9 @@ def main():
     #     # next(1, ?ans)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/next_number> .
-    #        ?s <http://value.org/variable_x> <http://value.org/1> .
-    #        ?s <http://value.org/variable_y> ?ans .
+    #        ?s <{OPERATION}> <{VAL}next_number> .
+    #        ?s <{VAL}variable_x> <{VAL}1> .
+    #        ?s <{VAL}variable_y> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -376,10 +376,10 @@ def main():
         # add(3, ?ans, 5)->ans:2
         my_question = f"""
             SELECT ?ans WHERE {{
-            ?s <http://value.org/operation> <http://value.org/add_number> . 
-            ?s <http://value.org/variable_x> <http://value.org/3> . 
-            ?s <http://value.org/variable_y> ?ans . 
-            ?s <http://value.org/variable_z> <http://value.org/5> . 
+            ?s <{OPERATION}> <{VAL}add_number> . 
+            ?s <{VAL}variable_x> <{VAL}3> . 
+            ?s <{VAL}variable_y> ?ans . 
+            ?s <{VAL}variable_z> <{VAL}5> . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=10)
@@ -391,10 +391,10 @@ def main():
         # multiply(2, 1, ?ans)
         my_question = f"""
            SELECT ?ans WHERE {{
-           ?s <http://value.org/operation> <http://value.org/multiply_number> .
-           ?s <http://value.org/variable_x> <http://value.org/2> .
-           ?s <http://value.org/variable_y> <http://value.org/1> .
-           ?s <http://value.org/variable_z> ?ans .
+           ?s <{OPERATION}> <{VAL}multiply_number> .
+           ?s <{VAL}variable_x> <{VAL}2> .
+           ?s <{VAL}variable_y> <{VAL}1> .
+           ?s <{VAL}variable_z> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -404,10 +404,10 @@ def main():
         # multiply(1, 2, ?ans)
         my_question = f"""
                    SELECT ?ans WHERE {{
-                   ?s <http://value.org/operation> <http://value.org/multiply_number> .
-                   ?s <http://value.org/variable_x> <http://value.org/1> .
-                   ?s <http://value.org/variable_y> <http://value.org/2> .
-                   ?s <http://value.org/variable_z> ?ans .
+                   ?s <{OPERATION}> <{VAL}multiply_number> .
+                   ?s <{VAL}variable_x> <{VAL}1> .
+                   ?s <{VAL}variable_y> <{VAL}2> .
+                   ?s <{VAL}variable_z> ?ans .
                    }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -417,10 +417,10 @@ def main():
         # multiply(2, 2, ?ans)
         my_question = f"""
            SELECT ?ans WHERE {{
-           ?s <http://value.org/operation> <http://value.org/multiply_number> .
-           ?s <http://value.org/variable_x> <http://value.org/2> .
-           ?s <http://value.org/variable_y> <http://value.org/2> .
-           ?s <http://value.org/variable_z> ?ans .
+           ?s <{OPERATION}> <{VAL}multiply_number> .
+           ?s <{VAL}variable_x> <{VAL}2> .
+           ?s <{VAL}variable_y> <{VAL}2> .
+           ?s <{VAL}variable_z> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -430,10 +430,10 @@ def main():
         # multiply(3, 2, ?ans) = 6
         my_question = f"""
             SELECT ?ans WHERE {{
-            ?s <http://value.org/operation> <http://value.org/multiply_number> .
-            ?s <http://value.org/variable_x> <http://value.org/3> .
-            ?s <http://value.org/variable_y> <http://value.org/2> .
-            ?s <http://value.org/variable_z> ?ans .
+            ?s <{OPERATION}> <{VAL}multiply_number> .
+            ?s <{VAL}variable_x> <{VAL}3> .
+            ?s <{VAL}variable_y> <{VAL}2> .
+            ?s <{VAL}variable_z> ?ans .
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -441,10 +441,10 @@ def main():
         # multiply(?ans, 2, 6)
         my_question = f"""
            SELECT ?ans WHERE {{
-           ?s <http://value.org/operation> <http://value.org/multiply_number> .
-           ?s <http://value.org/variable_x> ?ans .
-           ?s <http://value.org/variable_y> <http://value.org/2> .
-           ?s <http://value.org/variable_z> <http://value.org/6> .
+           ?s <{OPERATION}> <{VAL}multiply_number> .
+           ?s <{VAL}variable_x> ?ans .
+           ?s <{VAL}variable_y> <{VAL}2> .
+           ?s <{VAL}variable_z> <{VAL}6> .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
@@ -454,10 +454,10 @@ def main():
         # divide(?ans, 2, 3)
         my_question = f"""
             SELECT ?ans WHERE {{
-            ?s <http://value.org/operation> <http://value.org/divide_number> .
-            ?s <http://value.org/variable_x> ?ans .
-            ?s <http://value.org/variable_y> <http://value.org/2> .
-            ?s <http://value.org/variable_z> <http://value.org/3> .
+            ?s <{OPERATION}> <{VAL}divide_number> .
+            ?s <{VAL}variable_x> ?ans .
+            ?s <{VAL}variable_y> <{VAL}2> .
+            ?s <{VAL}variable_z> <{VAL}3> .
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -471,9 +471,9 @@ def main():
         # fibonacci(1, ?ans) ?ans = 1
         my_question = f"""
             SELECT ?ans WHERE {{
-            ?s <http://value.org/operation> <http://value.org/fibonacci_number> . 
-            ?s <http://value.org/variable_x> <http://value.org/1> . 
-            ?s <http://value.org/variable_y> ?ans . 
+            ?s <{OPERATION}> <{VAL}fibonacci_number> . 
+            ?s <{VAL}variable_x> <{VAL}1> . 
+            ?s <{VAL}variable_y> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -485,15 +485,15 @@ def main():
         # solve_simultaneous_linear_equation(2, 3, 12, 1, 1, 5, ?ans1, ?ans2)
         my_question = f"""
            SELECT ?ans1 ?ans2 WHERE {{
-           ?s <http://value.org/operation> <http://value.org/solve_simultaneous_linear_equation> .
-           ?s <http://value.org/variable_a11> <http://value.org/2> .
-           ?s <http://value.org/variable_a12> <http://value.org/3> .
-           ?s <http://value.org/variable_b1> <http://value.org/12> .
-           ?s <http://value.org/variable_a21> <http://value.org/1> .
-           ?s <http://value.org/variable_a22> <http://value.org/1> .
-           ?s <http://value.org/variable_b2> <http://value.org/5> .
-           ?s <http://value.org/variable_x1> ?ans1 .
-           ?s <http://value.org/variable_x2> ?ans2 .
+           ?s <{OPERATION}> <{VAL}solve_simultaneous_linear_equation> .
+           ?s <{VAL}variable_a11> <{VAL}2> .
+           ?s <{VAL}variable_a12> <{VAL}3> .
+           ?s <{VAL}variable_b1> <{VAL}12> .
+           ?s <{VAL}variable_a21> <{VAL}1> .
+           ?s <{VAL}variable_a22> <{VAL}1> .
+           ?s <{VAL}variable_b2> <{VAL}5> .
+           ?s <{VAL}variable_x1> ?ans1 .
+           ?s <{VAL}variable_x2> ?ans2 .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -502,19 +502,19 @@ def main():
         # solve_simultaneous_linear_equation(2, 3, 12, 1, 1, 5, ?ans1, ?ans2), add(?ans1, ?ans2, ?ans) .
         my_question = f"""
            SELECT ?ans ?ans1 ?ans2 WHERE {{
-           ?s <http://value.org/operation> <http://value.org/solve_simultaneous_linear_equation> .
-           ?s <http://value.org/variable_a11> <http://value.org/3> .
-           ?s <http://value.org/variable_a12> <http://value.org/2> .
-           ?s <http://value.org/variable_b1> <http://value.org/22> .
-           ?s <http://value.org/variable_a21> <http://value.org/2> .
-           ?s <http://value.org/variable_a22> <http://value.org/1> .
-           ?s <http://value.org/variable_b2> <http://value.org/13> .
-           ?s <http://value.org/variable_x1> ?ans1 .
-           ?s <http://value.org/variable_x2> ?ans2 .
-           ?s2 <http://value.org/operation> <http://value.org/add_number> .
-           ?s2 <http://value.org/variable_x> ?ans1 .
-           ?s2 <http://value.org/variable_y> ?ans2 .
-           ?s2 <http://value.org/variable_z> ?ans .
+           ?s <{OPERATION}> <{VAL}solve_simultaneous_linear_equation> .
+           ?s <{VAL}variable_a11> <{VAL}3> .
+           ?s <{VAL}variable_a12> <{VAL}2> .
+           ?s <{VAL}variable_b1> <{VAL}22> .
+           ?s <{VAL}variable_a21> <{VAL}2> .
+           ?s <{VAL}variable_a22> <{VAL}1> .
+           ?s <{VAL}variable_b2> <{VAL}13> .
+           ?s <{VAL}variable_x1> ?ans1 .
+           ?s <{VAL}variable_x2> ?ans2 .
+           ?s2 <{OPERATION}> <{VAL}add_number> .
+           ?s2 <{VAL}variable_x> ?ans1 .
+           ?s2 <{VAL}variable_y> ?ans2 .
+           ?s2 <{VAL}variable_z> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -522,9 +522,9 @@ def main():
         # factorial(4, ?ans) -> ?ans = 24
         my_question = f"""
            SELECT ?ans WHERE {{
-           ?s <http://value.org/operation> <http://value.org/factorial> .
-           ?s <http://value.org/variable_x> <http://value.org/4> .
-           ?s <http://value.org/variable_fact> ?ans .
+           ?s <{OPERATION}> <{VAL}factorial> .
+           ?s <{VAL}variable_x> <{VAL}4> .
+           ?s <{VAL}variable_fact> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -537,9 +537,9 @@ def main():
     #     # grandfather(taro, ?ans)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/grandfather> .
-    #        ?s <http://value.org/variable_x> <http://value.org/taro> .
-    #        ?s <http://value.org/variable_y> ?ans .
+    #        ?s <{OPERATION}> <{VAL}grandfather> .
+    #        ?s <{VAL}variable_x> <{VAL}taro> .
+    #        ?s <{VAL}variable_y> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -551,8 +551,8 @@ def main():
     #     # mortal(?ans)
     #     my_question = f"""
     #        SELECT ?ans WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/mortal> .
-    #        ?s <http://value.org/variable_x> ?ans .
+    #        ?s <{OPERATION}> <{VAL}mortal> .
+    #        ?s <{VAL}variable_x> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # rdf_prolog.answer_question(my_sparql_query)
@@ -565,9 +565,9 @@ def main():
     #     # knows(andy, bob)
     #     my_question = f"""
     #        SELECT ?s WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/knows_direct> .
-    #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    #        ?s <http://value.org/variable_y> <http://value.org/bob> .
+    #        ?s <{OPERATION}> <{VAL}knows_direct> .
+    #        ?s <{VAL}variable_x> <{VAL}andy> .
+    #        ?s <{VAL}variable_y> <{VAL}bob> .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # rdf_prolog.answer_question(my_sparql_query)
@@ -575,9 +575,9 @@ def main():
     #     # knows_direct(andy, chris)
     #     my_question = f"""
     #        SELECT ?s WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/knows_direct> .
-    #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    #        ?s <http://value.org/variable_y> <http://value.org/chris> .
+    #        ?s <{OPERATION}> <{VAL}knows_direct> .
+    #        ?s <{VAL}variable_x> <{VAL}andy> .
+    #        ?s <{VAL}variable_y> <{VAL}chris> .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # rdf_prolog.answer_question(my_sparql_query)
@@ -585,9 +585,9 @@ def main():
         # knows_direct(andy, ?ans)
         my_question = f"""
            SELECT ?s ?ans WHERE {{
-           ?s <http://value.org/operation> <http://value.org/knows_direct> .
-           ?s <http://value.org/variable_x> <http://value.org/andy> .
-           ?s <http://value.org/variable_y> ?ans .
+           ?s <{OPERATION}> <{VAL}knows_direct> .
+           ?s <{VAL}variable_x> <{VAL}andy> .
+           ?s <{VAL}variable_y> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # rdf_prolog.answer_question(my_sparql_query, results_limit=2)
@@ -595,9 +595,9 @@ def main():
     #     # knows_indirect(andy, chris)
     #     my_question = f"""
     #        SELECT ?s WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/knows_indirect> .
-    #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    #        ?s <http://value.org/variable_y> <http://value.org/chris> .
+    #        ?s <{OPERATION}> <{VAL}knows_indirect> .
+    #        ?s <{VAL}variable_x> <{VAL}andy> .
+    #        ?s <{VAL}variable_y> <{VAL}chris> .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # rdf_prolog.answer_question(my_sparql_query)
@@ -605,9 +605,9 @@ def main():
     #     # knows_indirect(andy, edgar)
     #     my_question = f"""
     #        SELECT ?s WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/knows_indirect> .
-    #        ?s <http://value.org/variable_x> <http://value.org/andy> .
-    #        ?s <http://value.org/variable_y> <http://value.org/edgar> .
+    #        ?s <{OPERATION}> <{VAL}knows_indirect> .
+    #        ?s <{VAL}variable_x> <{VAL}andy> .
+    #        ?s <{VAL}variable_y> <{VAL}edgar> .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # rdf_prolog.answer_question(my_sparql_query)
@@ -615,9 +615,9 @@ def main():
         # knows_indirect(andy, ?ans)
         my_question = f"""
            SELECT ?s WHERE {{
-           ?s <http://value.org/operation> <http://value.org/knows_indirect> .
-           ?s <http://value.org/variable_x> <http://value.org/andy> .
-           ?s <http://value.org/variable_y> ?ans .
+           ?s <{OPERATION}> <{VAL}knows_indirect> .
+           ?s <{VAL}variable_x> <{VAL}andy> .
+           ?s <{VAL}variable_y> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # rdf_prolog.answer_question(my_sparql_query)
@@ -625,9 +625,9 @@ def main():
         # knows(andy, ?ans)
         my_question = f"""
            SELECT ?ans WHERE {{
-           ?s <http://value.org/operation> <http://value.org/knows> .
-           ?s <http://value.org/variable_x> <http://value.org/andy> .
-           ?s <http://value.org/variable_y> ?ans .
+           ?s <{OPERATION}> <{VAL}knows> .
+           ?s <{VAL}variable_x> <{VAL}andy> .
+           ?s <{VAL}variable_y> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # rdf_prolog.answer_question(my_sparql_query, results_limit=4)
@@ -639,13 +639,13 @@ def main():
     #     # next(1, ?ans)
     #     my_question = f"""
     #        SELECT ?ans ?car ?cdr WHERE {{
-    #        ?s <http://value.org/operation> <http://value.org/next_list_number> .
-    #        ?s <http://value.org/variable_x> <http://value.org/list_one> .
-    #        ?s <http://value.org/variable_y> ?ans .
-    #        ?s2 <http://value.org/operation> <http://value.org/cons> .
-    #        ?s2 <http://value.org/variable_x> ?car .
-    #        ?s2 <http://value.org/variable_y> ?cdr .
-    #        ?s2 <http://value.org/variable_z> ?ans .
+    #        ?s <{OPERATION}> <{VAL}next_list_number> .
+    #        ?s <{VAL}variable_x> <{VAL}list_one> .
+    #        ?s <{VAL}variable_y> ?ans .
+    #        ?s2 <{OPERATION}> <{VAL}cons> .
+    #        ?s2 <{VAL}variable_x> ?car .
+    #        ?s2 <{VAL}variable_y> ?cdr .
+    #        ?s2 <{VAL}variable_z> ?ans .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -653,17 +653,17 @@ def main():
     #     # next(2, ?ans)
     #     my_question = f"""
     #        SELECT ?list_three ?car ?cdr WHERE {{
-    #        ?s1 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s1 <http://value.org/variable_x> <http://value.org/two> . 
-    #        ?s1 <http://value.org/variable_y> <http://value.org/nil> . 
-    #        ?s1 <http://value.org/variable_z> ?list_two . 
-    #        ?s2 <http://value.org/operation> <http://value.org/next_list_number> . 
-    #        ?s2 <http://value.org/variable_x> ?list_two . 
-    #        ?s2 <http://value.org/variable_y> ?list_three . 
-    #        ?s3 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s3 <http://value.org/variable_x> ?car . 
-    #        ?s3 <http://value.org/variable_y> ?cdr . 
-    #        ?s3 <http://value.org/variable_z> ?list_three . 
+    #        ?s1 <{OPERATION}> <{VAL}cons> .
+    #        ?s1 <{VAL}variable_x> <{VAL}two> .
+    #        ?s1 <{VAL}variable_y> <{VAL}nil> .
+    #        ?s1 <{VAL}variable_z> ?list_two .
+    #        ?s2 <{OPERATION}> <{VAL}next_list_number> .
+    #        ?s2 <{VAL}variable_x> ?list_two .
+    #        ?s2 <{VAL}variable_y> ?list_three .
+    #        ?s3 <{OPERATION}> <{VAL}cons> .
+    #        ?s3 <{VAL}variable_x> ?car .
+    #        ?s3 <{VAL}variable_y> ?cdr .
+    #        ?s3 <{VAL}variable_z> ?list_three .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -671,21 +671,21 @@ def main():
     #     # next(9, ?ans)
     #     my_question = f"""
     #        SELECT ?list_three ?car ?cdr WHERE {{
-    #        ?s1 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s1 <http://value.org/variable_x> <http://value.org/nine> . 
-    #        ?s1 <http://value.org/variable_y> <http://value.org/nil> . 
-    #        ?s1 <http://value.org/variable_z> ?list_nine . 
-    #        ?s2 <http://value.org/operation> <http://value.org/next_list_number> . 
-    #        ?s2 <http://value.org/variable_x> ?list_nine . 
-    #        ?s2 <http://value.org/variable_y> ?list_ten . 
-    #        ?s3 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s3 <http://value.org/variable_x> ?car_ten . 
-    #        ?s3 <http://value.org/variable_y> ?cdr_ten . 
-    #        ?s3 <http://value.org/variable_z> ?list_ten . 
-    #        ?s4 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s4 <http://value.org/variable_x> ?car . 
-    #        ?s4 <http://value.org/variable_y> ?cdr . 
-    #        ?s4 <http://value.org/variable_z> ?cdr_ten . 
+    #        ?s1 <{OPERATION}> <{VAL}cons> .
+    #        ?s1 <{VAL}variable_x> <{VAL}nine> .
+    #        ?s1 <{VAL}variable_y> <{VAL}nil> .
+    #        ?s1 <{VAL}variable_z> ?list_nine .
+    #        ?s2 <{OPERATION}> <{VAL}next_list_number> .
+    #        ?s2 <{VAL}variable_x> ?list_nine .
+    #        ?s2 <{VAL}variable_y> ?list_ten .
+    #        ?s3 <{OPERATION}> <{VAL}cons> .
+    #        ?s3 <{VAL}variable_x> ?car_ten .
+    #        ?s3 <{VAL}variable_y> ?cdr_ten .
+    #        ?s3 <{VAL}variable_z> ?list_ten .
+    #        ?s4 <{OPERATION}> <{VAL}cons> .
+    #        ?s4 <{VAL}variable_x> ?car .
+    #        ?s4 <{VAL}variable_y> ?cdr .
+    #        ?s4 <{VAL}variable_z> ?cdr_ten .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -693,17 +693,17 @@ def main():
     #     # next(?ans, [2])
     #     my_question = f"""
     #        SELECT ?list_one ?car ?cdr WHERE {{
-    #        ?s3 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s3 <http://value.org/variable_x> <http://value.org/two> . 
-    #        ?s3 <http://value.org/variable_y> <http://value.org/nil> . 
-    #        ?s3 <http://value.org/variable_z> ?list_two . 
-    #        ?s2 <http://value.org/operation> <http://value.org/next_list_number> . 
-    #        ?s2 <http://value.org/variable_x> ?list_one . 
-    #        ?s2 <http://value.org/variable_y> ?list_two . 
-    #        ?s4 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s4 <http://value.org/variable_x> ?car . 
-    #        ?s4 <http://value.org/variable_y> ?cdr . 
-    #        ?s4 <http://value.org/variable_z> ?list_one . 
+    #        ?s3 <{OPERATION}> <{VAL}cons> .
+    #        ?s3 <{VAL}variable_x> <{VAL}two> .
+    #        ?s3 <{VAL}variable_y> <{VAL}nil> .
+    #        ?s3 <{VAL}variable_z> ?list_two .
+    #        ?s2 <{OPERATION}> <{VAL}next_list_number> .
+    #        ?s2 <{VAL}variable_x> ?list_one .
+    #        ?s2 <{VAL}variable_y> ?list_two .
+    #        ?s4 <{OPERATION}> <{VAL}cons> .
+    #        ?s4 <{VAL}variable_x> ?car .
+    #        ?s4 <{VAL}variable_y> ?cdr .
+    #        ?s4 <{VAL}variable_z> ?list_one .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -711,17 +711,17 @@ def main():
     #     # next(?ans, [3])
     #     my_question = f"""
     #        SELECT ?list_two ?car ?cdr WHERE {{
-    #        ?s3 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s3 <http://value.org/variable_x> <http://value.org/three> . 
-    #        ?s3 <http://value.org/variable_y> <http://value.org/nil> . 
-    #        ?s3 <http://value.org/variable_z> ?list_three . 
-    #        ?s2 <http://value.org/operation> <http://value.org/next_list_number> . 
-    #        ?s2 <http://value.org/variable_x> ?list_two . 
-    #        ?s2 <http://value.org/variable_y> ?list_three . 
-    #        ?s4 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s4 <http://value.org/variable_x> ?car . 
-    #        ?s4 <http://value.org/variable_y> ?cdr . 
-    #        ?s4 <http://value.org/variable_z> ?list_two . 
+    #        ?s3 <{OPERATION}> <{VAL}cons> .
+    #        ?s3 <{VAL}variable_x> <{VAL}three> .
+    #        ?s3 <{VAL}variable_y> <{VAL}nil> .
+    #        ?s3 <{VAL}variable_z> ?list_three .
+    #        ?s2 <{OPERATION}> <{VAL}next_list_number> .
+    #        ?s2 <{VAL}variable_x> ?list_two .
+    #        ?s2 <{VAL}variable_y> ?list_three .
+    #        ?s4 <{OPERATION}> <{VAL}cons> .
+    #        ?s4 <{VAL}variable_x> ?car .
+    #        ?s4 <{VAL}variable_y> ?cdr .
+    #        ?s4 <{VAL}variable_z> ?list_two .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -729,21 +729,21 @@ def main():
     #     # next(?ans, [3])
     #     my_question = f"""
     #        SELECT ?list_two ?car ?cdr WHERE {{
-    #        ?s1 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s1 <http://value.org/variable_x> <http://value.org/two> . 
-    #        ?s1 <http://value.org/variable_y> <http://value.org/nil> . 
-    #        ?s1 <http://value.org/variable_z> ?list_dummy . 
-    #        ?s3 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s3 <http://value.org/variable_x> <http://value.org/three> . 
-    #        ?s3 <http://value.org/variable_y> <http://value.org/nil> . 
-    #        ?s3 <http://value.org/variable_z> ?list_three . 
-    #        ?s2 <http://value.org/operation> <http://value.org/next_list_number> . 
-    #        ?s2 <http://value.org/variable_x> ?list_two . 
-    #        ?s2 <http://value.org/variable_y> ?list_three . 
-    #        ?s4 <http://value.org/operation> <http://value.org/cons> . 
-    #        ?s4 <http://value.org/variable_x> ?car . 
-    #        ?s4 <http://value.org/variable_y> ?cdr . 
-    #        ?s4 <http://value.org/variable_z> ?list_two . 
+    #        ?s1 <{OPERATION}> <{VAL}cons> .
+    #        ?s1 <{VAL}variable_x> <{VAL}two> .
+    #        ?s1 <{VAL}variable_y> <{VAL}nil> .
+    #        ?s1 <{VAL}variable_z> ?list_dummy .
+    #        ?s3 <{OPERATION}> <{VAL}cons> .
+    #        ?s3 <{VAL}variable_x> <{VAL}three> .
+    #        ?s3 <{VAL}variable_y> <{VAL}nil> .
+    #        ?s3 <{VAL}variable_z> ?list_three .
+    #        ?s2 <{OPERATION}> <{VAL}next_list_number> .
+    #        ?s2 <{VAL}variable_x> ?list_two .
+    #        ?s2 <{VAL}variable_y> ?list_three .
+    #        ?s4 <{OPERATION}> <{VAL}cons> .
+    #        ?s4 <{VAL}variable_x> ?car .
+    #        ?s4 <{VAL}variable_y> ?cdr .
+    #        ?s4 <{VAL}variable_z> ?list_two .
     #        }}"""
     #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
     #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -756,13 +756,13 @@ def main():
         # next([1], ?ans) = [2]
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{ 
-            ?s1 <http://value.org/operation> <http://value.org/next_list_number> . 
-            ?s1 <http://value.org/variable_x> <http://value.org/list_one> . 
-            ?s1 <http://value.org/variable_y> ?ans . 
-            ?s2 <http://value.org/operation> <http://value.org/cons> . 
-            ?s2 <http://value.org/variable_x> ?car . 
-            ?s2 <http://value.org/variable_y> ?cdr . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s1 <{OPERATION}> <{VAL}next_list_number> . 
+            ?s1 <{VAL}variable_x> <{VAL}list_one> . 
+            ?s1 <{VAL}variable_y> ?ans . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -770,25 +770,25 @@ def main():
         # next([9, 9], ?ans) = [0, 0, 1] means 100
         my_question = f"""
             SELECT ?car_one_hundred ?car ?cdr WHERE {{
-            ?s1 <http://value.org/operation> <http://value.org/cons> .
-            ?s1 <http://value.org/variable_x> <http://value.org/nine> .
-            ?s1 <http://value.org/variable_y> <http://value.org/nil> .
-            ?s1 <http://value.org/variable_z> ?list_nine .
-            ?s1b <http://value.org/operation> <http://value.org/cons> .
-            ?s1b <http://value.org/variable_x> <http://value.org/nine> .
-            ?s1b <http://value.org/variable_y> ?list_nine .
-            ?s1b <http://value.org/variable_z> ?list_ninety_nine .
-            ?s2 <http://value.org/operation> <http://value.org/next_list_number> .
-            ?s2 <http://value.org/variable_x> ?list_ninety_nine .
-            ?s2 <http://value.org/variable_y> ?list_one_hundred .
-            ?s3 <http://value.org/operation> <http://value.org/cons> .
-            ?s3 <http://value.org/variable_x> ?car_one_hundred .
-            ?s3 <http://value.org/variable_y> ?cdr_one_hundred .
-            ?s3 <http://value.org/variable_z> ?list_one_hundred .
-            ?s4 <http://value.org/operation> <http://value.org/cons> .
-            ?s4 <http://value.org/variable_x> ?car .
-            ?s4 <http://value.org/variable_y> ?cdr .
-            ?s4 <http://value.org/variable_z> ?cdr_one_hundred .
+            ?s1 <{OPERATION}> <{VAL}cons> .
+            ?s1 <{VAL}variable_x> <{VAL}nine> .
+            ?s1 <{VAL}variable_y> <{VAL}nil> .
+            ?s1 <{VAL}variable_z> ?list_nine .
+            ?s1b <{OPERATION}> <{VAL}cons> .
+            ?s1b <{VAL}variable_x> <{VAL}nine> .
+            ?s1b <{VAL}variable_y> ?list_nine .
+            ?s1b <{VAL}variable_z> ?list_ninety_nine .
+            ?s2 <{OPERATION}> <{VAL}next_list_number> .
+            ?s2 <{VAL}variable_x> ?list_ninety_nine .
+            ?s2 <{VAL}variable_y> ?list_one_hundred .
+            ?s3 <{OPERATION}> <{VAL}cons> .
+            ?s3 <{VAL}variable_x> ?car_one_hundred .
+            ?s3 <{VAL}variable_y> ?cdr_one_hundred .
+            ?s3 <{VAL}variable_z> ?list_one_hundred .
+            ?s4 <{OPERATION}> <{VAL}cons> .
+            ?s4 <{VAL}variable_x> ?car .
+            ?s4 <{VAL}variable_y> ?cdr .
+            ?s4 <{VAL}variable_z> ?cdr_one_hundred .
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -799,14 +799,14 @@ def main():
         # add(1, 1, ?ans)
         my_question = f"""
            SELECT ?ans ?car ?cdr WHERE {{
-           ?s <http://value.org/operation> <http://value.org/list_add> . 
-           ?s <http://value.org/variable_x> <http://value.org/list_one> . 
-           ?s <http://value.org/variable_y> <http://value.org/list_one> . 
-           ?s <http://value.org/variable_z> ?ans . 
-           ?s2 <http://value.org/operation> <http://value.org/cons> . 
-           ?s2 <http://value.org/variable_x> ?car . 
-           ?s2 <http://value.org/variable_y> ?cdr . 
-           ?s2 <http://value.org/variable_z> ?ans . 
+           ?s1 <{OPERATION}> <{VAL}list_add> . 
+           ?s1 <{VAL}variable_x> <{VAL}list_one> . 
+           ?s1 <{VAL}variable_y> <{VAL}list_one> . 
+           ?s1 <{VAL}variable_z> ?ans . 
+           ?s2 <{OPERATION}> <{VAL}cons> . 
+           ?s2 <{VAL}variable_x> ?car . 
+           ?s2 <{VAL}variable_y> ?cdr . 
+           ?s2 <{VAL}variable_z> ?ans . 
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -814,14 +814,14 @@ def main():
         # add(2, 1, ?ans)
         my_question = f"""
            SELECT ?ans ?car ?cdr WHERE {{
-           ?s <http://value.org/operation> <http://value.org/list_add> . 
-           ?s <http://value.org/variable_x> <http://value.org/list_two> . 
-           ?s <http://value.org/variable_y> <http://value.org/list_one> . 
-           ?s <http://value.org/variable_z> ?ans . 
-           ?s2 <http://value.org/operation> <http://value.org/cons> . 
-           ?s2 <http://value.org/variable_x> ?car . 
-           ?s2 <http://value.org/variable_y> ?cdr . 
-           ?s2 <http://value.org/variable_z> ?ans . 
+           ?s1 <{OPERATION}> <{VAL}list_add> . 
+           ?s1 <{VAL}variable_x> <{VAL}list_two> . 
+           ?s1 <{VAL}variable_y> <{VAL}list_one> . 
+           ?s1 <{VAL}variable_z> ?ans . 
+           ?s2 <{OPERATION}> <{VAL}cons> . 
+           ?s2 <{VAL}variable_x> ?car . 
+           ?s2 <{VAL}variable_y> ?cdr . 
+           ?s2 <{VAL}variable_z> ?ans . 
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -829,14 +829,14 @@ def main():
         # add(1, 2, ?ans)
         my_question = f"""
            SELECT ?ans ?car ?cdr WHERE {{
-           ?s <http://value.org/operation> <http://value.org/list_add> . 
-           ?s <http://value.org/variable_x> <http://value.org/list_one> . 
-           ?s <http://value.org/variable_y> <http://value.org/list_two> . 
-           ?s <http://value.org/variable_z> ?ans . 
-           ?s2 <http://value.org/operation> <http://value.org/cons> . 
-           ?s2 <http://value.org/variable_x> ?car . 
-           ?s2 <http://value.org/variable_y> ?cdr . 
-           ?s2 <http://value.org/variable_z> ?ans . 
+           ?s1 <{OPERATION}> <{VAL}list_add> . 
+           ?s1 <{VAL}variable_x> <{VAL}list_one> . 
+           ?s1 <{VAL}variable_y> <{VAL}list_two> . 
+           ?s1 <{VAL}variable_z> ?ans . 
+           ?s2 <{OPERATION}> <{VAL}cons> . 
+           ?s2 <{VAL}variable_x> ?car . 
+           ?s2 <{VAL}variable_y> ?cdr . 
+           ?s2 <{VAL}variable_z> ?ans . 
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -844,14 +844,14 @@ def main():
         # add(9, 1, ?ans)
         my_question = f"""
            SELECT ?ans ?car ?cdr WHERE {{
-           ?s <http://value.org/operation> <http://value.org/list_add> . 
-           ?s <http://value.org/variable_x> <http://value.org/list_nine> . 
-           ?s <http://value.org/variable_y> <http://value.org/list_one> . 
-           ?s <http://value.org/variable_z> ?ans . 
-           ?s2 <http://value.org/operation> <http://value.org/cons> . 
-           ?s2 <http://value.org/variable_x> ?car . 
-           ?s2 <http://value.org/variable_y> ?cdr . 
-           ?s2 <http://value.org/variable_z> ?ans . 
+           ?s1 <{OPERATION}> <{VAL}list_add> . 
+           ?s1 <{VAL}variable_x> <{VAL}list_nine> . 
+           ?s1 <{VAL}variable_y> <{VAL}list_one> . 
+           ?s1 <{VAL}variable_z> ?ans . 
+           ?s2 <{OPERATION}> <{VAL}cons> . 
+           ?s2 <{VAL}variable_x> ?car . 
+           ?s2 <{VAL}variable_y> ?cdr . 
+           ?s2 <{VAL}variable_z> ?ans . 
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -859,14 +859,14 @@ def main():
         # add(1, ?ans, 2)
         my_question = f"""
            SELECT ?ans ?car ?cdr WHERE {{
-           ?s <http://value.org/operation> <http://value.org/list_add> . 
-           ?s <http://value.org/variable_x> <http://value.org/list_one> . 
-           ?s <http://value.org/variable_y> ?ans . 
-           ?s <http://value.org/variable_z> <http://value.org/list_two> . 
-           ?s2 <http://value.org/operation> <http://value.org/cons> . 
-           ?s2 <http://value.org/variable_x> ?car . 
-           ?s2 <http://value.org/variable_y> ?cdr . 
-           ?s2 <http://value.org/variable_z> ?ans . 
+           ?s1 <{OPERATION}> <{VAL}list_add> . 
+           ?s1 <{VAL}variable_x> <{VAL}list_one> . 
+           ?s1 <{VAL}variable_y> ?ans . 
+           ?s1 <{VAL}variable_z> <{VAL}list_two> . 
+           ?s2 <{OPERATION}> <{VAL}cons> . 
+           ?s2 <{VAL}variable_x> ?car . 
+           ?s2 <{VAL}variable_y> ?cdr . 
+           ?s2 <{VAL}variable_z> ?ans . 
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -875,10 +875,10 @@ def main():
         # add(1, ?ans, 3)
         my_question = f"""
            SELECT ?ans ?car ?cdr WHERE {{
-           ?s <http://value.org/operation> <http://value.org/list_add> . 
-           ?s <http://value.org/variable_x> <http://value.org/list_one> . 
-           ?s <http://value.org/variable_y> ?ans . 
-           ?s <http://value.org/variable_z> <http://value.org/list_three> . 
+           ?s <{OPERATION}> <{VAL}list_add> . 
+           ?s <{VAL}variable_x> <{VAL}list_one> . 
+           ?s <{VAL}variable_y> ?ans . 
+           ?s <{VAL}variable_z> <{VAL}list_three> . 
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
@@ -891,25 +891,25 @@ def main():
         # next([9, 9], ?ans) = [0, 0, 1] means 100
         my_question = f"""
             SELECT ?car_one_hundred ?car ?cdr WHERE {{
-            ?s1 <http://value.org/operation> <http://value.org/cons> .
-            ?s1 <http://value.org/variable_x> <http://value.org/nine> .
-            ?s1 <http://value.org/variable_y> <http://value.org/nil> .
-            ?s1 <http://value.org/variable_z> ?list_nine .
-            ?s1b <http://value.org/operation> <http://value.org/cons> .
-            ?s1b <http://value.org/variable_x> <http://value.org/nine> .
-            ?s1b <http://value.org/variable_y> ?list_nine .
-            ?s1b <http://value.org/variable_z> ?list_ninety_nine .
-            ?s2 <http://value.org/operation> <http://value.org/next_list_number> .
-            ?s2 <http://value.org/variable_x> ?list_ninety_nine .
-            ?s2 <http://value.org/variable_y> ?list_one_hundred .
-            ?s3 <http://value.org/operation> <http://value.org/cons> .
-            ?s3 <http://value.org/variable_x> ?car_one_hundred .
-            ?s3 <http://value.org/variable_y> ?cdr_one_hundred .
-            ?s3 <http://value.org/variable_z> ?list_one_hundred .
-            ?s4 <http://value.org/operation> <http://value.org/cons> .
-            ?s4 <http://value.org/variable_x> ?car .
-            ?s4 <http://value.org/variable_y> ?cdr .
-            ?s4 <http://value.org/variable_z> ?cdr_one_hundred .
+            ?s1 <{OPERATION}> <{VAL}cons> .
+            ?s1 <{VAL}variable_x> <{VAL}nine> .
+            ?s1 <{VAL}variable_y> <{VAL}nil> .
+            ?s1 <{VAL}variable_z> ?list_nine .
+            ?s1b <{OPERATION}> <{VAL}cons> .
+            ?s1b <{VAL}variable_x> <{VAL}nine> .
+            ?s1b <{VAL}variable_y> ?list_nine .
+            ?s1b <{VAL}variable_z> ?list_ninety_nine .
+            ?s2 <{OPERATION}> <{VAL}next_list_number> .
+            ?s2 <{VAL}variable_x> ?list_ninety_nine .
+            ?s2 <{VAL}variable_y> ?list_one_hundred .
+            ?s3 <{OPERATION}> <{VAL}cons> .
+            ?s3 <{VAL}variable_x> ?car_one_hundred .
+            ?s3 <{VAL}variable_y> ?cdr_one_hundred .
+            ?s3 <{VAL}variable_z> ?list_one_hundred .
+            ?s4 <{OPERATION}> <{VAL}cons> .
+            ?s4 <{VAL}variable_x> ?car .
+            ?s4 <{VAL}variable_y> ?cdr .
+            ?s4 <{VAL}variable_z> ?cdr_one_hundred .
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -917,13 +917,13 @@ def main():
         # next([1], ?ans) = [2]
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s1 <http://value.org/operation> <http://value.org/next_list_number> .
-            ?s1 <http://value.org/variable_x> <http://value.org/list_one> .
-            ?s1 <http://value.org/variable_y> ?ans .
-            ?s2 <http://value.org/operation> <http://value.org/cons> .
-            ?s2 <http://value.org/variable_x> ?car .
-            ?s2 <http://value.org/variable_y> ?cdr .
-            ?s2 <http://value.org/variable_z> ?ans .
+            ?s1 <{OPERATION}> <{VAL}next_list_number> .
+            ?s1 <{VAL}variable_x> <{VAL}list_one> .
+            ?s1 <{VAL}variable_y> ?ans .
+            ?s2 <{OPERATION}> <{VAL}cons> .
+            ?s2 <{VAL}variable_x> ?car .
+            ?s2 <{VAL}variable_y> ?cdr .
+            ?s2 <{VAL}variable_z> ?ans .
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -931,14 +931,14 @@ def main():
         # add(2, ?ans, 3)
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s <http://value.org/operation> <http://value.org/list_add> . 
-            ?s <http://value.org/variable_x> <http://value.org/list_two> . 
-            ?s <http://value.org/variable_y> ?ans . 
-            ?s <http://value.org/variable_z> <http://value.org/list_three> . 
-            ?s2 <http://value.org/operation> <http://value.org/cons> . 
-            ?s2 <http://value.org/variable_x> ?car . 
-            ?s2 <http://value.org/variable_y> ?cdr . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s <{OPERATION}> <{VAL}list_add> . 
+            ?s <{VAL}variable_x> <{VAL}list_two> . 
+            ?s <{VAL}variable_y> ?ans . 
+            ?s <{VAL}variable_z> <{VAL}list_three> . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -946,14 +946,14 @@ def main():
         # subtract(4, 2, ?ans)
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s <http://value.org/operation> <http://value.org/list_subtract> . 
-            ?s <http://value.org/variable_x> <http://value.org/list_four> . 
-            ?s <http://value.org/variable_y> <http://value.org/list_two> . 
-            ?s <http://value.org/variable_z> ?ans . 
-            ?s2 <http://value.org/operation> <http://value.org/cons> . 
-            ?s2 <http://value.org/variable_x> ?car . 
-            ?s2 <http://value.org/variable_y> ?cdr . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s <{OPERATION}> <{VAL}list_subtract> . 
+            ?s <{VAL}variable_x> <{VAL}list_four> . 
+            ?s <{VAL}variable_y> <{VAL}list_two> . 
+            ?s <{VAL}variable_z> ?ans . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
@@ -961,14 +961,14 @@ def main():
         # multiply(2, 1, ?ans) -> ?ans = 2
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s <http://value.org/operation> <http://value.org/list_multiply> . 
-            ?s <http://value.org/variable_x> <http://value.org/list_three> . 
-            ?s <http://value.org/variable_y> <http://value.org/list_one> . 
-            ?s <http://value.org/variable_z> ?ans . 
-            ?s2 <http://value.org/operation> <http://value.org/cons> . 
-            ?s2 <http://value.org/variable_x> ?car . 
-            ?s2 <http://value.org/variable_y> ?cdr . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s <{OPERATION}> <{VAL}list_multiply> . 
+            ?s <{VAL}variable_x> <{VAL}list_three> . 
+            ?s <{VAL}variable_y> <{VAL}list_one> . 
+            ?s <{VAL}variable_z> ?ans . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
@@ -976,14 +976,14 @@ def main():
         # multiply(3, 1, ?ans) -> ?ans = 3
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s <http://value.org/operation> <http://value.org/list_multiply> . 
-            ?s <http://value.org/variable_x> <http://value.org/list_three> . 
-            ?s <http://value.org/variable_y> <http://value.org/list_one> . 
-            ?s <http://value.org/variable_z> ?ans . 
-            ?s2 <http://value.org/operation> <http://value.org/cons> . 
-            ?s2 <http://value.org/variable_x> ?car . 
-            ?s2 <http://value.org/variable_y> ?cdr . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s <{OPERATION}> <{VAL}list_multiply> . 
+            ?s <{VAL}variable_x> <{VAL}list_three> . 
+            ?s <{VAL}variable_y> <{VAL}list_one> . 
+            ?s <{VAL}variable_z> ?ans . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
@@ -991,14 +991,14 @@ def main():
         # multiply(3, 2, ?ans) -> ?ans = 6
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s <http://value.org/operation> <http://value.org/list_multiply> . 
-            ?s <http://value.org/variable_x> <http://value.org/list_three> . 
-            ?s <http://value.org/variable_y> <http://value.org/list_two> . 
-            ?s <http://value.org/variable_z> ?ans . 
-            ?s2 <http://value.org/operation> <http://value.org/cons> . 
-            ?s2 <http://value.org/variable_x> ?car . 
-            ?s2 <http://value.org/variable_y> ?cdr . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s <{OPERATION}> <{VAL}list_multiply> . 
+            ?s <{VAL}variable_x> <{VAL}list_three> . 
+            ?s <{VAL}variable_y> <{VAL}list_two> . 
+            ?s <{VAL}variable_z> ?ans . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
@@ -1006,14 +1006,14 @@ def main():
         # multiply(3, ?ans, 3) -> ?ans = 1
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s <http://value.org/operation> <http://value.org/list_multiply> . 
-            ?s <http://value.org/variable_x> <http://value.org/list_three> . 
-            ?s <http://value.org/variable_y> ?ans . 
-            ?s <http://value.org/variable_z> <http://value.org/list_three> . 
-            ?s2 <http://value.org/operation> <http://value.org/cons> . 
-            ?s2 <http://value.org/variable_x> ?car . 
-            ?s2 <http://value.org/variable_y> ?cdr . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s <{OPERATION}> <{VAL}list_multiply> . 
+            ?s <{VAL}variable_x> <{VAL}list_three> . 
+            ?s <{VAL}variable_y> ?ans . 
+            ?s <{VAL}variable_z> <{VAL}list_three> . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
@@ -1021,14 +1021,14 @@ def main():
         # multiply(3, ?ans, 9) -> ?ans = 3
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s <http://value.org/operation> <http://value.org/list_multiply> . 
-            ?s <http://value.org/variable_x> <http://value.org/list_three> . 
-            ?s <http://value.org/variable_y> ?ans . 
-            ?s <http://value.org/variable_z> <http://value.org/list_nine> . 
-            ?s2 <http://value.org/operation> <http://value.org/cons> . 
-            ?s2 <http://value.org/variable_x> ?car . 
-            ?s2 <http://value.org/variable_y> ?cdr . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s <{OPERATION}> <{VAL}list_multiply> . 
+            ?s <{VAL}variable_x> <{VAL}list_three> . 
+            ?s <{VAL}variable_y> ?ans . 
+            ?s <{VAL}variable_z> <{VAL}list_nine> . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=150)
@@ -1036,14 +1036,14 @@ def main():
         # divide(6, 2, ?ans) -> ?ans = [3]
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s1 <http://value.org/operation> <http://value.org/cons> . 
-            ?s1 <http://value.org/variable_x> <http://value.org/six> . 
-            ?s1 <http://value.org/variable_y> <http://value.org/nil> . 
-            ?s1 <http://value.org/variable_z> ?list_15 . 
-            ?s2 <http://value.org/operation> <http://value.org/list_divide> . 
-            ?s2 <http://value.org/variable_x> ?list_15 . 
-            ?s2 <http://value.org/variable_y> <http://value.org/list_two> . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s1 <{OPERATION}> <{VAL}cons> . 
+            ?s1 <{VAL}variable_x> <{VAL}six> . 
+            ?s1 <{VAL}variable_y> <{VAL}nil> . 
+            ?s1 <{VAL}variable_z> ?list_15 . 
+            ?s2 <{OPERATION}> <{VAL}list_divide> . 
+            ?s2 <{VAL}variable_x> ?list_15 . 
+            ?s2 <{VAL}variable_y> <{VAL}list_two> . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=50)
@@ -1051,10 +1051,10 @@ def main():
         # divide(5, 2, ?ans)
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s <http://value.org/operation> <http://value.org/list_divide> .
-            ?s <http://value.org/variable_x> <http://value.org/list_five> .
-            ?s <http://value.org/variable_y> <http://value.org/list_two> .
-            ?s <http://value.org/variable_z> ?ans .
+            ?s <{OPERATION}> <{VAL}list_divide> .
+            ?s <{VAL}variable_x> <{VAL}list_five> .
+            ?s <{VAL}variable_y> <{VAL}list_two> .
+            ?s <{VAL}variable_z> ?ans .
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=200)
@@ -1062,13 +1062,13 @@ def main():
         # fibinacci(1, ?ans) -> ?ans = 1
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s <http://value.org/operation> <http://value.org/fibonacci_number> . 
-            ?s <http://value.org/variable_x> <http://value.org/list_one> . 
-            ?s <http://value.org/variable_y> ?ans . 
-            ?s2 <http://value.org/operation> <http://value.org/cons> . 
-            ?s2 <http://value.org/variable_x> ?car . 
-            ?s2 <http://value.org/variable_y> ?cdr . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s1 <{OPERATION}> <{VAL}fibonacci_number> . 
+            ?s1 <{VAL}variable_x> <{VAL}list_one> . 
+            ?s1 <{VAL}variable_y> ?ans . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
@@ -1076,13 +1076,13 @@ def main():
         # fibinacci(3, ?ans) -> ?ans = 2
         my_question = f"""
             SELECT ?ans ?car ?cdr WHERE {{
-            ?s <http://value.org/operation> <http://value.org/fibonacci_number> . 
-            ?s <http://value.org/variable_x> <http://value.org/list_three> . 
-            ?s <http://value.org/variable_y> ?ans . 
-            ?s2 <http://value.org/operation> <http://value.org/cons> . 
-            ?s2 <http://value.org/variable_x> ?car . 
-            ?s2 <http://value.org/variable_y> ?cdr . 
-            ?s2 <http://value.org/variable_z> ?ans . 
+            ?s1 <{OPERATION}> <{VAL}fibonacci_number> . 
+            ?s1 <{VAL}variable_x> <{VAL}list_three> . 
+            ?s1 <{VAL}variable_y> ?ans . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)

@@ -6,7 +6,7 @@ T. Masuda, 2023/12/25
 local_bindings = {}
 
 for key1, value1 in bindings.items():
-    key_modified = key1.replace('http://some.org/_', '').replace('http://variable.org/_', '')  # -> x
+    key_modified = key1.replace(f'http://some.org/_', '').replace(f'http://variable.org/_', '')  # -> x
     value_modified = value1.replace('http://value.org/', '').replace('http://variable.org/', '')
     local_bindings[key_modified] = value_modified  # arguments for exec
 
