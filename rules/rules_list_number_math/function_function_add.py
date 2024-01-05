@@ -4,6 +4,6 @@ called from exec()
 T. Masuda, 2024/1/5
 """
 
-from src.RdfResolution import *
+from src.RdfResolution import FunctionHelper
 
-results = function_list_add(rdf_prolog, bindings)
+results = FunctionHelper.function_list_add(rdf_prolog, bindings)
