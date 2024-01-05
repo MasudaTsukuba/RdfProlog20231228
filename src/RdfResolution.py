@@ -269,6 +269,7 @@ class Reasoner:
             except KeyError as e:
                 print_and_log(f'applications not found {e}')
             return success_out_, list_of_bindings_return_  # return of try_applications
+            # end of try_applications
 
         success_out, list_of_bindings_return = try_applications(first_clause, rest_clauses, depth_current, success_out, list_of_bindings_return)  # try applications
 
@@ -276,6 +277,8 @@ class Reasoner:
         if success_out and len(list_of_bindings_return) > self.width_reached:
             self.width_reached = len(list_of_bindings_return)  # update the width
         return success_out, list_of_bindings_return  # return of reasoner
+        # end of reasoner
+    # end of Reasoner class
 
 
 # class Resolution:  # main class for resolution
@@ -591,6 +594,134 @@ class Reasoner:
 #                 pass
 #         return succeeded, resolve_bindings_out
 #     # end of resolve_clause
+
+def list_to_num(rdf_prolog: RdfProlog, list_number: str):
+    """Convert a list number to an integer.
+    http://value.org/list_five -> 5
+
+    Args:
+        rdf_prolog (RdfProlog): RdfProlog instance
+        list_number (str): an integer represented as a list number
+
+    Returns:
+        int: an integer number
+
+    """
+    number_list = {'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9}  # conversion table
+    return_number = 0  # initial value of an integer to be returned
+    multiplier = 1  # multiplier for each digit of the integer
+    while True:
+        my_question = f"""
+                SELECT ?car ?cdr WHERE {{
+                ?s1 <{OPERATION}> <{VAL}cons> . 
+                ?s1 <{VAL}variable_x> ?car . 
+                ?s1 <{VAL}variable_y> ?cdr . 
+                ?s1 <{VAL}variable_z> <{list_number}> . 
+                }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)  # get the car and cdr of the list number
+        car = resolve_bindings[0]['?car']  # car part
+        car_value = number_list[car.replace(VAL, '')]  # convert to an integer
+        return_number += car_value * multiplier  # 345 = 5*1 + 4*10 + 3*100
+        multiplier *= 10
+        cdr = resolve_bindings[0]['?cdr']  # cdr part
+        if cdr == f'{VAL}nil':  # no more digit exists
+            break  # leave the while loop
+        list_number = cdr  # repeat for the remaining, 345 -> 5 and 34
+    return return_number
+
+
+def num_to_list(rdf_prolog: RdfProlog, num: int):
+    """Convert integer number to a list number.
+
+    Args:
+        rdf_prolog (RdfProlog): RdfProlog instance holding all the info of list numbers
+        num (int): an integer number to be converted
+
+    Returns:
+        str: list number
+
+    """
+    number_list = {0: 'zero', 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine'}  # conversion table
+    if num < 10:  # no more upper digits
+        list_number = f'{VAL}{number_list[num]}'  # 2 -> http://value.org/two
+        my_question = f"""
+                SELECT ?ans WHERE {{
+                ?s1 <{OPERATION}> <{VAL}cons> . 
+                ?s1 <{VAL}variable_x> <{list_number}> . 
+                ?s1 <{VAL}variable_y> <{VAL}nil> . 
+                ?s1 <{VAL}variable_z> ?ans . 
+                }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
+        return resolve_bindings[0]['?ans']  # create a cons and return it
+    else:  # num >=10, more digits exist
+        quotient, remainder = divmod(num, 10)
+        quotient_number = num_to_list(rdf_prolog, quotient)  # recursive call
+        remainder_number = f'{VAL}{number_list[remainder]}'  # least significant digit
+        my_question = f"""
+                SELECT ?ans WHERE {{
+                ?s1 <{OPERATION}> <{VAL}cons> . 
+                ?s1 <{VAL}variable_x> <{remainder_number}> . 
+                ?s1 <{VAL}variable_y> <{quotient_number}> . 
+                ?s1 <{VAL}variable_z> ?ans . 
+                }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
+        return resolve_bindings[0]['?ans']  # create a cons and return it
+    pass
+
+
+def function_list_add(rdf_prolog: RdfProlog, bindings: dict[str, str]):
+    """Execute add operation for list numbers.
+    Function called from function_function_add.py
+
+    Args:
+        rdf_prolog (RdfProlog):
+        bindings (dict[str, str]):
+
+    Returns:
+        str: list number of add results
+
+    """
+
+    x = bindings[f'{VAR}_x']  # extract an argument x
+    y = bindings[f'{VAR}_y']  # extract an argument y
+    print(f'x: {x}')  # just for debug
+    print(f'y: {y}')
+    x_num = list_to_num(rdf_prolog, x)  # convert a list number to an integer
+    y_num = list_to_num(rdf_prolog, y)
+    z_num = x_num + y_num  # add
+    z = num_to_list(rdf_prolog, z_num)  # convert back to a list number
+
+    results = {bindings[f'{VAR}_z']: z}  # return the result
+    return results
+
+
+def function_list_multiply(rdf_prolog: RdfProlog, bindings: dict[str, str]):
+    """Execute multiplication operation for list numbers.
+    Function called from function_function_multiply.py
+
+    Args:
+        rdf_prolog (RdfProlog):
+        bindings (dict[str, str]):
+
+    Returns:
+        str: list number of multiplication results
+
+    """
+
+    x = bindings[f'{VAR}_x']  # extract an argument x
+    y = bindings[f'{VAR}_y']  # extract an argument y
+    print(f'x: {x}')  # just for debug
+    print(f'y: {y}')
+    x_num = list_to_num(rdf_prolog, x)  # convert a list number to an integer
+    y_num = list_to_num(rdf_prolog, y)
+    z_num = x_num * y_num  # add
+    z = num_to_list(rdf_prolog, z_num)  # convert back to a list number
+
+    results = {bindings[f'{VAR}_z']: z}  # return the result
+    return results
 
 
 def main():

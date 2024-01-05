@@ -617,7 +617,7 @@ class ClassClause:
 
                     """
                     code_to_execute: str = function_.code  # code contains teh Python code to be executed.
-                    local_vars = {'bindings': forward_binding_}  # variable bindings
+                    local_vars = {'bindings': forward_binding_, 'rdf_prolog': rdf_prolog}  # variable bindings
                     # for key1, value1 in forward_binding_.items():
                     #     key_modified = key1.replace(f'{SOME}_', '').replace(f'{VAR}_', '')  # -> x
                     #     value_modified = value1.replace(VAL, '').replace(VAR, '')
@@ -782,13 +782,13 @@ class ClassFacts:
         Returns:
 
         """
-        self.facts.add(fact)
+        self.facts.add(fact)  # register the new fact
         # operation_name = fact.operation_name_uri
         try:
-            self.fact_dict[fact.operation_name_uri].add(fact)
-        except KeyError:
-            self.fact_dict[fact.operation_name_uri] = set()
-            self.fact_dict[fact.operation_name_uri].add(fact)
+            self.fact_dict[fact.operation_name_uri].add(fact)  # try to register the new fact into a dict
+        except KeyError:  # a dict entry for this operation name does not exit
+            self.fact_dict[fact.operation_name_uri] = set()  # create an entry for this operation name as an empty set
+            self.fact_dict[fact.operation_name_uri].add(fact)  # and register the fact
 
 
 class ClassFact:

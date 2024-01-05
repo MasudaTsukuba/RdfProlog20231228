@@ -1,0 +1,64 @@
+# rules_function_add.ttl
+# rules for calling function_add
+# T. Masuda, 2024/1/5
+
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+##################################################################
+# rules
+
+VAL:rule_function_add
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:function_add ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:function_add ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_y ;
+            VAL:variable_z VAR:_z ] ;
+        VAL:id "1" ] .
+
+##################################################################
+# controls
+
+##################################################################
+# functions
+
+VAL:function_add
+    VAL:type VAL:function ;
+    VAL:rule VAL:rule_function_add ;
+    VAL:left_side [
+        VAL:variable_x "some" ;
+        VAL:variable_y "some" ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] .
+
+##################################################################
+# applications
+
+VAL:application_function_add
+    VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+        VAL:operation VAL:function_add ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:function VAL:function_add ;
+        VAL:priority "1" ] ;
+    VAL:priority "1".
+
+
+##################################################################
+# inferences

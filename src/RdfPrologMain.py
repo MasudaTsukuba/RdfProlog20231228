@@ -107,7 +107,7 @@ def main():
 
     # add
     if True:
-        rdf_prolog = RdfProlog(rules_folder='../rules/rules_number')
+        # rdf_prolog = RdfProlog(rules_folder='../rules/rules_number')
 
         # add(3, 1, ?ans)
         my_question = f"""
@@ -215,7 +215,7 @@ def main():
            ?s <{VAL}variable_z> <{VAL}five> .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        rdf_prolog.answer_question(my_sparql_query)
+        # rdf_prolog.answer_question(my_sparql_query)
 
         # add(1, ?y, ?z)
         my_question = f"""
@@ -528,7 +528,6 @@ def main():
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
-
         pass
 
     # family
@@ -884,9 +883,9 @@ def main():
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=100)
         pass
 
-     # list number math
+    # list number math
     if True:
-        # rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
+        rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
 
         # next([9, 9], ?ans) = [0, 0, 1] means 100
         my_question = f"""
@@ -1087,6 +1086,60 @@ def main():
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
 
+        # function_cons()
+        my_question = f"""
+            SELECT ?ans WHERE {{
+            ?s1 <{OPERATION}> <{VAL}function_cons> . 
+            ?s1 <{VAL}variable_x> <{VAL}three> . 
+            ?s1 <{VAL}variable_y> <{VAL}list_two> . 
+            ?s1 <{VAL}variable_z> ?ans . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
+            }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
+        pass
+
+        # function_add()
+        my_question = f"""
+            SELECT ?ans WHERE {{
+            ?s1 <{OPERATION}> <{VAL}function_add> . 
+            ?s1 <{VAL}variable_x> <{VAL}list_three> . 
+            ?s1 <{VAL}variable_y> <{VAL}list_two> . 
+            ?s1 <{VAL}variable_z> ?ans . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
+            }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
+        pass
+
+        # function_add()
+        my_question = f"""
+            SELECT ?ans WHERE {{
+            ?s3 <{OPERATION}> <{VAL}cons> . 
+            ?s3 <{VAL}variable_x> <{VAL}seven> . 
+            ?s3 <{VAL}variable_y> <{VAL}list_one> . 
+            ?s3 <{VAL}variable_z> ?list_seventeen . 
+            ?s4 <{OPERATION}> <{VAL}cons> . 
+            ?s4 <{VAL}variable_x> <{VAL}nine> . 
+            ?s4 <{VAL}variable_y> <{VAL}list_one> . 
+            ?s4 <{VAL}variable_z> ?list_nineteen . 
+            ?s1 <{OPERATION}> <{VAL}function_add> . 
+            ?s1 <{VAL}variable_x> ?list_seventeen . 
+            ?s1 <{VAL}variable_y> ?list_nineteen . 
+            ?s1 <{VAL}variable_z> ?ans . 
+            ?s2 <{OPERATION}> <{VAL}cons> . 
+            ?s2 <{VAL}variable_x> ?car . 
+            ?s2 <{VAL}variable_y> ?cdr . 
+            ?s2 <{VAL}variable_z> ?ans . 
+            }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
         pass
 
 
