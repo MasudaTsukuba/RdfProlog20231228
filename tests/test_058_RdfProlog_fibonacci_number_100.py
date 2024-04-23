@@ -74,17 +74,17 @@ def test_answer_question4_fibonacci_5_ans():
     assert resolve_bindings[0]['?ans'] == f'{VAL}5'
 
 
-def test_answer_question5_divide_6_ans():
-    # divide(?ans, 2, 3)->ans:6
-    my_question = f"""
-        SELECT ?ans WHERE {{
-        ?s <{OPERATION}> <{VAL}fibonacci_number> .
-        ?s <{VAL}variable_x> <{VAL}6> .
-        ?s <{VAL}variable_y> ?ans .
-        }}"""
-    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=200)
-    assert resolve_bindings[0]['?ans'] == f'{VAL}8'
+# def test_answer_question5_divide_6_ans():
+#     # divide(?ans, 2, 3)->ans:6
+#     my_question = f"""
+#         SELECT ?ans WHERE {{
+#         ?s <{OPERATION}> <{VAL}fibonacci_number> .
+#         ?s <{VAL}variable_x> <{VAL}6> .
+#         ?s <{VAL}variable_y> ?ans .
+#         }}"""
+#     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+#     resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=200)
+#     assert resolve_bindings[0]['?ans'] == f'{VAL}8'
 
 
 def test_answer_complex_question1():

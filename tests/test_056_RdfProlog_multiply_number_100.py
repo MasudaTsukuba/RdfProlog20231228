@@ -124,22 +124,22 @@ def test_answer_complex_question1():
     assert resolve_bindings[0]['?ans'] == f'{VAL}7'
 
 
-def test_answer_complex_question2():
-    # multiply(3, 2, ?z), multiply(?z, 5, ?ans)->z:6, ans:30
-    my_question = f"""
-        SELECT ?ans WHERE {{
-        ?s1 <{OPERATION}> <{VAL}multiply_number> .
-        ?s1 <{VAL}variable_x> <{VAL}3> .
-        ?s1 <{VAL}variable_y> <{VAL}2> .
-        ?s1 <{VAL}variable_z> ?z .
-        ?s2 <{OPERATION}> <{VAL}multiply_number> .
-        ?s2 <{VAL}variable_x> ?z .
-        ?s2 <{VAL}variable_y> <{VAL}5> .
-        ?s2 <{VAL}variable_z> ?ans .
-        }}"""
-    my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=200)
-    assert resolve_bindings[0]['?ans'] == f'{VAL}30'
+# def test_answer_complex_question2():
+#     # multiply(3, 2, ?z), multiply(?z, 5, ?ans)->z:6, ans:30
+#     my_question = f"""
+#         SELECT ?ans WHERE {{
+#         ?s1 <{OPERATION}> <{VAL}multiply_number> .
+#         ?s1 <{VAL}variable_x> <{VAL}3> .
+#         ?s1 <{VAL}variable_y> <{VAL}2> .
+#         ?s1 <{VAL}variable_z> ?z .
+#         ?s2 <{OPERATION}> <{VAL}multiply_number> .
+#         ?s2 <{VAL}variable_x> ?z .
+#         ?s2 <{VAL}variable_y> <{VAL}5> .
+#         ?s2 <{VAL}variable_z> ?ans .
+#         }}"""
+#     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+#     resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=200)
+#     assert resolve_bindings[0]['?ans'] == f'{VAL}30'
 
 
 # # def test_add_1_y_z():

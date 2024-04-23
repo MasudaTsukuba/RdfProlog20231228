@@ -76,7 +76,7 @@ class ClassClauses:
     def build(self, graph, results):  # not used at the moment
         pass
 
-    def split_clauses(self):
+    def split_clauses(self, index: int = 0):
         """Split the clauses into the first clause and the rest of clauses.
 
         Returns:
@@ -84,9 +84,16 @@ class ClassClauses:
              ClassClauses: rest clauses
         """
         if len(self.list_of_clauses) > 0:
+            if index >= len(self.list_of_clauses):
+                sys.exit(-1)  # error
             rest_clauses = ClassClauses()  # create a new instance of ClassClauses
-            rest_clauses.list_of_clauses = self.list_of_clauses[1:]  # copy the rest clauses
-            return self.list_of_clauses[0], rest_clauses  # first and rest
+            first_clause = ClassClause()
+            for idx, clause in enumerate(self.list_of_clauses):
+                if idx == index:
+                    first_clause = clause
+                else:
+                    rest_clauses.list_of_clauses.append(clause)  # copy the rest clauses
+            return first_clause, rest_clauses  # first and rest
         else:
             return None, None  # contains no clauses
 
@@ -258,7 +265,17 @@ class ClassClause:
             for predicate, object_ in self.predicate_object_dict.items():
                 try:
                     if object_.find(VAR) >= 0:  # object is a variable
-                        bindings_[object_] = candidate_.fact.predicate_object_dict[predicate]  # correspondence against the object
+                        candidate_value = candidate_.fact.predicate_object_dict[predicate]
+                        try:
+                            current_binding = bindings_[object_]
+                            if current_binding == candidate_value:
+                                pass  # binding to the same variable must be the same candidate value
+                            else:
+                                success_ = False  # different constants cause failure
+                                break
+                        except KeyError:  # not yet registered
+                            bindings_[object_] = candidate_value
+                            # correspondence against the object
                     else:
                         if candidate_.fact.predicate_object_dict[predicate] == object_:
                             pass  # same constants are OK
@@ -355,19 +372,25 @@ class ClassClause:
 
     def match_application(self, rdf_prolog, application):
         """Test whether the argument application matches with this clause.
+        Conventional one to one matching.
 
         Args:
             rdf_prolog:
             application (ClassApplication):
 
         Returns:
+            matched,
+            list_of_clauses,
+            list_of_forward_bindings,
+            list_of_backward_bindings
 
         """
-        def append_to_bindings(bindings, key_, value_):
+        def append_to_bindings(bindings_, key_, value_):
             """Append a value to the list specified by key.
+            For bindings multiple.
 
             Args:
-                bindings (dict[str, list[str]]):
+                bindings_ (dict[str, list[str]]):
                 key_ (str):
                 value_ (str):
 
@@ -376,11 +399,11 @@ class ClassClause:
 
             """
             try:
-                xxx = bindings[key_]  # search an entry
+                xxx = bindings_[key_]  # search an entry
             except KeyError:  # no entry found
-                bindings[key_] = []  # value of the dict is an empty list
-            bindings[key_].append(value_)
-            return bindings
+                bindings_[key_] = []  # value of the dict is an empty list
+            bindings_[key_].append(value_)
+            return bindings_
 
         def apply_internal_bindings(forward_multiple: dict[str, list[str]], backward_multiple: dict[str, list[str]]):
             """Apply forward and backward bindings to this clause.
@@ -425,13 +448,27 @@ class ClassClause:
                                     success_ = False  # failure
                                     break  # skip the rest
                     first_element = first_constant
-                    if first_constant == '':  # no constant value is found
+                    if first_constant == '':  # no constant value is found, all the values are variables
                         for value_ in values:
                             if not is_constant(value_):
-                                first_element = value_  # variable
-                    for value_ in values:  # scan for the variables
-                        if not is_constant(value_):  # the value is a variable
-                            backward_binding_[value_] = first_element  # variable
+                                try:
+                                    current_value = forward_binding_[key_]
+                                    if current_value != value_:
+                                        success_ = False  # failure
+                                        break  # skip the rest
+                                except KeyError:
+                                    forward_binding_[key_] = value_  # variable
+                    else:
+                        for value_ in values:  # scan for the variables
+                            if not is_constant(value_):  # the value is a variable
+                                try:
+                                    current_value = backward_binding_[value_]
+                                    if current_value != first_element:  # the variable must have the same value
+                                        success_ = False  # failure
+                                        break  # skip the rest
+                                except KeyError:
+                                    backward_binding_[value_] = first_element
+
                 else:  # len(values)==0 => error
                     sys.exit(-1)  # stop the program
 
@@ -458,30 +495,39 @@ class ClassClause:
                         break
                     for value_ in values:  # scan for the variables
                         if not is_constant(value_):  # the value is a variable
-                            backward_binding_[value_] = first_constant
+                            backward_binding_[key_] = first_constant
                 else:  # len(values)==0 => error
                     sys.exit(-1)  # stop the program
 
             return success_, forward_binding_, backward_binding_  # end and return of apply_internal_bindings
 
         # try to match the pattern of an application
-        pattern = application.pattern  # extract the pattern in the application
+
+        # pattern = application.pattern  # extract the pattern in the application
+        # ex. add(2, 2, ?ans)
+        # application VAL:application_add_number_x_y_z
+        # pattern add_number(_x, _y, _z)
+        pattern = application.patterns.list_of_clauses[0]  # extract the pattern in the application  # 2024/2/2
+
         matched = True  # first assume the success
         forward_binding_multiple = {}  # query is constant, rule is variable
         backward_binding_multiple = {}  # query is variable, rule is either constant or variable
+        # sef.predicate_object_dict add_number(two, two, ?z)
         for key, value in self.predicate_object_dict.items():  # key: predicate, value: object
             if value.find(VAR) >= 0:  # object of this clause is a variable
                 try:
-                    pattern_value = pattern.predicate_object_dict[key]
+                    pattern_value = pattern.predicate_object_dict[key]  # get the corresponding value in pattern
                     if pattern_value.find(VAR) >= 0:  # application side is also a variable
                         # forward_binding[pattern_value] = value
-                        forward_binding_multiple = append_to_bindings(forward_binding_multiple, pattern_value, value)  # 2023/12/12
+                        forward_binding_multiple \
+                            = append_to_bindings(forward_binding_multiple, pattern_value, value)  # 2023/12/12
                     elif pattern_value.find(SOME) >= 0:  # application side is a semi-variable
                         matched = False  # a semi-variable only matches with a constant
                         break
                     else:  # application side is a constant
                         # backward_binding[value] = pattern_value  # application side is a constant
-                        backward_binding_multiple = append_to_bindings(backward_binding_multiple, value, pattern_value)  # 2023/12/12
+                        backward_binding_multiple \
+                            = append_to_bindings(backward_binding_multiple, value, pattern_value)  # 2023/12/12
                 except KeyError:  # no entry for this key (=predicate)
                     matched = False  # match failed
                     break  # skip the rest of for loop
@@ -503,13 +549,17 @@ class ClassClause:
                 except KeyError:
                     matched = False  # match failed
                     break  # skip the rest of for loop
+        # after executing the above code
+        # forward_binding_multiple {_x: two, _y: two, _z: z}
 
         # apply the bindings to the controls contained in the application
         list_of_clauses = []
         list_of_forward_bindings = []
         list_of_backward_bindings = []
         if matched:
-            success, forward_binding, backward_binding = apply_internal_bindings(forward_binding_multiple, backward_binding_multiple)  # 2023/12/12
+            success, binding_forward, binding_backward \
+                = apply_internal_bindings(forward_binding_multiple, backward_binding_multiple)  # 2023/12/12
+            # forward_binding {_x: two, _y: two, _z: z}
             if not success:
                 matched = False  # match failed
                 return matched, list_of_clauses, list_of_forward_bindings, list_of_backward_bindings
@@ -527,9 +577,16 @@ class ClassClause:
 
                 """
                 controls = application.list_of_controls  # names (uri) of controls
+                # ex., add(two, two, ?z)
+                # control_add_number_x_1_z
+                # control_add_number_x_y_z
                 for control_uri in controls:  # try each control
-                    control: ClassControl = rdf_prolog.controls.operation_name_dict[control_uri]  # get the ClassControl instance from its name
-                    left_side: ClassClause = control.rule.left_side.update_variables()  # update variable name ?x -> ?x1000, etc. before establishing bindings
+                    control: ClassControl = rdf_prolog.controls.operation_name_dict[control_uri]
+                    # get the ClassControl instance from its name
+                    # left_side: ClassClause = control.rule.left_side.update_variables()
+                    # update variable name ?x -> ?x1000, etc. before establishing bindings
+                    left_side: ClassClause = control.rule.left_sides.list_of_clauses[0].update_variables()
+                    # update variable name ?x -> ?x1000, etc. before establishing bindings
                     restrictions = control.left_side
                     forward_binding_control_multiple: dict[str, list[str]] = {}
                     backward_binding_control_multiple: dict[str, list[str]] = {}
@@ -542,33 +599,46 @@ class ClassClause:
                                     try:
                                         restriction = restrictions[key_]
                                         match_control = False  # semi-variable only matches a constant
-                                        break  # match failed, no further matching in useless
+                                        break  # match failed, no further matching is useless
                                     except KeyError:
                                         # forward_binding_control[left_value] = value
-                                        forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
+                                        forward_binding_control_multiple \
+                                            = append_to_bindings(
+                                                forward_binding_control_multiple, left_value, value_)  # 2023/12/12
                                 # elif left_value.find(SOME) >= 0:  # control side is a semi-variable
                                 #     match_control = False  # semi-variable only matches a constant
                                 #     break  # match failed, no further matching in useless
                                 else:  # control side is a constant
                                     # backward_binding_control[value] = left_value
-                                    backward_binding_control_multiple = append_to_bindings(backward_binding_control_multiple, value_, left_value)  # 2023/12/12
+                                    backward_binding_control_multiple \
+                                        = append_to_bindings(
+                                            backward_binding_control_multiple, value_, left_value)  # 2023/12/12
                             except KeyError:
                                 match_control = False  # match failed
                                 break  # no further matching is useless
-                        else:  # value in key-value pair is a constant, therefore the argument in the control must be a variable, a semi-variable or the same constant value
+                        else:
+                            # value in key-value pair is a constant,
+                            # therefore the argument in the control must be a variable,
+                            # a semi-variable or the same constant value
                             try:
                                 left_value = left_side.predicate_object_dict[key_]  # control side
                                 if left_value.find(VAR) >= 0:  # is variable
                                     try:
                                         restriction = restrictions[key_]
                                         # forward_binding_control[left_value] = value
-                                        forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
+                                        forward_binding_control_multiple \
+                                            = append_to_bindings(
+                                                forward_binding_control_multiple, left_value, value_)  # 2023/12/12
                                     except KeyError:
                                         # forward_binding_control[left_value] = value
-                                        forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
+                                        forward_binding_control_multiple \
+                                            = append_to_bindings(
+                                                forward_binding_control_multiple, left_value, value_)  # 2023/12/12
                                 # elif left_value.find(SOME) >= 0:  # semi-variable
                                 #     # forward_binding_control[left_value] = value
-                                #     forward_binding_control_multiple = append_to_bindings(forward_binding_control_multiple, left_value, value_)  # 2023/12/12
+                                #     forward_binding_control_multiple
+                                #     = append_to_bindings(
+                                #     forward_binding_control_multiple, left_value, value_)  # 2023/12/12
                                 else:  # constant
                                     if left_value == value_:  # same value
                                         pass  # if the constant has the same value, match is OK.
@@ -579,19 +649,23 @@ class ClassClause:
                                 match_control = False  # match failed
                                 break  # no further matching is useless
                     if match_control:  # the arguments of this control match with the values in the current clause
-                        success_, forward_binding_control, backward_binding_control = apply_internal_bindings(forward_binding_control_multiple, backward_binding_control_multiple)
+                        success_, forward_binding_control, backward_binding_control \
+                            = apply_internal_bindings(
+                                forward_binding_control_multiple, backward_binding_control_multiple)
                         if success_:
                             matched_ = True  # return value
-                            list_of_forward_bindings.append({**forward_binding, **forward_binding_control})
-                            list_of_backward_bindings.append({**backward_binding, **backward_binding_control})
+                            list_of_forward_bindings.append({**binding_forward, **forward_binding_control})
+                            list_of_backward_bindings.append({**binding_backward, **backward_binding_control})
                             clauses = ClassClauses()
                             for index in control.right_sides:
-                                right: ClassClause = control.rule.right_sides.list_of_clauses[index-1]
+                                right: ClassClause \
+                                    = control.rule.right_sides.list_of_clauses[index-1]  # index starts with 1
                                 right_updated: ClassClause = right.update_variables()
                                 clauses.list_of_clauses.append(right_updated)
                             list_of_clauses.append(clauses)
                             ClassClauses.variable_modifier += 1
                 return matched_
+                # end of try_controls
 
             matched = try_controls(matched)  # try controls
 
@@ -635,7 +709,8 @@ class ClassClause:
                 functions = application.list_of_functions  # get a list of function name uri
                 for function_uri in functions:  # try each function
                     function: ClassFunction = rdf_prolog.functions.operation_name_dict[URIRef(function_uri)]  # get the ClassFunction instance from uri name
-                    left_side: ClassClause = function.rule.left_side  # .update_variables()  # ?x -> ?x1000, etc.
+                    # left_side: ClassClause = function.rule.left_side  # .update_variables()  # ?x -> ?x1000, etc.
+                    left_side: ClassClause = function.rule.left_sides.list_of_clauses[0]  # .update_variables()  # ?x -> ?x1000, etc.
                     restrictions = function.left_side
                     forward_binding_function_multiple = {}
                     backward_binding_function_multiple = {}
@@ -690,13 +765,15 @@ class ClassClause:
                             matched_ = True  # match result to be returned
                             # list_of_clauses.append(function.right_sides.update_variables())
                             result_bindings = exec_function(function, forward_binding_function)
-                            list_of_forward_bindings.append({**forward_binding, **forward_binding_function, **result_bindings})
-                            list_of_backward_bindings.append({**backward_binding, **backward_binding_function})
+                            list_of_forward_bindings.append({**binding_forward, **forward_binding_function, **result_bindings})
+                            list_of_backward_bindings.append({**binding_backward, **backward_binding_function})
                 return matched_  # end and return of try_functions
 
-            matched = try_functions(matched)
+            matched = try_functions(matched)  # try functions
 
-        return matched, list_of_clauses, list_of_forward_bindings, list_of_backward_bindings  # end and return of match_application
+        return (
+            matched, list_of_clauses,
+            list_of_forward_bindings, list_of_backward_bindings)  # end and return of match_application
 
     def apply_bindings(self, bindings: dict[str, str]):
         """Apply bindings to this clause.
@@ -714,9 +791,11 @@ class ClassClause:
         for triple in self.list_of_triple:  # apply to each triple
             triple_applied = triple.apply_bindings(bindings)  # apply the bindings to a triple
             clause_applied.list_of_triple.append(triple_applied)  # append to the new clause to be returned
-            clause_applied.predicate_object_dict[triple_applied.predicate.to_uri(drop=True)] = triple_applied.object.to_uri(drop=True)
+            clause_applied.predicate_object_dict[triple_applied.predicate.to_uri(drop=True)] \
+                = triple_applied.object.to_uri(drop=True)
             if triple.predicate.to_uri(drop=True) == OPERATION:
-                clause_applied.operation_name_uri = rdflib.term.URIRef(triple_applied.object.to_uri(drop=True))  # set the operation name
+                clause_applied.operation_name_uri \
+                    = rdflib.term.URIRef(triple_applied.object.to_uri(drop=True))  # set the operation name
         return clause_applied
 
     def update_variables(self):
@@ -845,18 +924,20 @@ class ClassApplications:
             SELECT ?application WHERE {{ 
             ?application {uri_ref_ext('type')} {uri_ref_ext('application')} . 
             OPTIONAL {{ ?application {uri_ref_ext('priority')} ?priority . }}
-            }} ORDER BY ?priority
+            }} ORDER BY DESC(?priority)
         """
         results_for_applications = graph.query(query_for_applications)
         for binding in results_for_applications.bindings:
-            application: ClassApplication = ClassApplication(graph, URIRef(binding[Variable('application')]))  # create an instance of ClassApplication
+            application: ClassApplication \
+                = ClassApplication(graph, URIRef(binding[Variable('application')]))
+            # create an instance of ClassApplication
             self.applications.append(application)  # append to the list
-            operation_name = application.operation_name_uri  # get the operation name
-            try:
-                self.operation_names_dict[operation_name].append(application)
-            except Exception as e:
-                self.operation_names_dict[operation_name] = []
-                self.operation_names_dict[operation_name].append(application)
+            for operation_name in application.operation_name_uris:  # get the operation name
+                try:
+                    self.operation_names_dict[operation_name].append(application)
+                except KeyError as e:  # not yet registered in operation_names_dict
+                    self.operation_names_dict[operation_name] = []
+                    self.operation_names_dict[operation_name].append(application)
         pass
 
     def build(self):
@@ -868,8 +949,8 @@ class ClassApplication:
 
     Attributes:
         program (bool): True if this application is a program without back tracking.
-        pattern (ClassClause): Acceptable query pattern
-        operation_name_uri (str): Operation name such as VAL:add in uri form
+        patterns (ClassClauses): Acceptable query pattern
+        operation_name_uris (list[str]): Operation name such as VAL:add in uri form
         list_of_controls (list[ClassControl]): List of controls included in this application with priorities
     """
     def __init__(self, graph: Graph, subject: rdflib.term.URIRef):
@@ -879,13 +960,23 @@ class ClassApplication:
             OPTIONAL {{ <{subject}> {uri_ref_ext('program')} ?program . }}
             }}
         """
+        self.application_label = str(subject)  # 2024/2/20
         results_for_application = graph.query(query_for_application)
         if len(results_for_application.bindings) > 0:
             self.program = str(results_for_application.bindings[0][Variable('program')]).find(f'{uri_ref("true")}') >= 0
-            self.pattern = ClassClause()  # pattern is an instance ClassClause
-            self.pattern.from_query(graph, URIRef(results_for_application.bindings[0][Variable('pattern')]))
-        self.operation_name_uri = self.pattern.operation_name_uri
+            # self.pattern = ClassClause()  # pattern is an instance ClassClause
+            # self.pattern.from_query(graph, URIRef(results_for_application.bindings[0][Variable('pattern')]))
+            self.patterns = ClassClauses()  # accept multiple patterns, 2024/2/2
+            for binding in results_for_application.bindings:  # 2024/2/2
+                pattern = ClassClause()  # 2024/2/2
+                pattern.from_query(graph, URIRef(binding[Variable('pattern')]))  # 2024/2/2
+                self.patterns.list_of_clauses.append(pattern)  # 2024/2/2
+        # self.operation_name_uri = self.pattern.operation_name_uri
+        self.operation_name_uris = []
+        for clause in self.patterns.list_of_clauses:
+            self.operation_name_uris.append(clause.operation_name_uri)
 
+        # controls
         query_for_application_use = f"""
             SELECT ?control WHERE {{ <{subject}> {uri_ref_ext('use')} ?use . 
             ?use {uri_ref_ext('control')} ?control .
@@ -898,6 +989,7 @@ class ClassApplication:
             # control = ClassControl(graph, control_uri)
             self.list_of_controls.append(control_uri)
 
+        # functions
         query_for_application_use = f"""
                     SELECT ?function WHERE {{ <{subject}> {uri_ref_ext('use')} ?use . 
                     ?use {uri_ref_ext('function')} ?function .
@@ -923,7 +1015,8 @@ class ClassControls:
     def __init__(self, rdf_prolog, graph: Graph):
         self.list_of_controls: list[ClassControl] = []  # controls has a list of ClassControl
         # self.operation_name_dict: dict[str, set[ClassControl]] = {}  # also has a dict object to store
-        self.operation_name_dict: dict[str, ClassControl] = {}  # also has a dict object to store, operation name is unique to each control
+        self.operation_name_dict: dict[str, ClassControl] = {}
+        # also has a dict object to store, operation name is unique to each control
         query_for_controls = f"""
             SELECT ?s ?rule_name WHERE {{
             ?s {uri_ref_ext('type')} {uri_ref_ext('control')} . 
@@ -933,7 +1026,10 @@ class ClassControls:
         """
         results_for_controls = graph.query(query_for_controls)
         for binding in results_for_controls.bindings:
-            control: ClassControl = ClassControl(rdf_prolog, graph, URIRef(binding[Variable('s')]), URIRef(binding[Variable('rule_name')]))  # create an instance of ClassControl
+            control: ClassControl \
+                = ClassControl(
+                    rdf_prolog, graph, URIRef(binding[Variable('s')]),
+                    URIRef(binding[Variable('rule_name')]))  # create an instance of ClassControl
             self.list_of_controls.append(control)  # register to the list
             operation_name: str = control.control_uri
             # try:
@@ -983,7 +1079,8 @@ class ClassControl:
             for binding in results_for_control_right.bindings:
                 # clause = ClassClause()  # create a new instance
                 # right_side = clause.from_query(graph, binding['child'])
-                self.right_sides.append(int(binding[Variable('id')]))  #.list_of_clauses.append(right_side)  # append to the right sides
+                self.right_sides.append(int(binding[Variable('id')]))
+                # .list_of_clauses.append(right_side)  # append to the right sides
         except KeyError:
             pass  # error
         except Exception as e:  # unknown and unexpected exception
@@ -1018,7 +1115,9 @@ class ClassFunctions:
          """
         results_for_functions = graph.query(query_for_functions)  # execute query
         for binding in results_for_functions.bindings:
-            function: ClassFunction = ClassFunction(rdf_prolog, graph, URIRef(binding[Variable('s')]), URIRef(binding[Variable('rule_name')]))
+            function: ClassFunction \
+                = ClassFunction(
+                    rdf_prolog, graph, URIRef(binding[Variable('s')]), URIRef(binding[Variable('rule_name')]))
             self.functions.append(function)
             # operation_name_dict = function.left_side.operation_name_uri
             function_uri: str = function.function_uri
@@ -1029,7 +1128,8 @@ class ClassFunctions:
             #     self.operation_name_dict[function_uri].append(function)
             self.operation_name_dict[function_uri] = function
         for function in self.functions:  # read the function codes
-            function_name: str = function.rule.left_side.operation_name_uri
+            # function_name: str = function.rule.left_side.operation_name_uri
+            function_name: str = function.rule.left_sides.list_of_clauses[0].operation_name_uri
             function_name: str = f'function_{function_name.replace(VAL, "")}.py'
             with open(f'{rules_folder}/{function_name}', 'r') as function_file:
                 code: str = function_file.read()
@@ -1107,7 +1207,9 @@ class ClassRules:  # list of rules
         # query_for_rules = SELECT ?s ?left WHERE {{ ' \
         #                   ?s <{uri_ref("left_side")}> ?left .
         #                   f'OPTIONAL {{ ?s <{uri_ref("priority")}> ?priority .}} }}' \
-        #                   f'ORDER BY ?priority '  # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
+        #                   f'ORDER BY ?priority '
+        # query for extracting rules and their left side.
+        # Rules always have left_side. Use the priority values to order the rules.
         # results_for_rule_left = graph.query(query_for_rules)  # execute query and extract
         # for binding_for_left in results_for_rule_left.bindings:
         #     instance_rule = ClassRule()  # create a rule instance
@@ -1117,14 +1219,18 @@ class ClassRules:  # list of rules
         self.operation_name_dict: dict[str, set[ClassRule]] = {}  # dict of rules. operation name as a key
         query_for_rules = f"""
             SELECT ?rule_subject WHERE {{ ?rule_subject {uri_ref_ext('type')} {uri_ref_ext('rule')} }}
-            """ # query for extracting rules and their left side. Rules always have left_side. Use the priority values to order the rules.
+            """ # query for extracting rules and their left side. Rules always have left_side.
+        # Use the priority values to order the rules.
         results_for_rules = graph.query(query_for_rules)  # execute query and extract
         for binding in results_for_rules.bindings:
             rule_subject = URIRef(binding[Variable('rule_subject')])
             rule_instance: ClassRule = ClassRule(graph, rule_subject)  # create a rule instance
             self.list_of_rules.append(rule_instance)  # append the rule to the list
             self.dict_of_rules[str(rule_subject)] = rule_instance
-            operation_name: str = rule_instance.left_side.operation_name_uri  # rule_left.operation_name_uri
+            # operation_name: str = rule_instance.left_side.operation_name_uri  # rule_left.operation_name_uri
+            operation_name: str \
+                = rule_instance.left_sides.list_of_clauses[0].operation_name_uri
+            # rule_left.operation_name_uri 2024/2/2
             try:
                 self.operation_name_dict[operation_name].add(rule_instance)
             except KeyError:
@@ -1151,14 +1257,19 @@ class ClassRule:  # class for individual rule
         """Initialize ClassRule class.
         """
         self.rule_uri: str = str(subject)
+        self.left_sides = ClassClauses()  # left sides 2024/2/2
         query_for_rule_left = f"""
         SELECT ?left_side  WHERE {{ <{subject}> {uri_ref_ext('left_side')} ?left_side . }}
         """
         results_for_rule_left = graph.query(query_for_rule_left)  # get the left side of a control
         try:
-            subject_left = results_for_rule_left.bindings[0][Variable('left_side')]
-            clause = ClassClause()  # create a new instance
-            self.left_side = clause.from_query(graph, URIRef(subject_left))  # create the left side
+            # subject_left = results_for_rule_left.bindings[0][Variable('left_side')]
+            # clause = ClassClause()  # create a new instance
+            # self.left_side = clause.from_query(graph, URIRef(subject_left))  # create the left side
+            for binding in results_for_rule_left.bindings:
+                clause = ClassClause()
+                left_side = clause.from_query(graph, URIRef(binding[Variable('left_side')]))
+                self.left_sides.list_of_clauses.append(left_side)
             self.right_sides = ClassClauses()  # create the right sides
             query_for_rule_right = f"""
             SELECT ?child ?id WHERE {{ 
@@ -1170,7 +1281,8 @@ class ClassRule:  # class for individual rule
             results_for_rule_right = graph.query(query_for_rule_right)  # get the right side
             for binding in results_for_rule_right.bindings:
                 clause = ClassClause()  # create a new instance
-                right_side = clause.from_query(graph, URIRef(binding[Variable('child')]), URIRef(binding[Variable('id')]))
+                right_side \
+                    = clause.from_query(graph, URIRef(binding[Variable('child')]), URIRef(binding[Variable('id')]))
                 self.right_sides.list_of_clauses.append(right_side)  # append to the right sides
         except KeyError:
             pass  # error
@@ -1260,12 +1372,12 @@ class ClassRuleLeft(ClassClause):  # left side of a rule
     """Left side of a rule.
 
     Attributes:
-        label: id for the left part of the rule
-        content: sparql query for finding applicable rules
+        label (str | None): id for the left part of the rule
+        content (str | None): sparql query for finding applicable rules
         bindings:
-        var_list: a list of variables in the triple
-        const_dict: dict of constants in object with the correspondent predicate
-        predicate_object_dict: dict for finding object from predicate as a key
+        var_list (list[str]): a list of variables in the triple
+        const_dict (dict[str, str]): dict of constants in object with the correspondent predicate
+        predicate_object_dict (dict[str, str]): dict for finding object from predicate as a key
         forward_bindings:
         backward_bindings:
     """
@@ -1281,10 +1393,10 @@ class ClassRuleLeft(ClassClause):  # left side of a rule
         self.set_of_half_variables: set[tuple[str, str]] = set()  # SOME:x
         self.variables_of_interest: set[str] = set()
 
-        self.label = None  # id for the left part of the rule
-        self.content = None  # sparql query for finding applicable rules
+        self.label: str | None = None  # id for the left part of the rule
+        self.content: str | None = None  # sparql query for finding applicable rules
         self.bindings = {}
-        # self.var_list = []  # a list of variables in the triple
+        self.var_list: list[str] = []  # a list of variables in the triple
         self.const_dict = {}  # dict of constants in object with the correspondent predicate
         self.forward_bindings = {}
         self.backward_bindings = {}
@@ -1308,7 +1420,7 @@ class ClassRuleLeft(ClassClause):  # left side of a rule
         Returns:
 
         """
-        self.label = None  # label for the left side part of a rule
+        self.label: str | None = None  # label for the left side part of a rule
         self.content = None
         self.bindings = {}
         self.var_list = []
@@ -1361,7 +1473,8 @@ class ClassRuleLeft(ClassClause):  # left side of a rule
 #         """Initialize ClassRuleRight class.
 #         """
 #         super().__init__()
-#         self.child = ClassRuleRightChild()  # right side clause has one child, which in turn has one or more grandchild
+#         self.child
+#         = ClassRuleRightChild()  # right side clause has one child, which in turn has one or more grandchild
 #
 #     def build(self, graph: Graph, right_side_for_child):  # executed at the initial stage
 #         """Build the right side clause of a rule.
@@ -1589,7 +1702,8 @@ class ClassTerm:  # term is either subject, predicate or object
         Returns:
             self:
         """
-        self.term_text = str(term_text).replace(' ', '').replace('<', '').replace('>', '')
+        self.term_text \
+            = str(term_text).replace(' ', '').replace('<', '').replace('>', '')
         self.is_variable = False
         if self.term_text.find(VAR) >= 0:  # <http://variable.org/x> -> x
             self.is_variable = True
@@ -1765,7 +1879,7 @@ class ClassSparqlQuery:  # Sparql Query Class
         self.list_of_variables: list[str] = []  # list of variables in this query
         # self.rule = ClassRule()  # empty rule
 
-    def set(self, sparql_query: str) -> 'ClassSparqlQuery':  # convert from sparql query string to a sparql query class instance
+    def set(self, sparql_query: str) -> 'ClassSparqlQuery':
         """Convert from SPARQL query string to a SPARQL query class instance.
 
         Args:

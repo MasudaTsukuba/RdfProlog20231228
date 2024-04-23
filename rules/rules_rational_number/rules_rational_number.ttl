@@ -1,0 +1,261 @@
+# rules_rational_number.ttl
+# T. Masuda, 2024/2/2
+
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+VAL:integer_multiply_3_7
+    VAL:type VAL:fact ;
+	VAL:operation VAL:integer_multiply ;
+	VAL:variable_x VAL:3 ;
+	VAL:variable_y VAL:7 ;
+	VAL:variable_z VAL:21 .
+
+VAL:integer_multiply_5_11
+    VAL:type VAL:fact ;
+	VAL:operation VAL:integer_multiply ;
+	VAL:variable_x VAL:5 ;
+	VAL:variable_y VAL:11 ;
+	VAL:variable_z VAL:55 .
+
+VAL:rational_number_2
+	VAL:type VAL:fact ;
+	VAL:operation VAL:rational_number ;
+	VAL:variable_x VAL:2 ;
+	VAL:variable_y VAL:1 ;
+	VAL:variable_z VAL:rational_2 .
+
+#VAL:rational_number_2b
+#	VAL:type VAL:fact ;
+#	VAL:operation VAL:rational_number ;
+#	VAL:variable_x VAL:4 ;
+#	VAL:variable_y VAL:2 ;
+#	VAL:variable_z VAL:rational_2 .
+
+##################################################################
+# rules
+
+VAL:rule_function_cons
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:function_cons ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:function_cons ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_y ;
+            VAL:variable_z VAR:_z ] ;
+        VAL:id "1" ] .
+
+VAL:rule_rational_number_x_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:rational_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:cons ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_y ;
+            VAL:variable_z VAR:_z ] ;
+        VAL:id "1" ] .
+
+VAL:rule_rational_multiply_x_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:rational_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:rational_number ;
+            VAL:variable_x VAR:_xm ;
+            VAL:variable_y VAR:_xn ;
+            VAL:variable_z VAR:_x ] ;
+        VAL:id "1" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:rational_number ;
+            VAL:variable_x VAR:_ym ;
+            VAL:variable_y VAR:_yn ;
+            VAL:variable_z VAR:_y ] ;
+        VAL:id "2" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_xm ;
+            VAL:variable_y VAR:_ym ;
+            VAL:variable_z VAR:_zm ] ;
+        VAL:id "3" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_xn ;
+            VAL:variable_y VAR:_yn ;
+            VAL:variable_z VAR:_zn ] ;
+        VAL:id "4" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:rational_number ;
+            VAL:variable_x VAR:_zm ;
+            VAL:variable_y VAR:_zn ;
+            VAL:variable_z VAR:_z ] ;
+        VAL:id "5" ] .
+
+VAL:rule_rational_multiply_x_x_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:rational_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_x ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_m ;
+            VAL:variable_y VAR:_m ;
+            VAL:variable_z VAR:_m2 ] ;
+        VAL:id "1" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_n ;
+            VAL:variable_y VAR:_n ;
+            VAL:variable_z VAR:_n2 ] ;
+        VAL:id "2" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:rational_multiply ;
+            VAL:variable_x VAR:_m2 ;
+            VAL:variable_y VAR:_n2 ;
+            VAL:variable_z VAR:_z ] ;
+        VAL:id "3" ] .
+
+##################################################################
+# controls
+
+VAL:control_rational_number_x_y_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_rational_number_x_y_z ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] .
+
+VAL:control_rational_multiply_x_y_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_rational_multiply_x_y_z ;
+    VAL:left_side [
+        VAL:variable_x "some" ;
+        VAL:variable_y "some" ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "3" ] ;
+    VAL:right_side [
+        VAL:id "4" ;
+        VAL:priority "4" ] ;
+    VAL:right_side [
+        VAL:id "5" ;
+        VAL:priority "5" ] .
+
+VAL:control_rational_multiply_x_x_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_rational_multiply_x_x_z ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "3" ] .
+
+##################################################################
+# functions
+
+VAL:function_cons
+    VAL:type VAL:function ;
+    VAL:rule VAL:rule_function_cons ;
+    VAL:left_side [
+        VAL:variable_x "some" ;
+        VAL:variable_y "some" ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] .
+
+##################################################################
+# applications
+
+VAL:application_function_cons
+    VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+        VAL:operation VAL:function_cons ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:function VAL:function_cons ;
+        VAL:priority "1" ] ;
+    VAL:priority "1".
+
+VAL:application_rational_number_x_y_z
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:rational_number ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_rational_number_x_y_z ;
+        VAL:priority "1" ] ;
+    VAL:priority "2" .
+
+VAL:application_rational_multiply_x_y_z
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:rational_multiply ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_rational_multiply_x_y_z ;
+        VAL:priority "1" ] ;
+    VAL:priority "1" .
+
+VAL:application_rational_multiply_x_x_z
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:rational_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_x ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_rational_multiply_x_x_z ;
+        VAL:priority "1" ] ;
+    VAL:priority "5" .
+
+##################################################################
+# inferences

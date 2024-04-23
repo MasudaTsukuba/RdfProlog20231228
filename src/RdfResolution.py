@@ -8,7 +8,10 @@ T. Masuda
 import os
 from rdflib import BNode  # , Graph, URIRef, Variable
 from itertools import permutations  # 2023/12/28
-from src.RdfClass import *  # ClassClauses, ClassClause, ClassRule, ClassRules, ClassRuleRight, ClassSparqlQuery, ClassTerm
+from src.RdfClass import *
+
+
+# ClassClauses, ClassClause, ClassRule, ClassRules, ClassRuleRight, ClassSparqlQuery, ClassTerm
 
 
 def start_log():
@@ -33,7 +36,8 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
         applications (ClassApplications): applications
 
     """
-    def __init__(self, rules_folder='../rules/rules_human'):
+
+    def __init__(self, rules_folder: str ='../rules/rules_human'):
         """Initialize the RdfProlog class.
         Create a graph g_rules for storing facts and rules.
         Prepare applicable rules from the left sides of the rules.
@@ -45,14 +49,15 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
             None
         """
         # print('$$$$$$$$$$ PREPARING $$$$$$$$$$')  # debug
-        print_and_log('$$$$$$$$$$ PREPARING $$$$$$$$$$')  # debug
+        print_and_log('$$$$$$$$$$ PREPARATION STARTED $$$$$$$$$$')  # debug
         # self.find_all: bool = False  # stop the search if the first result is obtained.  # NOT USED anymore.
         # self.find_all = True  # find all the results using inferences.  # NOT USED anymore.
 
-        graph = Graph()  # graph for facts and rules
-        g_temp = Graph()  # temporary graph for reading RDF files
-        # self.rules_folder: str = rules_folder  # folder where the RDFs describing rules exist.  # NO NEED to store as an instance variable.
-        files = os.listdir(rules_folder)  # get all the files in the folder.
+        graph: Graph = Graph()  # graph for facts and rules
+        g_temp: Graph = Graph()  # temporary graph for reading RDF files
+        # self.rules_folder: str = rules_folder  # folder where the RDFs describing rules exist.
+        # NO NEED to store as an instance variable.
+        files: list[str] = os.listdir(rules_folder)  # get all the files in the folder.
         for file in files:  # read all the turtle files in rules folder
             if file.endswith('.ttl'):
                 g_temp.parse(f'{rules_folder}/{file}')  # read into a graph object
@@ -73,11 +78,11 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
         self.functions: ClassFunctions = ClassFunctions(self, graph, rules_folder)  # functions
         self.applications: ClassApplications = ClassApplications(graph)  # applications
         # print('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')  # debug
-        print_and_log('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')  # debug
+        print_and_log('$$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$')  # debug
         # print()  # line feed
         print_and_log('')  # line feed
 
-    def answer_question(self, sparql_query, results_limit: int = 1, depth_limit: int = 30):  # answer a sparql query with multiple clauses
+    def answer_question(self, sparql_query, results_limit: int = 1, depth_limit: int = 30):
         """Answer a SPARQL query with multiple clauses.
 
         Args:
@@ -90,12 +95,15 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
             list[dict[str, str]]: list of bindings
         """
         # self.find_all = find_all  # if true, find all the possible answers
-        # resolution = Resolution(self.rules, self.find_all, depth_limit)  # create an instance of Resolution class, left_rules: ClassLeftRules
+        # resolution = Resolution(self.rules, self.find_all, depth_limit)
+        # create an instance of Resolution class, left_rules: ClassLeftRules
         # resolve_succeeded, resolve_bindings \
         #     = resolution.resolve_rule(sparql_query.rule)  # execute the resolution / resolve rule
-        reasoner = Reasoner(self, results_limit=results_limit, depth_limit=depth_limit)  # create an instance of Reasoner class
-        clauses_in = sparql_query.to_clauses()  # convert a sparql_query instance to ClassClauses object
-        resolve_succeeded, resolve_bindings_temp = reasoner.reasoner(clauses_in, depth_current=0)  # start the reasoner with depth = 0
+        reasoner: Reasoner = Reasoner(self, results_limit=results_limit, depth_limit=depth_limit)
+        # create an instance of Reasoner class
+        clauses_in: ClassClauses = sparql_query.to_clauses()  # convert a sparql_query instance to ClassClauses object
+        resolve_succeeded, resolve_bindings_temp, contradiction \
+            = reasoner.reasoner(clauses_in, depth_current=0)  # start the reasoner with depth = 0
         resolve_bindings = []  # receive the query results
         for binding in resolve_bindings_temp:
             binding_revised = {}  # receiver dict object
@@ -122,8 +130,10 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
                     print_and_log(str(e))
                     pass
         else:  # reasoner failed
-            # print('answer_complex_question: RESOLVE FAILED xxxxxxxxxxxxx')
-            print_and_log('answer_complex_question: RESOLVE FAILED xxxxxxxxxxxxx')
+            # print('answer_complex_question: RESOLVE FAILED')
+            print_and_log('answer_complex_question: RESOLVE FAILED')
+            if contradiction:
+                print_and_log('============================>> Contradiction found.')
             # print('resolve_bindings: ', resolve_bindings)
             print_and_log(f'resolve_bindings: {resolve_bindings}')
             resolve_bindings = []
@@ -131,8 +141,8 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
         # print('Depth reached: ', reasoner.depth_reached)  # record the depth reached during the search  # 2023/12/19
         print_and_log(f'Depth reached: {reasoner.depth_reached}')  # record the depth reached during the search
         print_and_log(f'Width reached: {reasoner.width_reached}')  # record the width reached during the search
-        # print('===================================================================================================')
-        print_and_log('===================================================================================================')
+        # print('==============================================================================================')
+        print_and_log('==============================================================================================')
         return resolve_bindings
 
     def search_order(self, sparql_query, results_limit: int = 1, depth_limit: int = 30):
@@ -142,17 +152,20 @@ class RdfProlog:  # Prolog Class, prepare a graph and available rules
 
         """
 
-        reasoner = Reasoner(self, results_limit=results_limit, depth_limit=depth_limit)  # create an instance of Reasoner class
-        clauses_in = sparql_query.to_clauses()  # convert a sparql_query instance to ClassClauses object
-        control_target: ClassControl = self.controls.operation_name_dict[f'{VAL}control_add_number_x_y_z']  # get the control for add(x, y, z)
+        reasoner: Reasoner = Reasoner(self, results_limit=results_limit, depth_limit=depth_limit)
+        # create an instance of Reasoner class
+        clauses_in: ClassClauses = sparql_query.to_clauses()  # convert a sparql_query instance to ClassClauses object
+        control_target: ClassControl = self.controls.operation_name_dict[f'{VAL}control_add_number_x_y_z']
+        # get the control for add(x, y, z)
         execution_order: list[int] = control_target.right_sides
-        permutated_order = permutations(execution_order)
-        for order in permutated_order:
+        permuted_order = permutations(execution_order)
+        for order in permuted_order:
             # order = (3, 2, 1)  # debug
             control_target.right_sides = list(order)
-            resolve_succeeded, resolve_bindings_temp = reasoner.reasoner(clauses_in, depth_current=0)  # start the reasoner with depth = 0
-            width_reached = reasoner.width_reached
-            depth_reached = reasoner.depth_reached
+            resolve_succeeded, resolve_bindings_temp, contradiction = reasoner.reasoner(clauses_in, depth_current=0)
+            # start the reasoner with depth = 0
+            width_reached: int = reasoner.width_reached
+            depth_reached: int = reasoner.depth_reached
             if depth_reached < depth_limit:
                 pass
             print_and_log(f'>>>{order}, {depth_reached}, {width_reached}')
@@ -171,8 +184,9 @@ class Reasoner:
         depth_reached (int): depth reached while executing reasoning.
         width_reached (int): number of max answers reached while executing reasoning.
     """
+
     def __init__(self, rdf_prolog, results_limit: int = 10, depth_limit: int = 30):
-        self.rdf_prolog = rdf_prolog
+        self.rdf_prolog: RdfProlog = rdf_prolog
         # self.find_all: bool = find_all  # find all the possible answers  # NOT USED anymore.
         self.results_limit: int = results_limit  # limit of bindings in results
         self.depth_limit: int = depth_limit  # maximum depth of recursive call
@@ -192,7 +206,8 @@ class Reasoner:
             bool: success or failure
             dict[str, str]: results bindings
         """
-        if depth_current == 0:  # start of reasoner
+        contradiction: bool = False  # 2024/2/6
+        if depth_current == 0:  # if this is the start of reasoner
             self.depth_reached = 0  # reset depth_reached
             self.width_reached = 0  # reset width_reached
         print_and_log(f'reasoner: depth={depth_current}')  # for debug
@@ -201,82 +216,718 @@ class Reasoner:
         if depth_current > self.depth_limit:  # if the depth reaches the depth_limit, return with failure
             # print(f'Depth limit reached: {depth}')  # debug
             print_and_log(f'Depth limit reached: {depth_current}')  # debug
-            return False, []  # success = False, list_of_bindings = None
-        first_clause, rest_clauses = clauses.split_clauses()  # split the clauses into the first and the remainder
+            return False, [], contradiction  # success = False, list_of_bindings = None
+        first_clause, rest_clauses = clauses.split_clauses(index=0)  # split the clauses into the first and the remainder
         if first_clause is None or len(first_clause.list_of_triple) == 0:  # first clause is empty
             self.number_of_results_obtained += 1  # successful result is obtained
-            return True, [{}]  # success = True, list_of_bindings = [{}]
+            return True, [{}], contradiction  # success = True, list_of_bindings = [{}]
+        if first_clause.operation_name_uri == URIRef(f'{VAL}nil'):
+            return False, [{}], True  # contradiction
         list_of_bindings_return = []  # list of bindings to be returned
-        success_out = False  # flag for success
+        success_out: bool = False  # flag for success
         # print('first clause: ', first_clause.predicate_object_dict)  # debug
         print_and_log(f'first clause: {dict(sorted(first_clause.predicate_object_dict.items()))}')  # debug
 
         def try_facts(first_clause_, rest_clauses_, depth_, success_out_, list_of_bindings_return_):
             # try facts
-            list_of_bindings_current = first_clause_.search_facts(self.rdf_prolog)  # find facts that match the first clause
+            contradiction_: bool = False  # 2024/2/6
+            list_of_bindings_current = first_clause_.search_facts(self.rdf_prolog)
+            # find facts that match the first clause
             # print('search facts: ', len(list_of_bindings_current), list_of_bindings_current)  # debug
             print_and_log(f'search facts: {len(list_of_bindings_current)}, {list_of_bindings_current}')  # debug
             if len(list_of_bindings_current) > self.width_reached:
                 self.width_reached = len(list_of_bindings_current)  # update the width
             for bindings_current in list_of_bindings_current:  # repeat for multiple possibilities
-                rest_clauses_applied = rest_clauses_.apply_bindings(bindings_current)  # apply the bindings to the remainder of clauses
-                success, list_of_bindings_fact = self.reasoner(rest_clauses_applied, depth_ + 1)  # recursive call
+                rest_clauses_applied = rest_clauses_.apply_bindings(bindings_current)
+                # apply the bindings to the remainder of clauses
+                success, list_of_bindings_fact, contradiction_ = self.reasoner(rest_clauses_applied, depth_ + 1)
+                # recursive call
                 if success:  # find some results
                     success_out_ = True  # at least one trial is successful
-                    list_of_bindings_out = [{**bindings_current, **bindings_fact} for bindings_fact in list_of_bindings_fact]  # combine the bindings
+                    list_of_bindings_out \
+                        = [{**bindings_current, **bindings_fact} for bindings_fact in list_of_bindings_fact]
+                    # combine the bindings
                     list_of_bindings_return_ += list_of_bindings_out  # add to the list
                     # if not self.find_all:  # at least one trial is successful
-                    if self.number_of_results_obtained >= self.results_limit:  # 2023/12/19
-                        return success_out_, list_of_bindings_return_  # return the answer
-            return success_out_, list_of_bindings_return_  # return the answer
+                    if self.number_of_results_obtained >= self.results_limit or contradiction_:  # 2023/12/19
+                        return success_out_, list_of_bindings_return_, contradiction_  # return the answer
+            return success_out_, list_of_bindings_return_, contradiction_  # return the answer
 
-        success_out, list_of_bindings_return = try_facts(first_clause, rest_clauses, depth_current, success_out, list_of_bindings_return)  # try facts
+        success_out, list_of_bindings_return, contradiction \
+            = try_facts(first_clause, rest_clauses, depth_current, success_out, list_of_bindings_return)  # try facts
+        if self.number_of_results_obtained >= self.results_limit or contradiction:  # 2024/2/2
+            print_and_log(f'return, depth={depth_current}')
+            return success_out, list_of_bindings_return, contradiction  # return the answer without try_applications
 
         def try_applications(first_clause_, rest_clauses_, depth_, success_out_, list_of_bindings_return_):
             # try applications
+            def match_application(rdf_prolog__, application__, first_clause__, rest_clauses__):  # 2024/2/5
+                """
+                match an application to query clauses
+                an application has more than 1 input patterns
+
+                Args:
+                    rdf_prolog__:
+                    application__ (ClassApplication): application to be matched
+                    first_clause__ (ClassClause): first clause in the query
+                    rest_clauses__ (ClassClauses): remaining clauses in the query
+
+                Returns:
+                    matched, list_of_application_clauses, list_of_bindings_forward,
+                    list_of_bindings_backward, rest_clauses_, contradiction
+
+                """
+
+                def match_clause_clause(
+                        application_clause_____: ClassClause,
+                        query_clause_____: ClassClause,
+                        rest_of_application_clauses_____: ClassClauses,
+                        rest_of_query_clauses_____: ClassClauses,
+                        list_of_rest_of_query_clauses_____: list[ClassClauses],
+                        list_of_bindings_forward_multiple_____: list[dict[str, list[str]]],
+                        list_of_bindings_backward_multiple_____: list[dict[str, list[str]]],
+                        bindings_forward_multiple_in_____: dict[str, list[str]],
+                        bindings_backward_multiple_in_____: dict[str, list[str]]):
+                    """
+
+                    Args:
+                        application_clause_____ (ClassClause):
+                        query_clause_____ (ClassClause):
+                        rest_of_application_clauses_____ (ClassClauses):
+                        rest_of_query_clauses_____ (ClassClauses):
+                        list_of_rest_of_query_clauses_____ (list[ClassClauses]):
+                        list_of_bindings_forward_multiple_____:
+                        list_of_bindings_backward_multiple_____:
+                        bindings_forward_multiple_in_____:
+                        bindings_backward_multiple_in_____:
+
+                    Returns:
+
+                    """
+
+                    def append_to_bindings(bindings_, key_, value_):
+                        """Append a value to the list specified by key.
+                        For bindings multiple.
+
+                        Args:
+                            bindings_ (dict[str, list[str]]):
+                            key_ (str):
+                            value_ (str):
+
+                        Returns:
+                            dict[str, list[str]]: revised bindings
+
+                        """
+                        try:
+                            xxx: str = bindings_[key_]  # search an entry
+                        except KeyError:  # no entry found
+                            bindings_[key_] = []  # value of the dict is an empty list
+                        bindings_[key_].append(value_)
+                        return bindings_
+
+                    # application vs query clauses matching
+                    matched_____: bool = True  # assume the success
+                    bindings_forward_multiple_____ = {}  # forward: query is constant, rule is variable
+                    bindings_backward_multiple_____ = {}  # backward: query is variable, rule is either constant or variable
+                    bindings_forward_out_____ = {}
+                    bindings_backward_out_____ = {}
+                    for application_key_____, application_value_____ in (
+                            application_clause_____.predicate_object_dict.items()):  # key: predicate, value: object
+                        try:
+                            query_value_____ = query_clause_____.predicate_object_dict[application_key_____]
+                            # get the corresponding value in query clause
+                            if query_value_____.find(VAR) >= 0:  # object of this clause is a variable
+                                if application_value_____.find(VAR) >= 0:  # application side is also a variable
+                                    bindings_forward_multiple_____ \
+                                        = append_to_bindings(
+                                            bindings_forward_multiple_____,
+                                            application_value_____, query_value_____)  # append to forward bindings
+                                elif application_value_____.find(SOME) >= 0:  # application side is a semi-variable
+                                    matched_____ = False  # a semi-variable only matches with a constant
+                                    # break  # skip the rest of the loop
+                                    return (
+                                        False,  # match failed
+                                        list_of_rest_of_query_clauses_____,
+                                        list_of_bindings_forward_multiple_____,
+                                        list_of_bindings_backward_multiple_____)
+                                else:  # application side is a constant
+                                    bindings_backward_multiple_____ \
+                                        = append_to_bindings(
+                                            bindings_backward_multiple_____,
+                                            query_value_____,
+                                            application_value_____)  # append to backward bindings
+                            else:  # query side is constant
+                                if application_value_____.find(VAR) >= 0:  # application side is a variable
+                                    bindings_forward_multiple_____ \
+                                        = append_to_bindings(
+                                            bindings_forward_multiple_____,
+                                            application_value_____,
+                                            query_value_____)  # append to forward bindings
+                                elif application_value_____.find(SOME) >= 0:  # application side is a semi-variable
+                                    bindings_forward_multiple_____ \
+                                        = append_to_bindings(
+                                            bindings_forward_multiple_____,
+                                            application_value_____,
+                                            query_value_____)  # append to forward bindings
+                                else:  # application side is a constant
+                                    if application_value_____ == query_value_____:
+                                        pass  # if both sides are constants, they must be the same
+                                    else:
+                                        matched_____ = False  # match failed
+                                        # break  # skip the rest of the loop
+                                        return (
+                                            False,
+                                            list_of_rest_of_query_clauses_____,
+                                            list_of_bindings_forward_multiple_____,
+                                            list_of_bindings_backward_multiple_____)
+                        except KeyError:
+                            matched_____ = False  # match failed
+                            # break  # skip the rest of the loop
+                            return (
+                                False,
+                                list_of_rest_of_query_clauses_____,
+                                list_of_bindings_forward_multiple_____,
+                                list_of_bindings_backward_multiple_____)
+
+                    def bindings_join(bindings_multiple_in, bindings_multiple):
+                        bindings_out = {}
+                        for key, value in bindings_multiple_in.items():
+                            bindings_out[key] = value
+                        for key, value in bindings_multiple.items():
+                            try:
+                                value_in = bindings_out[key]
+                                bindings_out[key] = value_in + value
+                            except KeyError:  # no key exists in bindings_out
+                                bindings_out[key] = value
+                        return bindings_out
+
+                    bindings_forward_out_____ \
+                        = bindings_join(bindings_forward_multiple_in_____, bindings_forward_multiple_____)
+                    bindings_backward_out_____ \
+                        = bindings_join(bindings_backward_multiple_in_____, bindings_backward_multiple_____)
+                    rest_of_query_clauses_____.apply_bindings(bindings_backward_out_____)
+                    (matched_____,
+                     list_of_rest_of_query_clauses___,
+                     list_of_bindings_forward_multiple_____,
+                     list_of_bindings_backward_multiple_____) \
+                        = match_clauses_clauses(
+                            rest_of_application_clauses_____,
+                            rest_of_query_clauses_____,
+                            list_of_rest_of_query_clauses_____,
+                            list_of_bindings_forward_multiple_____,
+                            list_of_bindings_backward_multiple_____,
+                            bindings_forward_out_____,
+                            bindings_backward_out_____)  # recursively process the remained application clauses
+                    return (
+                        matched_____,  # matched____ is not used
+                        list_of_rest_of_query_clauses___,
+                        list_of_bindings_forward_multiple_____,
+                        list_of_bindings_backward_multiple_____)
+
+                def match_clause_clauses(
+                        application_clause____: ClassClause,
+                        rest_of_application_clauses____: ClassClauses,
+                        query_clauses____: ClassClauses,
+                        list_of_rest_of_query_clauses____: list[ClassClauses],
+                        list_of_bindings_forward_multiple____: list[dict[str, list[str]]],
+                        list_of_bindings_backward_multiple____: list[dict[str, list[str]]],
+                        bindings_forward_multiple____: dict[str, list[str]],
+                        bindings_backward_multiple____: dict[str, list[str]]):
+                    """
+
+                    Args:
+                        application_clause____ (ClassClause):
+                        rest_of_application_clauses____ (ClassClauses):
+                        query_clauses____ (ClassClauses):
+                        list_of_rest_of_query_clauses____:
+                        list_of_bindings_forward_multiple____:
+                        list_of_bindings_backward_multiple____:
+                        bindings_forward_multiple____:
+                        bindings_backward_multiple____:
+
+                    Returns:
+
+                    """
+                    matched____: bool = True
+                    if len(query_clauses____.list_of_clauses) == 0:
+                        # no more query clauses against the application clause
+                        return (
+                            False,
+                            list_of_rest_of_query_clauses____,
+                            list_of_bindings_forward_multiple____,
+                            list_of_bindings_backward_multiple____)
+                    for index____, query_clause____ in enumerate(query_clauses____.list_of_clauses):
+                        rest_of_query_clauses____ = ClassClauses()
+                        rest_of_query_clauses____.list_of_clauses \
+                            = [clause____ for clause____ in query_clauses____.list_of_clauses]
+                        rest_of_query_clauses____.list_of_clauses.pop(index____)
+                        (matched____,
+                         list_of_rest_of_query_clauses___,
+                         list_of_bindings_forward_multiple____,
+                         list_of_bindings_backward_multiple____) \
+                            = match_clause_clause(
+                            application_clause____,
+                            query_clause____,
+                            rest_of_application_clauses____,
+                            rest_of_query_clauses____,
+                            list_of_rest_of_query_clauses____,
+                            list_of_bindings_forward_multiple____,
+                            list_of_bindings_backward_multiple____,
+                            bindings_forward_multiple____,
+                            bindings_backward_multiple____)
+                        # if not matched____:
+                        #     return False, [], [{}], [{}]
+                    return (
+                        matched____,  # matched___ is not used
+                        list_of_rest_of_query_clauses____,
+                        list_of_bindings_forward_multiple____,
+                        list_of_bindings_backward_multiple____)
+
+                def match_clauses_clauses(
+                        application_clauses___: ClassClauses,
+                        query_clauses___: ClassClauses,
+                        list_of_rest_of_query_clauses___: list[ClassClauses],
+                        list_of_bindings_forward_multiple___: list[dict[str, list[str]]],
+                        list_of_bindings_backward_multiple___: list[dict[str, list[str]]],
+                        bindings_forward_multiple___: dict[str, list[str]],
+                        bindings_backward_multiple___: dict[str, list[str]]):
+                    """
+                    Matching between application clauses and query clauses.
+
+                    Args:
+                        application_clauses___ (ClassClauses):
+                        query_clauses___ (ClassClauses):
+                        list_of_rest_of_query_clauses___ (list[ClassClauses]):
+                        list_of_bindings_forward_multiple___ (list[dict[str, list[str]]]):
+                        list_of_bindings_backward_multiple___ (list[dict[str, list[str]]]):
+                        bindings_forward_multiple___ (dict[str, list[str]]):
+                        bindings_backward_multiple___ (dict[str, list[str]]):
+
+                    Returns:
+
+                    """
+                    matched___ = True
+                    if len(application_clauses___.list_of_clauses) == 0:
+                        # all the clause in application clauses have been satisfied
+                        list_of_bindings_forward_multiple___.append(bindings_forward_multiple___)
+                        list_of_bindings_backward_multiple___.append(bindings_backward_multiple___)
+                        list_of_rest_of_query_clauses___.append(query_clauses___)
+                        return (
+                            True, list_of_rest_of_query_clauses___,
+                            list_of_bindings_forward_multiple___,
+                            list_of_bindings_backward_multiple___)  # recursive call ends
+                    rest_of_application_clauses___ = None
+                    application_clause___: ClassClause \
+                        = application_clauses___.list_of_clauses[0]
+                    # choose first one of the remaining application clauses
+                    rest_of_application_clauses___: ClassClauses = ClassClauses()
+                    rest_of_application_clauses___.list_of_clauses \
+                        = application_clauses___.list_of_clauses[1:]
+                    (matched___,
+                     list_of_rest_of_query_clauses___,
+                     list_of_bindings_forward_multiple___,
+                     list_of_bindings_backward_multiple___) \
+                        = match_clause_clauses(
+                        application_clause___,
+                        rest_of_application_clauses___,
+                        query_clauses___,
+                        list_of_rest_of_query_clauses___,
+                        list_of_bindings_forward_multiple___,
+                        list_of_bindings_backward_multiple___,
+                        bindings_forward_multiple___,
+                        bindings_backward_multiple___)
+                    # if not matched___:  # match failed
+                    #     return False, [], [{}], [{}]
+                    return (
+                        matched___,  # matched__ is not used
+                        list_of_rest_of_query_clauses___,  # return the remained query clauses
+                        list_of_bindings_forward_multiple___,
+                        list_of_bindings_backward_multiple___)
+
+                application_pattern_clauses__: ClassClauses = application__.patterns
+                query_clauses__: ClassClauses = ClassClauses()
+                query_clauses__.list_of_clauses.append(first_clause__)  # merge the first clause and the rest clauses
+                for clause__ in rest_clauses__.list_of_clauses:  # do not modify rest_clauses__, but copy them
+                    query_clauses__.list_of_clauses.append(clause__)
+                list_of_bindings_forward_multiple__: list[dict[str, list[str]]] = []
+                list_of_bindings_backward_multiple__: list[dict[str, list[str]]] = []
+                list_of_rest_of_query_clauses__: list[ClassClauses] = []
+                bindings_forward_multiple__: dict[str, list[str]] = {}  # initial states
+                bindings_backward_multiple__: dict[str, list[str]] = {}
+                (matched__,
+                 list_of_rest_of_query_clauses__,
+                 list_of_bindings_forward_multiple__,
+                 list_of_bindings_backward_multiple__) \
+                    = match_clauses_clauses(
+                        application_pattern_clauses__,
+                        query_clauses__,
+                        list_of_rest_of_query_clauses__,
+                        list_of_bindings_forward_multiple__,
+                        list_of_bindings_backward_multiple__,
+                        bindings_forward_multiple__,
+                        bindings_backward_multiple__)
+                matched__ = True
+                # returned value of matched__ is not used, but is created from list_of_bindings_forward_multiple__
+                if list_of_bindings_forward_multiple__ is None or len(list_of_bindings_forward_multiple__) == 0:
+                    matched__ = False
+
+                def apply_internal_bindings(
+                        forward_multiple: dict[str, list[str]],
+                        backward_multiple: dict[str, list[str]]):
+                    """Apply forward and backward bindings to this clause.
+
+                    Args:
+                        forward_multiple:
+                        backward_multiple:
+
+                    Returns:
+
+                    """
+
+                    def is_constant(term: str) -> bool:
+                        """Check whether term is a variable or not.
+
+                        Args:
+                            term (str):
+
+                        Returns:
+                            bool: True if constant
+
+                        """
+                        if term.find(VAL) >= 0:
+                            return True  # constant
+                        return False  # variable, not constant
+
+                    success_: bool = True  # assume a success
+                    forward_binding_: dict[str, str] = {}  # forward bindings
+                    backward_binding_: dict[str, str] = {}  # backward bindings, query is variable and rule is constant
+                    for key_, values in forward_multiple.items():
+                        if len(values) == 1:  # this is the only element in the list
+                            forward_binding_[key_] = values[0]  # just copy the first element
+                        elif len(values) > 1:
+                            first_constant: str = ''  # start from empty string
+                            for value_ in values:
+                                if is_constant(value_):  # value is a constant
+                                    if first_constant == '':  # first_constant is not yet assigned
+                                        first_constant = value_  # set the constant value
+                                    else:
+                                        if first_constant == value_:  # same value
+                                            pass
+                                        else:  # different constants are assigned to a variable
+                                            success_ = False  # failure
+                                            break  # skip the rest
+                            first_element: str = first_constant
+                            if first_constant == '':  # no constant value is found
+                                for value_ in values:
+                                    if not is_constant(value_):
+                                        first_element = value_  # variable
+                            for value_ in values:  # scan for the variables
+                                if not is_constant(value_):  # the value is a variable
+                                    backward_binding_[value_] = first_element  # variable
+                        else:  # len(values)==0 => error
+                            sys.exit(-1)  # stop the program
+
+                    if not success_:
+                        return success_, forward_binding_, backward_binding_  # no further processing
+
+                    first_constant: str = ''
+                    for key_, values in backward_multiple.items():  # process the backward bindings
+                        if len(values) == 1:  # this is the only element in the list
+                            backward_binding_[key_] = values[0]  # just copy the first element
+                        elif len(values) > 1:
+                            first_constant: str = ''  # start from empty string
+                            for value_ in values:
+                                if is_constant(value_):  # value is a constant
+                                    if first_constant == '':  # first_constant is not yet assigned
+                                        first_constant = value_  # set the constant value
+                                    else:
+                                        if first_constant == value_:  # same value
+                                            pass
+                                        else:  # different constants are assigned to a variable
+                                            success_ = False
+                                            break
+                            if first_constant == '':  # no constant value is found
+                                break
+                            for value_ in values:  # scan for the variables
+                                if not is_constant(value_):  # the value is a variable
+                                    backward_binding_[value_] = first_constant
+                        else:  # len(values)==0 => error
+                            sys.exit(-1)  # stop the program
+
+                    return (
+                        success_,
+                        forward_binding_,
+                        backward_binding_)  # end and return of apply_internal_bindings
+
+                def try_controls(matched___):
+                    controls___: list[str] \
+                        = application__.list_of_controls  # names (uri) of controls
+                    for control_uri___ in controls___:  # try each control
+                        control___: ClassControl \
+                            = rdf_prolog__.controls.operation_name_dict[control_uri___]
+                        rule_left_sides___: ClassClauses \
+                            = control___.rule.left_sides.update_variables()
+                        restrictions___ = control___.left_side
+                        forward_bindings_control_multiple___: dict[str, list[str]] = {}
+                        backward_bindings_control_multiple___: dict[str, list[str]] = {}
+                        match_control___ = True  # assume a success
+
+                        list_of_rest_of_query_clauses___: list[ClassClauses] = []
+                        list_of_bindings_forward_multiple___: list[dict[str, list[str]]] = []
+                        list_of_bindings_backward_multiple___: list[dict[str, list[str]]] = []
+                        bindings_forward_multiple___: dict[str, list[str]] = {}  # initial states
+                        bindings_backward_multiple___: dict[str, list[str]] = {}
+
+                        (match_control___,
+                         list_of_rest_of_query_clauses___,
+                         list_of_bindings_forward_multiple___,
+                         list_of_bindings_backward_multiple___) \
+                            = match_clauses_clauses(
+                            rule_left_sides___,
+                            query_clauses__,
+                            list_of_rest_of_query_clauses___,
+                            list_of_bindings_forward_multiple___,
+                            list_of_bindings_backward_multiple___,
+                            bindings_forward_multiple___,
+                            bindings_backward_multiple___)
+                        if (list_of_bindings_forward_multiple___ is None or
+                                len(list_of_bindings_forward_multiple___) == 0):
+                            # match_control___ = False
+                            return False
+
+                        if len(list_of_bindings_forward_multiple___) == 1:
+                            another_bindings_forward_multiple___ = list_of_bindings_forward_multiple___[0]
+                            another_bindings_backward_multiple___ = list_of_bindings_backward_multiple___[0]
+                            success___, another_bindings_forward___, another_bindings_backward___ \
+                                = apply_internal_bindings(
+                                another_bindings_forward_multiple___,
+                                another_bindings_backward_multiple___)
+                            if not success___:
+                                # match_control___ = False
+                                return False
+                            else:  # success___ == True
+                                matched_ = True  # return value
+                                list_of_bindings_forward__.append(
+                                    {**another_bindings_forward__, **another_bindings_forward___})
+                                list_of_bindings_backward__.append(
+                                    {**another_bindings_backward__, **another_bindings_backward___})
+                                clauses___ = ClassClauses()
+                                for index___ in control___.right_sides:
+                                    right___: ClassClause \
+                                        = control___.rule.right_sides.list_of_clauses[index___ - 1]
+                                    # index starts with 1
+                                    right_updated___: ClassClause \
+                                        = right___.update_variables()
+                                    clauses___.list_of_clauses.append(right_updated___)
+                                list_of_query_clauses__.append(clauses___)
+                                ClassClauses.variable_modifier += 1
+
+                        else:
+                            for another_bindings_forward_multiple___, another_bindings_backward_multiple___ \
+                                    in zip(list_of_bindings_forward_multiple___, list_of_bindings_backward_multiple___):
+                                success___, another_bindings_forward___, another_bindings_backward___ \
+                                    = apply_internal_bindings(
+                                        another_bindings_forward_multiple___,
+                                        another_bindings_backward_multiple___)
+                                if not success___:
+                                    # match_control___ = False
+                                    # return False
+                                    pass  # 2024/4/23
+                                else:  # success___ == True
+                                    matched_ = True  # return value
+                                    list_of_bindings_forward__.append(
+                                        {**another_bindings_forward__, **another_bindings_forward___})
+                                    list_of_bindings_backward__.append(
+                                        {**another_bindings_backward__, **another_bindings_backward___})
+                                    clauses___ = ClassClauses()
+                                    for index___ in control___.right_sides:
+                                        right___: ClassClause \
+                                            = control___.rule.right_sides.list_of_clauses[index___ - 1]
+                                        # index starts with 1
+                                        right_updated___: ClassClause \
+                                            = right___.update_variables()
+                                        clauses___.list_of_clauses.append(right_updated___)
+                                    list_of_query_clauses__.append(clauses___)
+                                    ClassClauses.variable_modifier += 1
+                        pass  # end of if len(list_of_bindings_forward_multiple___) == 1:
+                    return matched___
+                    # end of try_controls
+
+                list_of_query_clauses__: list[ClassClauses] = []
+                list_of_bindings_forward__: list[dict[str, str]] = []
+                list_of_bindings_backward__: list[dict[str, str]] = []
+                if matched__:
+                    matched__: bool = False  # assume a failure
+                    if len(list_of_bindings_forward_multiple__) == 1:
+                        rest_of_query_clauses__ = list_of_rest_of_query_clauses__[0]
+                        another_bindings_forward_multiple__: dict[str, list[str]] \
+                            = list_of_bindings_forward_multiple__[0]
+                        another_bindings_backward_multiple__: dict[str, list[str]] \
+                            = list_of_bindings_backward_multiple__[0]
+
+                        success__, another_bindings_forward__, another_bindings_backward__ \
+                            = apply_internal_bindings(
+                                another_bindings_forward_multiple__,
+                                another_bindings_backward_multiple__)
+                        if success__:
+                            matched__ = True
+                        else:
+                            matched__ = False
+                            return (
+                                False, list_of_query_clauses__,
+                                list_of_bindings_forward__, list_of_bindings_backward__)
+
+                        matched__ = try_controls(matched__)  # try controls
+
+                    else:
+                        matched__ = False
+                        for \
+                            rest_of_query_clauses__, \
+                            another_bindings_forward_multiple__, \
+                            another_bindings_backward_multiple__ \
+                            in zip(list_of_rest_of_query_clauses__,
+                                   list_of_bindings_forward_multiple__,
+                                   list_of_bindings_backward_multiple__):
+
+                            success__, another_bindings_forward__, another_bindings_backward__ \
+                                = apply_internal_bindings(
+                                    another_bindings_forward_multiple__,
+                                    another_bindings_backward_multiple__)
+                            if success__:
+                                matched__ = True
+                            # else:
+                            #     matched__ = False
+                            #     return (
+                            #         False, list_of_query_clauses__,
+                            #         list_of_bindings_forward__, list_of_bindings_backward__)
+                        if matched__:
+                            matched__ = try_controls(matched__)  # try controls
+
+                pass  # end of if matched__:
+                return (
+                    matched__,
+                    list_of_query_clauses__,
+                    list_of_bindings_forward__,
+                    list_of_bindings_backward__)
+                # end of match_application
+
             # print('trying applications')
             print_and_log('trying applications')  # debug
+            contradiction_: bool = False  # 2024/2/6
             # applications = []  # start the rule search
             try:
-                applications = self.rdf_prolog.applications.operation_names_dict[first_clause_.operation_name_uri]  # possible rules are already summarized in ClassRules object
+                applications \
+                    = self.rdf_prolog.applications.operation_names_dict[first_clause_.operation_name_uri]
+                # possible rules are already summarized in ClassApplications object
                 # print('number of applications: ', len(applications))
                 print_and_log(f'number of applications: {len(applications)}')
-                for application in applications:  # repeat for each application
-                    matched, list_of_application_clauses, list_of_bindings_forward, list_of_bindings_backward = first_clause_.match_application(self.rdf_prolog, application)  # match the rule against the query
-                    # if len(list_of_bindings_forward) > self.width_reached:  # these two lines are unnecessary  # 2023/12/28
-                    #     self.width_reached = len(list_of_bindings_forward)  # update the width
-                    index = 0  # index for loop
-                    for bindings_forward, bindings_backward in zip(list_of_bindings_forward, list_of_bindings_backward):
-                        try:
-                            application_clauses = list_of_application_clauses[index]
-                            combined_clauses = application_clauses.combine(rest_clauses_)  # combine the clauses
-                        except IndexError:  # no list_of_application_clauses found  # 2023/12/21
-                            combined_clauses = rest_clauses_  # just use the rest clauses
+                spaces = ''
+                for d in range(depth_):
+                    spaces += spaces + '  '
+                for index, application in enumerate(applications):  # repeat for each candidate application
+                    print_and_log(f'{spaces}{index}/{len(applications)} trying: {application.application_label}')  # 2024/2/20
+                    matched = False
+                    list_of_query_clauses = []
+                    list_of_bindings_forward = []
+                    list_of_bindings_backward = []
+                    if len(application.patterns.list_of_clauses) == 1:  # conventional match, 2024/2/5
+                        matched, list_of_query_clauses, list_of_bindings_forward, list_of_bindings_backward \
+                            = first_clause_.match_application(self.rdf_prolog, application)
+                        # match the rule against the query
+                        index = 0  # index for loop
+                        for bindings_forward, bindings_backward \
+                                in zip(list_of_bindings_forward, list_of_bindings_backward):
+                            try:
+                                application_clauses: ClassClauses = list_of_query_clauses[index]
+                                combined_clauses: ClassClauses = application_clauses.combine(rest_clauses_)  # combine the clauses
+                            except IndexError:  # no list_of_application_clauses found  # 2023/12/21
+                                combined_clauses: ClassClauses = rest_clauses_  # just use the rest clauses
 
-                        application_clauses_applied = combined_clauses.apply_bindings({**bindings_forward, **bindings_backward})  # apply the bindings
-                        for clause in application_clauses_applied.list_of_clauses:  # debug
-                            # print(clause.predicate_object_dict)
-                            print_and_log(dict(sorted(clause.predicate_object_dict.items())))  # debug
-                        success, list_of_bindings_application = self.reasoner(application_clauses_applied, depth_ + 1)  # recursive call with +1 depth
-                        if success:  # reasoner succeeded
-                            success_out_ = True  # success flag for return
-                            list_of_bindings_out = [{**bindings_forward, **bindings_backward, **bindings_application} for bindings_application in list_of_bindings_application]
-                            list_of_bindings_return_ += list_of_bindings_out  # merge list for return
-                        # if not self.find_all:  # NOT USED anymore
-                        if self.number_of_results_obtained >= self.results_limit:  # number of results reached the limit # 2023/12/19
-                            return True, list_of_bindings_return_  # return without further search
-                        index += 1  # try next bindings
+                            query_clauses_applied \
+                                = combined_clauses.apply_bindings(
+                                    {**bindings_forward, **bindings_backward})  # apply the bindings
+                            for clause in query_clauses_applied.list_of_clauses:  # debug
+                                # print(clause.predicate_object_dict)
+                                print_and_log(str(dict(sorted(clause.predicate_object_dict.items()))))  # debug
+                            success, list_of_bindings_application, contradiction_ \
+                                = self.reasoner(query_clauses_applied, depth_ + 1)  # recursive call with +1 depth
+                            if contradiction_:
+                                return False, list_of_bindings_return_, contradiction_  # return without further search
+                            if success:  # reasoner succeeded
+                                success_out_ = True  # success flag for return
+                                list_of_bindings_out = [
+                                    {**bindings_forward, **bindings_backward, **bindings_application}
+                                    for bindings_application in list_of_bindings_application]
+                                list_of_bindings_return_ += list_of_bindings_out  # merge list for return
+                                # if not self.find_all:  # NOT USED anymore
+                                if self.number_of_results_obtained >= self.results_limit or contradiction_:
+                                    # number of results reached the limit # 2023/12/19
+                                    return (
+                                        True,
+                                        list_of_bindings_return_,
+                                        contradiction_)  # return without further search
+                            index += 1  # try next bindings
+
+                    else:  # more than 1 clause in patterns, 2024/2/6
+                        print_and_log('more than 1 clause in patterns')  # 2024/4/22
+                        if application.application_label == 'http://value.org/application_square_integer_factor2_even':
+                            pass
+                        matched, list_of_query_clauses, list_of_bindings_forward, list_of_bindings_backward \
+                            = match_application(self.rdf_prolog, application, first_clause_, rest_clauses_)
+                        print_and_log('result of matched: ' + str(matched))
+                        if matched:  # 2024/4/22
+                            index = 0  # index for loop
+                            combined_clauses = ClassClauses()  # empty clauses
+                            for bindings_forward, bindings_backward \
+                                    in zip(list_of_bindings_forward, list_of_bindings_backward):
+                                try:
+                                    combined_clauses = list_of_query_clauses[index]
+
+                                except IndexError:  # no list_of_application_clauses found  # 2023/12/21
+                                    pass
+
+                                query_clauses_applied = combined_clauses.apply_bindings(
+                                    {**bindings_forward, **bindings_backward})  # apply the bindings
+                                for clause in query_clauses_applied.list_of_clauses:  # debug
+                                    # print(clause.predicate_object_dict)
+                                    print_and_log(str(dict(sorted(clause.predicate_object_dict.items()))))  # debug
+                                success, list_of_bindings_application, contradiction_ \
+                                    = self.reasoner(query_clauses_applied, depth_ + 1)  # recursive call with +1 depth
+                                if contradiction_:
+                                    return False, list_of_bindings_return_, contradiction_  # return without further search
+                                if success:  # reasoner succeeded
+                                    success_out_ = True  # success flag for return
+                                    list_of_bindings_out = [
+                                        {**bindings_forward, **bindings_backward, **bindings_application}
+                                        for bindings_application in list_of_bindings_application]
+                                    list_of_bindings_return_ += list_of_bindings_out  # merge list for return
+                                    # if not self.find_all:  # NOT USED anymore
+                                    if self.number_of_results_obtained >= self.results_limit or contradiction_:
+                                        # number of results reached the limit # 2023/12/19
+                                        return (
+                                            True,
+                                            list_of_bindings_return_,
+                                            contradiction_)  # return without further search
+                                index += 1  # try next bindings
+
             except KeyError as e:
                 print_and_log(f'applications not found {e}')
-            return success_out_, list_of_bindings_return_  # return of try_applications
+            return (
+                success_out_,
+                list_of_bindings_return_,
+                contradiction_)  # return of try_applications
             # end of try_applications
 
-        success_out, list_of_bindings_return = try_applications(first_clause, rest_clauses, depth_current, success_out, list_of_bindings_return)  # try applications
+        success_out, list_of_bindings_return, contradiction \
+            = try_applications(
+                first_clause, rest_clauses,
+                depth_current, success_out,
+                list_of_bindings_return)  # try applications
 
         print_and_log(f'return, depth={depth_current}')
         if success_out and len(list_of_bindings_return) > self.width_reached:
             self.width_reached = len(list_of_bindings_return)  # update the width
-        return success_out, list_of_bindings_return  # return of reasoner
+        return success_out, list_of_bindings_return, contradiction  # return of reasoner
         # end of reasoner
     # end of Reasoner class
 
@@ -302,7 +953,8 @@ class Reasoner:
 #         self.depth_limit = depth_limit  # maximum depth of resolution
 #         pass
 #
-#     def resolve_recursive(self, right_clauses: ClassClauses) -> (bool, list[dict[str, str]]):  # resolve_bindings_in 辞書の配列
+#     def resolve_recursive(self, right_clauses: ClassClauses) -> (bool, list[dict[str, str]]):
+#         resolve_bindings_in 辞書の配列
 #         """
 #         resolve_recursiveはルールの右側のclauseを順番に再帰呼び出しで処理する。
 #
@@ -341,10 +993,12 @@ class Reasoner:
 #             # print('[', Resolution.resolve_right_recursive_count, '] ENTERING resolve_recursive')  # debug
 #             print_and_log(f'[{Resolution.resolve_right_recursive_count}] ENTERING resolve_recursive')  # debug
 #             Resolution.resolve_right_recursive_count += 1  # 再帰呼び出しの深さをup。debug
-#             if Resolution.resolve_right_recursive_count > self.depth_limit:  # exceeds depth_limit of resolution  # 2023/11/7
+#             if Resolution.resolve_right_recursive_count > self.depth_limit:
+#                 exceeds depth_limit of resolution  # 2023/11/7
 #                 Resolution.resolve_right_recursive_count -= 1
 #                 return False, []
-#             grandchild_rules, right_clauses_sub = right_clauses.split_clauses()  # first clauseを取り出す, rest of clausesは後で処理する。
+#             grandchild_rules, right_clauses_sub = right_clauses.split_clauses()
+#                 first clauseを取り出す, rest of clausesは後で処理する。
 #             built_query = ClassSparqlQuery().set('SELECT ?s ?p ?o WHERE {?s ?p ?o .}')  # dummy query
 #             built_query.build_query(grandchild_rules)  # resolveを呼び出すためのクエリ
 #             succeeded, bindings_array = self.resolve_clause(built_query)  # execute resolve
@@ -397,7 +1051,8 @@ class Reasoner:
 #             # print('[', Resolution.resolve_right_recursive_count,
 #                   '] ==resolve_bindings_out IN resolve_right_recursive: ',
 #                   resolve_bindings_out)  # debug
-#             print_and_log(f'[{Resolution.resolve_right_recursive_count}] ==resolve_bindings_out IN resolve_right_recursive: {resolve_bindings_out}')  # debug
+#             print_and_log(f'[{Resolution.resolve_right_recursive_count}] == resolve_bindings_out
+#             IN resolve_right_recursive: {resolve_bindings_out}')  # debug
 #             # print('---------- resolve_right_recursive-2 ---------')  # debug
 #             print_and_log('---------- resolve_right_recursive-2 ---------')  # debug
 #             Resolution.resolve_right_recursive_count -= 1  # depth of recursive call down.  # debug
@@ -440,15 +1095,17 @@ class Reasoner:
 #         # print('++++++++++ resolve_rule ++++++++++')  # debug
 #         print_and_log('++++++++++ resolve_rule ++++++++++')  # debug
 #
-#         def build_argument_bindings_for_left(bindings_for_left: dict[rdflib.term.Variable, str]) -> dict[str, str]:  # 左辺の変数をチェック
+#         def build_argument_bindings_for_left(bindings_for_left: dict[rdflib.term.Variable, str]) -> dict[str, str]:
 #             """
 #             左辺の変数をチェック
 #
 #             Args:
-#                 bindings_for_left (dict[rdflib.term.Variable, str]): {x: 'http://value.org/two', y: 'http://value.org/two', z: 'http://value.org/z'}
+#                 bindings_for_left (dict[rdflib.term.Variable, str]): {x: 'http://value.org/two',
+#                 y: 'http://value.org/two', z: 'http://value.org/z'}
 #
 #             Returns:
-#                 dict[str, str]: {'x1000': '<http://value.org/two>', '?y1000': '<http://value.org/two>'. '?z1000': '?z'}
+#                 dict[str, str]: {'x1000': '<http://value.org/two>',
+#                 '?y1000': '<http://value.org/two>'. '?z1000': '?z'}
 #             """
 #             # print('BINDINGS FOR LEFT: ' + str(bindings_for_left))  # debug
 #             print_and_log(f'BINDINGS FOR LEFT: {str(bindings_for_left)}')  # debug
@@ -464,7 +1121,8 @@ class Reasoner:
 #                     except KeyError:
 #                         pass
 #                 my_term = ClassTerm().build(my_key)  # build a ClassTerm  instance from a string my_key
-#                 my_value = ClassTerm().build(str(bindings_for_left[item]))  # my_value is also an instance of ClassTerm
+#                 my_value = ClassTerm().build(str(bindings_for_left[item]))
+#                 my_value is also an instance of ClassTerm
 #                 argument_bindings_built[my_term.to_var_string()] = my_value.to_var_string()  # return value
 #             # print('ARGUMENT BINDINGS: ' + str(argument_bindings_built))
 #             print_and_log(f'ARGUMENT BINDINGS: {str(argument_bindings_built)}')
@@ -482,7 +1140,8 @@ class Reasoner:
 #             = self.resolve_recursive(right_clauses_sub_revised)  # ルールの右辺を評価
 #         return right_side_succeeded, resolve_bindings_array
 #
-#     def resolve_clause(self, resolve_query: ClassSparqlQuery) -> (bool, list[dict[str, str]]):  # resolve a single clause
+#     def resolve_clause(self, resolve_query: ClassSparqlQuery) -> (bool, list[dict[str, str]]):
+#         resolve a single clause
 #         """
 #         resolve_clauseは１つのclauseを対象にする。
 #
@@ -535,8 +1194,8 @@ class Reasoner:
 #                 return True, resolve_bindings_out  # 辞書の配列
 #         rules = resolve_query.find_applicable_rules(self.rules)  # set left side bindings
 #         if len(rules) == 0:
-#             # print('NO APPLICABLE RULES FOUND.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')  # debug
-#             print_and_log('NO APPLICABLE RULES FOUND.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')  # debug
+#             # print('NO APPLICABLE RULES FOUND.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')  # debug
+#             print_and_log('NO APPLICABLE RULES FOUND.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')  # debug
 #             # print('---------- resolve_clause-2 ---------')  # debug
 #             print_and_log('---------- resolve_clause-2 ---------')  # debug
 #             return succeeded, resolve_bindings_out
@@ -545,7 +1204,8 @@ class Reasoner:
 #         for rule_template in rules:
 #             if rule_template.label.find('list_number_add_x_y_z') >= 0:  # debug
 #                 pass  # debug
-#             rule = ClassRule().build(ClassRules.graph, rule_template.label, rule_template.rule_left.label)  # copy a rule
+#             rule = ClassRule().build(ClassRules.graph, rule_template.label, rule_template.rule_left.label)
+#             copy a rule
 #             rule.modify_variables()  # x -> x1000, etc.
 #             rule.rule_left.bindings = rule_template.rule_left.bindings
 #             rule.rule_left.forward_bindings = rule_template.rule_left.forward_bindings
@@ -612,19 +1272,24 @@ class FunctionHelper:
             int: an integer number
 
         """
-        number_list = {'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9}  # conversion table
+        number_list = {'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7,
+                       'eight': 8, 'nine': 9}  # conversion table
         return_number = 0  # initial value of an integer to be returned
         multiplier = 1  # multiplier for each digit of the integer
         while True:
-            my_question = f"""
+            my_question_ \
+                = f"""
                     SELECT ?car ?cdr WHERE {{
                     ?s1 <{OPERATION}> <{VAL}cons> . 
                     ?s1 <{VAL}variable_x> ?car . 
                     ?s1 <{VAL}variable_y> ?cdr . 
                     ?s1 <{VAL}variable_z> <{list_number}> . 
                     }}"""
-            my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-            resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)  # get the car and cdr of the list number
+            my_sparql_query = ClassSparqlQuery().set(my_question_).build_rule()
+            resolve_bindings \
+                = rdf_prolog.answer_question(
+                    my_sparql_query,
+                    depth_limit=300)  # get the car and cdr of the list number
             car = resolve_bindings[0]['?car']  # car part
             car_value = number_list[car.replace(VAL, '')]  # convert to an integer
             return_number += car_value * multiplier  # 345 = 5*1 + 4*10 + 3*100
@@ -647,31 +1312,32 @@ class FunctionHelper:
             str: list number
 
         """
-        number_list = {0: 'zero', 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine'}  # conversion table
+        number_list = {0: 'zero', 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven',
+                       8: 'eight', 9: 'nine'}  # conversion table
         if num < 10:  # no more upper digits
             list_number = f'{VAL}{number_list[num]}'  # 2 -> http://value.org/two
-            my_question = f"""
+            my_question_ = f"""
                     SELECT ?ans WHERE {{
                     ?s1 <{OPERATION}> <{VAL}cons> . 
                     ?s1 <{VAL}variable_x> <{list_number}> . 
                     ?s1 <{VAL}variable_y> <{VAL}nil> . 
                     ?s1 <{VAL}variable_z> ?ans . 
                     }}"""
-            my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+            my_sparql_query = ClassSparqlQuery().set(my_question_).build_rule()
             resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
             return resolve_bindings[0]['?ans']  # create a cons and return it
         else:  # num >=10, more digits exist
             quotient, remainder = divmod(num, 10)
             quotient_number = FunctionHelper.num_to_list(rdf_prolog, quotient)  # recursive call
             remainder_number = f'{VAL}{number_list[remainder]}'  # least significant digit
-            my_question = f"""
+            my_question_ = f"""
                     SELECT ?ans WHERE {{
                     ?s1 <{OPERATION}> <{VAL}cons> . 
                     ?s1 <{VAL}variable_x> <{remainder_number}> . 
                     ?s1 <{VAL}variable_y> <{quotient_number}> . 
                     ?s1 <{VAL}variable_z> ?ans . 
                     }}"""
-            my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+            my_sparql_query = ClassSparqlQuery().set(my_question_).build_rule()
             resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
             return resolve_bindings[0]['?ans']  # create a cons and return it
         pass
@@ -694,14 +1360,14 @@ class FunctionHelper:
         y = bindings[f'{VAR}_y']  # extract an argument y
         print(f'x: {x}')  # just for debug
         print(f'y: {y}')
-        my_question = f"""
+        my_question_ = f"""
             SELECT ?car ?cdr WHERE {{
             ?s1 <{OPERATION}> <{VAL}cons> . 
             ?s1 <{VAL}variable_x> <{x}> . 
             ?s1 <{VAL}variable_y> <{y}> . 
             ?s1 <{VAL}variable_z> ?ans . 
             }}"""
-        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        my_sparql_query = ClassSparqlQuery().set(my_question_).build_rule()
         resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
         print(resolve_bindings[0]['?ans'])
         results = {bindings[f'{VAR}_z']: resolve_bindings[0]['?ans']}  # return the result
@@ -774,35 +1440,37 @@ def main():
     if True:
         rdf_prolog = RdfProlog(rules_folder='../rules/rules_number_10')
 
-        my_question = f"""
+        my_question_ = f"""
                       SELECT ?ans WHERE {{ 
                       ?s <{OPERATION}> <{VAL}add_number> . 
                       ?s <{VAL}variable_x> <{VAL}one> . 
                       ?s <{VAL}variable_y> ?ans . 
                       ?s <{VAL}variable_z> <{VAL}three> . 
                       }}"""
-        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        my_sparql_query = ClassSparqlQuery().set(my_question_).build_rule()
         # rdf_prolog.answer_question(my_sparql_query)
 
-        my_question = f"""
+        my_question_ = f"""
               SELECT ?ans WHERE {{ 
                       ?s <{OPERATION}> <{VAL}add_number> . 
                       ?s <{VAL}variable_x> <{VAL}one> . 
                       ?s <{VAL}variable_y> ?ans . 
                       ?s <{VAL}variable_z> <{VAL}three> . 
                       }}"""
-        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.search_order(my_sparql_query, results_limit=30, depth_limit=30)  # search the optimal order of processing clauses
+        my_sparql_query = ClassSparqlQuery().set(my_question_).build_rule()
+        # resolve_bindings = rdf_prolog.search_order(my_sparql_query, results_limit=30, depth_limit=30)
+        # search the optimal order of processing clauses
 
-        my_question = f"""
+        my_question_ = f"""
               SELECT ?ans WHERE {{ 
                       ?s <{OPERATION}> <{VAL}add_number> . 
                       ?s <{VAL}variable_x> ?ans . 
                       ?s <{VAL}variable_y> <{VAL}two> . 
                       ?s <{VAL}variable_z> <{VAL}four> . 
                       }}"""
-        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        resolve_bindings = rdf_prolog.search_order(my_sparql_query, results_limit=30, depth_limit=30)  # search the optimal order of processing clauses
+        my_sparql_query = ClassSparqlQuery().set(my_question_).build_rule()
+        resolve_bindings = rdf_prolog.search_order(my_sparql_query, results_limit=30,
+                                                   depth_limit=30)  # search the optimal order of processing clauses
 
         pass
 
@@ -811,13 +1479,13 @@ def main():
         # rdf_prolog = RdfProlog(rules_folder='../rules/rules_number')
 
         # next(1, ?ans)
-        my_question = f"""
+        my_question_ = f"""
             SELECT ?ans WHERE {{ 
             ?s <{OPERATION}> <{VAL}next_number> . 
             ?s <{VAL}variable_x> <{VAL}one> . 
             ?s <{VAL}variable_y> ?ans . 
             }}"""
-        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        my_sparql_query = ClassSparqlQuery().set(my_question_).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
         pass
 

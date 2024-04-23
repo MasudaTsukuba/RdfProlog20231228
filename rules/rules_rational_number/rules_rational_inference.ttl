@@ -1,0 +1,414 @@
+# rules_rational_number.ttl
+# T. Masuda, 2024/2/5
+
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# rules
+
+# nil :- even(x), odd(x)
+# if x is even and odd at the same time, this is a contradiction and returns nil.
+VAL:rule_even_odd
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:even ;
+        VAL:variable_x VAR:_x ] ;
+    VAL:left_side [
+        VAL:operation VAL:odd ;
+        VAL:variable_x VAR:_x ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:nil ] ;
+        VAL:id "1" ] .
+
+# definition of rational equal
+# rational number am/an is equal to bm/bn, if am*bn = an*bm
+VAL:rule_rational_equal_a_b
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:rational_number ;
+        VAL:variable_x VAR:_am ;
+        VAL:variable_y VAR:_an ;
+        VAL:variable_z VAR:_x ] ;
+    VAL:left_side [
+        VAL:operation VAL:rational_number ;
+        VAL:variable_x VAR:_bm ;
+        VAL:variable_y VAR:_bn ;
+        VAL:variable_z VAR:_x ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_am ;
+            VAL:variable_y VAR:_bn ;
+            VAL:variable_z VAR:_y ] ;
+        VAL:id "1" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_an ;
+            VAL:variable_y VAR:_bm ;
+            VAL:variable_z VAR:_y ] ;
+        VAL:id "2" ] .
+
+# square root 2
+# if the square root of 2 is x=m/n, m*m = 2*n*n.
+VAL:rule_square_root2
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:rational_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_x ;
+        VAL:variable_z VAL:rational_2 ] ;
+    VAL:left_side [
+        VAL:operation VAL:rational_number ;
+        VAL:variable_x VAR:_m ;
+        VAL:variable_y VAR:_n ;
+        VAL:variable_z VAR:_x ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:rational_number ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_v ;
+            VAL:variable_z VAL:rational_2 ] ;
+        VAL:id "1" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_m ;
+            VAL:variable_y VAR:_m ;
+            VAL:variable_z VAR:_m2 ] ;
+        VAL:id "2" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_n ;
+            VAL:variable_y VAR:_n ;
+            VAL:variable_z VAR:_n2 ] ;
+        VAL:id "3" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_m2 ;
+            VAL:variable_y VAR:_v ;
+            VAL:variable_z VAR:_m2v ] ;
+        VAL:id "4" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_n2 ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_m2v ] ;
+        VAL:id "5" ] .
+
+# if the square root of y is x, that is y = x*x and z = y,
+# z contains even number of 2.
+VAL:rule_square_integer_factor2_even
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_x ;
+        VAL:variable_z VAR:_y ] ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_y ;
+        VAL:variable_y VAL:1 ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_factor2 ;
+            VAL:variable_x VAR:_z ;
+            VAL:variable_y VAR:_zf ] ;
+        VAL:id "1" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:even ;
+            VAL:variable_x VAR:_zf ] ;
+        VAL:id "2" ] .
+
+# if the square root of y is x, that is y = x*x and z = 2*y,
+# z contains odd number of 2.
+VAL:rule_square_integer_factor2_odd
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_xa ;
+        VAL:variable_y VAR:_xa ;
+        VAL:variable_z VAR:_ya ] ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_ya ;
+        VAL:variable_y VAL:1 ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_x ;
+        VAL:variable_z VAR:_y ] ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_y ;
+        VAL:variable_y VAL:2 ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_factor2 ;
+            VAL:variable_x VAR:_z ;
+            VAL:variable_y VAR:_zf ] ;
+        VAL:id "1" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:odd ;
+            VAL:variable_x VAR:_zf ] ;
+        VAL:id "2" ] .
+
+VAL:rule_square_integer_factor2_even_odd
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_xa ;
+        VAL:variable_y VAR:_xa ;
+        VAL:variable_z VAR:_ya ] ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_ya ;
+        VAL:variable_y VAL:2 ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_xb ;
+        VAL:variable_y VAR:_xb ;
+        VAL:variable_z VAR:_yb ] ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_yb ;
+        VAL:variable_y VAL:2 ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:even ;
+            VAL:variable_x VAR:_zf ] ;
+        VAL:id "2" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_factor2 ;
+            VAL:variable_x VAR:_z ;
+            VAL:variable_y VAR:_zf ] ;
+        VAL:id "1" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:odd ;
+            VAL:variable_x VAR:_zf ] ;
+        VAL:id "4" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_factor2 ;
+            VAL:variable_x VAR:_z ;
+            VAL:variable_y VAR:_zf ] ;
+        VAL:id "3" ] .
+
+##################################################################
+# controls
+
+VAL:control_even_odd
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_even_odd ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] .
+
+VAL:control_rational_equal_a_b
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_rational_equal_a_b ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] .
+
+VAL:control_square_root2
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_square_root2 ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "3" ] ;
+    VAL:right_side [
+        VAL:id "4" ;
+        VAL:priority "4" ] ;
+    VAL:right_side [
+        VAL:id "5" ;
+        VAL:priority "5" ] .
+
+VAL:control_square_integer_factor2_even
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_square_integer_factor2_even ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "1" ] .
+
+VAL:control_square_integer_factor2_odd
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_square_integer_factor2_odd ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "1" ] .
+
+VAL:control_square_integer_factor2_even_odd
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_square_integer_factor2_even_odd ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "4" ] ;
+    VAL:right_side [
+        VAL:id "4" ;
+        VAL:priority "3" ] .
+
+##################################################################
+# applications
+
+VAL:application_even_odd
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:even ;
+        VAL:variable_x VAR:_x ] ;
+    VAL:pattern [
+        VAL:operation VAL:odd ;
+        VAL:variable_x VAR:_x ] ;
+    VAL:use [
+        VAL:control VAL:control_even_odd ;
+        VAL:priority "1" ] ;
+    VAL:priority "10" .
+
+#VAL:application_rational_equal_a_b
+#    VAL:type VAL:application ;
+#    VAL:program VAL:false ;
+#   VAL:pattern [
+#        VAL:operation VAL:integer_multiply ;
+#        VAL:variable_x VAR:_am ;
+#        VAL:variable_y VAR:_bn ;
+#        VAL:variable_z VAR:_y ] ;
+#    VAL:pattern [
+#        VAL:operation VAL:integer_multiply ;
+#        VAL:variable_x VAR:_an ;
+#        VAL:variable_y VAR:_bm ;
+#        VAL:variable_z VAR:_y ] ;
+#    VAL:use [
+#        VAL:control VAL:control_rational_equal_a_b ;
+#        VAL:priority "1" ] ;
+#    VAL:priority "1" .
+
+VAL:application_square_root2
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:rational_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_x ;
+        VAL:variable_z VAL:rational_2 ] ;
+    VAL:pattern [
+        VAL:operation VAL:rational_number ;
+        VAL:variable_x VAR:_m ;
+        VAL:variable_y VAR:_n ;
+        VAL:variable_z VAR:_x ] ;
+    VAL:use [
+        VAL:control VAL:control_square_root2 ;
+        VAL:priority "1" ] ;
+    VAL:priority "8" .
+
+VAL:application_square_integer_factor2_even
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_x ;
+        VAL:variable_z VAR:_y ] ;
+    VAL:pattern [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_y ;
+        VAL:variable_y VAL:1 ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_square_integer_factor2_even ;
+        VAL:priority "1" ] ;
+    VAL:priority "7" .
+
+VAL:application_square_integer_factor2_odd
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_x ;
+        VAL:variable_z VAR:_y ] ;
+    VAL:pattern [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_y ;
+        VAL:variable_y VAL:2 ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_square_integer_factor2_odd ;
+        VAL:priority "1" ] ;
+    VAL:priority "6" .
+
+VAL:application_square_integer_factor2_even_odd
+    VAL:type VAL:application ;
+    VAL:program VAL:false ;
+    VAL:pattern [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_xa ;
+        VAL:variable_y VAR:_xa ;
+        VAL:variable_z VAR:_ya ] ;
+    VAL:pattern [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_ya ;
+        VAL:variable_y VAL:2 ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:pattern [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_xb ;
+        VAL:variable_y VAR:_xb ;
+        VAL:variable_z VAR:_yb ] ;
+    VAL:pattern [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_yb ;
+        VAL:variable_y VAL:2 ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_square_integer_factor2_even_odd ;
+        VAL:priority "1" ] ;
+    VAL:priority "9" .

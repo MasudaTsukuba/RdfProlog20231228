@@ -24,18 +24,18 @@ def main():
 
     # next
     if True:  # next
-        # rdf_prolog = RdfProlog(rules_folder='rules/rules_number')
-        # # next(1, ?ans)
-        # my_question = f"""
-        #    SELECT ?ans WHERE {{
-        #    ?s <{OPERATION}> <{VAL}next_number> .
-        #    ?s <{VAL}variable_x> <{VAL}one> .
-        #    ?s <{VAL}variable_y> ?ans .
-        #    }}"""
-        # my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
-        # # xxx = resolve_bindings[0]['?ans']
-        # pass
+    #     rdf_prolog = RdfProlog(rules_folder='rules/rules_number')
+    #     # next(1, ?ans)
+    #     my_question = f"""
+    #        SELECT ?ans WHERE {{
+    #        ?s <{OPERATION}> <{VAL}next_number> .
+    #        ?s <{VAL}variable_x> <{VAL}one> .
+    #        ?s <{VAL}variable_y> ?ans .
+    #        }}"""
+    #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+    #     resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
+    #     xxx = resolve_bindings[0]['?ans']
+    #     pass
 
     #     # next(?ans, 3)
     #     my_question = f"""
@@ -357,22 +357,23 @@ def main():
 
     # next_100
     if True:  # next_100
-    #     rdf_prolog = RdfProlog(rules_folder='../rules/rules_number_100')
-    #     # next(1, ?ans)
-    #     my_question = f"""
-    #        SELECT ?ans WHERE {{
-    #        ?s <{OPERATION}> <{VAL}next_number> .
-    #        ?s <{VAL}variable_x> <{VAL}1> .
-    #        ?s <{VAL}variable_y> ?ans .
-    #        }}"""
-    #     my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-    #     # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
-    #     # xxx = resolve_bindings[0]['?ans']
+        # rdf_prolog = RdfProlog(rules_folder='../rules/rules_number_100')
+        # # next(1, ?ans)
+        # my_question = f"""
+        #    SELECT ?ans WHERE {{
+        #    ?s <{OPERATION}> <{VAL}next_number> .
+        #    ?s <{VAL}variable_x> <{VAL}1> .
+        #    ?s <{VAL}variable_y> ?ans .
+        #    }}"""
+        # my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
+        # # xxx = resolve_bindings[0]['?ans']
         pass
 
     # add_100
     if True:
         # rdf_prolog = RdfProlog(rules_folder='../rules/rules_number_100')
+
         # add(3, ?ans, 5)->ans:2
         my_question = f"""
             SELECT ?ans WHERE {{
@@ -397,7 +398,7 @@ def main():
            ?s <{VAL}variable_z> ?ans .
            }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=10)
         # xxx = resolve_bindings[0]['?ans']
         pass
 
@@ -870,7 +871,6 @@ def main():
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
         # resolve_bindings = rdf_prolog.answer_question(my_sparql_query)
 
-
         # add(1, ?ans, 3)
         my_question = f"""
            SELECT ?ans ?car ?cdr WHERE {{
@@ -885,7 +885,7 @@ def main():
 
     # list number math
     if True:
-        rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
+        # rdf_prolog = RdfProlog(rules_folder='../rules/rules_list_number_math')
 
         # next([9, 9], ?ans) = [0, 0, 1] means 100
         my_question = f"""
@@ -1139,7 +1139,102 @@ def main():
             ?s2 <{VAL}variable_z> ?ans . 
             }}"""
         my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
-        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, depth_limit=300)
+        pass
+
+    # rational number
+    if True:
+        rdf_prolog = RdfProlog(rules_folder='../rules/rules_rational_number')
+
+        # rational number 2
+        my_question = f"""
+                    SELECT ?m ?n WHERE {{
+                    ?s1 <{OPERATION}> <{VAL}rational_number> . 
+                    ?s1 <{VAL}variable_x> ?m . 
+                    ?s1 <{VAL}variable_y> ?n . 
+                    ?s1 <{VAL}variable_z> <{VAL}rational_2> . 
+                    }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=5, depth_limit=300)
+
+        # rational number 3/5
+        my_question = f"""
+                            SELECT ?m ?n WHERE {{
+                            ?s1 <{OPERATION}> <{VAL}rational_number> . 
+                            ?s1 <{VAL}variable_x> <{VAL}3> . 
+                            ?s1 <{VAL}variable_y> <{VAL}5> . 
+                            ?s1 <{VAL}variable_z> ?z .
+                            ?s2 <{OPERATION}> <{VAL}rational_number> . 
+                            ?s2 <{VAL}variable_x> ?m . 
+                            ?s2 <{VAL}variable_y> ?n . 
+                            ?s2 <{VAL}variable_z> ?z . 
+                            }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=1, depth_limit=20)
+
+        # rational number 13/19
+        my_question = f"""
+                            SELECT ?m ?n WHERE {{
+                            ?s1 <{OPERATION}> <{VAL}rational_number> . 
+                            ?s1 <{VAL}variable_x> <{VAL}13> . 
+                            ?s1 <{VAL}variable_y> <{VAL}19> . 
+                            ?s1 <{VAL}variable_z> ?z .
+                            ?s2 <{OPERATION}> <{VAL}rational_number> . 
+                            ?s2 <{VAL}variable_x> ?m . 
+                            ?s2 <{VAL}variable_y> ?n . 
+                            ?s2 <{VAL}variable_z> ?z . 
+                            }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=1, depth_limit=300)
+
+        # rational multiply 3/5 * 7/11
+        my_question = f"""
+                            SELECT ?m ?n WHERE {{
+                            ?s1 <{OPERATION}> <{VAL}rational_number> . 
+                            ?s1 <{VAL}variable_x> <{VAL}3> . 
+                            ?s1 <{VAL}variable_y> <{VAL}5> . 
+                            ?s1 <{VAL}variable_z> ?x . 
+                            ?s2 <{OPERATION}> <{VAL}rational_number> . 
+                            ?s2 <{VAL}variable_x> <{VAL}7> . 
+                            ?s2 <{VAL}variable_y> <{VAL}11> . 
+                            ?s2 <{VAL}variable_z> ?y . 
+                            ?s3 <{OPERATION}> <{VAL}rational_multiply> . 
+                            ?s3 <{VAL}variable_x> ?x . 
+                            ?s3 <{VAL}variable_y> ?y . 
+                            ?s3 <{VAL}variable_z> ?z . 
+                            ?s4 <{OPERATION}> <{VAL}rational_number> . 
+                            ?s4 <{VAL}variable_x> ?m . 
+                            ?s4 <{VAL}variable_y> ?n . 
+                            ?s4 <{VAL}variable_z> ?z . 
+                            }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=1, depth_limit=20)
+
+        # contradiction of even(?x), odd(?x)
+        my_question = f"""
+                    SELECT ?x WHERE {{
+                    ?s1 <{OPERATION}> <{VAL}even> . 
+                    ?s1 <{VAL}variable_x> ?x . 
+                    ?s2 <{OPERATION}> <{VAL}odd> . 
+                    ?s2 <{VAL}variable_x> ?x . 
+                    }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        # resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=1, depth_limit=30)
+
+        # square root of 2 is not a rational number
+        my_question = f"""
+                    SELECT ?m ?n WHERE {{
+                    ?s1 <{OPERATION}> <{VAL}rational_multiply> . 
+                    ?s1 <{VAL}variable_x> ?root2 . 
+                    ?s1 <{VAL}variable_y> ?root2 . 
+                    ?s1 <{VAL}variable_z> <{VAL}rational_2> . 
+                    ?s2 <{OPERATION}> <{VAL}rational_number> . 
+                    ?s2 <{VAL}variable_x> ?m . 
+                    ?s2 <{VAL}variable_y> ?n . 
+                    ?s2 <{VAL}variable_z> ?root2 . 
+                    }}"""
+        my_sparql_query = ClassSparqlQuery().set(my_question).build_rule()
+        resolve_bindings = rdf_prolog.answer_question(my_sparql_query, results_limit=1, depth_limit=20)
         pass
 
 

@@ -1,0 +1,341 @@
+2024-04-23 12:26:32,596 - DEBUG - Starting debug log
+2024-04-23 12:26:33,788 - DEBUG - $$$$$$$$$$ PREPARATION STARTED $$$$$$$$$$
+2024-04-23 12:26:34,054 - WARNING - <http://value.org/type> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,054 - WARNING - <http://value.org/fact> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,345 - WARNING - <http://value.org/type> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,345 - WARNING - <http://value.org/inference> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,347 - WARNING - <http://value.org/type> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,347 - WARNING - <http://value.org/rule> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,350 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,357 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,357 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,358 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,377 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,382 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,382 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,383 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,396 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,402 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,402 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,402 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,416 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,421 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,421 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,421 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,429 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,434 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,434 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,434 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,449 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,454 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,454 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,454 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,459 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,464 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,464 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,464 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,479 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,484 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,484 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,484 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,503 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,510 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,510 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,510 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,522 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,527 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,527 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,527 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,533 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,541 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,541 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,541 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,549 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,554 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,554 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,554 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,563 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,576 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,576 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,576 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,587 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,592 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,592 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,592 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,607 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,615 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,615 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,615 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,626 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,639 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,639 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,640 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,656 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,661 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,661 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,661 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,670 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,675 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,675 - WARNING - <http://value.org/child> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,675 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,684 - WARNING - <http://value.org/type> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,684 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,684 - WARNING - <http://value.org/rule> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,684 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,693 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,696 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,696 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,696 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,702 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,705 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,706 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,706 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,711 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,714 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,714 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,714 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,721 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,724 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,724 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,724 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,729 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,733 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,733 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,733 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,739 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,742 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,742 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,742 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,748 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,751 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,751 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,751 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,757 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,760 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,760 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,760 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,767 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,770 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,770 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,770 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,776 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,779 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,779 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,779 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,785 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,788 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,788 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,788 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,794 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,797 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,797 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,797 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,802 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,806 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,806 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,806 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,812 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,815 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,815 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,815 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,821 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,824 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,824 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,824 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,830 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,833 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,833 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,833 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,838 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,841 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,842 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,842 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,847 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,851 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,851 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,851 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,857 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,860 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,860 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,860 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,866 - WARNING - <http://value.org/type> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,866 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,866 - WARNING - <http://value.org/rule> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,866 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,873 - WARNING - <http://value.org/left_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,876 - WARNING - <http://value.org/right_side> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,876 - WARNING - <http://value.org/id> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,876 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,882 - WARNING - <http://value.org/type> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,882 - WARNING - <http://value.org/application> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,882 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,891 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,891 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,907 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,907 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,907 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,914 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,914 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,914 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,921 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,921 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,930 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,931 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,931 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,938 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,938 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,938 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,945 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,945 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,955 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,955 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,955 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,962 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,962 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,962 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,969 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,969 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,979 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,979 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,979 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,986 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,986 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,986 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,993 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:34,993 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,001 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,001 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,001 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,008 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,008 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,008 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,015 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,015 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,022 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,022 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,022 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,029 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,029 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,029 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,036 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,036 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,044 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,044 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,044 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,051 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,051 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,051 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,058 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,059 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,068 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,069 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,069 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,075 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,076 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,076 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,082 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,082 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,089 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,090 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,090 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,097 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,097 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,097 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,104 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,104 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,111 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,111 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,111 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,118 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,119 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,119 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,126 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,126 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,133 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,133 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,133 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,141 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,141 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,141 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,148 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,148 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,155 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,155 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,155 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,163 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,163 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,163 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,170 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,170 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,177 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,177 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,177 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,184 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,184 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,184 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,191 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,191 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,198 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,198 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,198 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,205 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,205 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,205 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,212 - WARNING - <http://value.org/pattern> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,212 - WARNING - <http://value.org/program> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,219 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,219 - WARNING - <http://value.org/control> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,220 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,226 - WARNING - <http://value.org/use> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,226 - WARNING - <http://value.org/function> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,227 - WARNING - <http://value.org/priority> does not look like a valid URI, trying to serialize this will break.
+2024-04-23 12:26:35,233 - DEBUG - $$$$$$$$$$ PREPARATION COMPLETED $$$$$$$$
+2024-04-23 12:26:35,233 - DEBUG - 
+2024-04-23 12:26:35,487 - DEBUG - reasoner: depth=0
+2024-04-23 12:26:35,487 - DEBUG - first clause: {'http://value.org/operation': 'http://value.org/rational_multiply', 'http://value.org/variable_x': 'http://variable.org/root2', 'http://value.org/variable_y': 'http://variable.org/root2', 'http://value.org/variable_z': 'http://value.org/rational_2'}
+2024-04-23 12:26:35,488 - DEBUG - search facts: 0, []
+2024-04-23 12:26:35,488 - DEBUG - trying applications
+2024-04-23 12:26:35,488 - DEBUG - number of applications: 3
+2024-04-23 12:26:35,488 - DEBUG - 0/3 trying: http://value.org/application_square_root2
+2024-04-23 12:26:35,488 - DEBUG - more than 1 clause in patterns
+2024-04-23 12:26:35,489 - DEBUG - result of matched: True
+2024-04-23 12:26:35,489 - DEBUG - {'http://value.org/operation': 'http://value.org/rational_number', 'http://value.org/variable_x': 'http://variable.org/_u1001', 'http://value.org/variable_y': 'http://variable.org/_v1001', 'http://value.org/variable_z': 'http://value.org/rational_2'}
+2024-04-23 12:26:35,489 - DEBUG - {'http://value.org/operation': 'http://value.org/integer_multiply', 'http://value.org/variable_x': 'http://variable.org/_m1001', 'http://value.org/variable_y': 'http://variable.org/_m1001', 'http://value.org/variable_z': 'http://variable.org/_m21001'}
+2024-04-23 12:26:35,489 - DEBUG - {'http://value.org/operation': 'http://value.org/integer_multiply', 'http://value.org/variable_x': 'http://variable.org/_n1001', 'http://value.org/variable_y': 'http://variable.org/_n1001', 'http://value.org/variable_z': 'http://variable.org/_n21001'}
+2024-04-23 12:26:35,489 - DEBUG - {'http://value.org/operation': 'http://value.org/integer_multiply', 'http://value.org/variable_x': 'http://variable.org/_m21001', 'http://value.org/variable_y': 'http://variable.org/_v1001', 'http://value.org/variable_z': 'http://variable.org/_m2v1001'}
+2024-04-23 12:26:35,489 - DEBUG - {'http://value.org/operation': 'http://value.org/integer_multiply', 'http://value.org/variable_x': 'http://variable.org/_n21001', 'http://value.org/variable_y': 'http://variable.org/_u1001', 'http://value.org/variable_z': 'http://variable.org/_m2v1001'}
+2024-04-23 12:26:35,489 - DEBUG - reasoner: depth=1
+2024-04-23 12:26:35,489 - DEBUG - first clause: {'http://value.org/operation': 'http://value.org/rational_number', 'http://value.org/variable_x': 'http://variable.org/_u1001', 'http://value.org/variable_y': 'http://variable.org/_v1001', 'http://value.org/variable_z': 'http://value.org/rational_2'}
+2024-04-23 12:26:35,489 - DEBUG - search facts: 1, [{'http://variable.org/_u1001': 'http://value.org/2', 'http://variable.org/_v1001': 'http://value.org/1'}]
+2024-04-23 12:26:35,490 - DEBUG - reasoner: depth=2
+2024-04-23 12:26:35,490 - DEBUG - first clause: {'http://value.org/operation': 'http://value.org/integer_multiply', 'http://value.org/variable_x': 'http://variable.org/_m1001', 'http://value.org/variable_y': 'http://variable.org/_m1001', 'http://value.org/variable_z': 'http://variable.org/_m21001'}
+2024-04-23 12:26:35,490 - DEBUG - search facts: 0, []
+2024-04-23 12:26:35,490 - DEBUG - trying applications
+2024-04-23 12:26:35,490 - DEBUG - number of applications: 11
+2024-04-23 12:26:35,490 - DEBUG -       0/11 trying: http://value.org/application_square_integer_factor2_even_odd
+2024-04-23 12:26:35,490 - DEBUG - more than 1 clause in patterns
+2024-04-23 12:26:35,497 - DEBUG - result of matched: True
+2024-04-23 12:26:35,498 - DEBUG - {'http://value.org/operation': 'http://value.org/even', 'http://value.org/variable_x': 'http://variable.org/_zf1003'}
+2024-04-23 12:26:35,498 - DEBUG - {'http://value.org/operation': 'http://value.org/integer_factor2', 'http://value.org/variable_x': 'http://variable.org/_z1003', 'http://value.org/variable_y': 'http://variable.org/_zf1003'}
+2024-04-23 12:26:35,498 - DEBUG - {'http://value.org/operation': 'http://value.org/odd', 'http://value.org/variable_x': 'http://variable.org/_zf1003'}
+2024-04-23 12:26:35,498 - DEBUG - {'http://value.org/operation': 'http://value.org/integer_factor2', 'http://value.org/variable_x': 'http://variable.org/_z1003', 'http://value.org/variable_y': 'http://variable.org/_zf1003'}
+2024-04-23 12:26:35,498 - DEBUG - reasoner: depth=3
+2024-04-23 12:26:35,498 - DEBUG - first clause: {'http://value.org/operation': 'http://value.org/even', 'http://value.org/variable_x': 'http://variable.org/_zf1003'}
+2024-04-23 12:26:35,498 - DEBUG - search facts: 0, []
+2024-04-23 12:26:35,498 - DEBUG - trying applications
+2024-04-23 12:26:35,498 - DEBUG - number of applications: 1
+2024-04-23 12:26:35,498 - DEBUG -               0/1 trying: http://value.org/application_even_odd
+2024-04-23 12:26:35,498 - DEBUG - more than 1 clause in patterns
+2024-04-23 12:26:35,499 - DEBUG - result of matched: True
+2024-04-23 12:26:35,499 - DEBUG - {'http://value.org/operation': 'http://value.org/nil'}
+2024-04-23 12:26:35,499 - DEBUG - reasoner: depth=4
+2024-04-23 12:26:35,499 - DEBUG - return, depth=3
+2024-04-23 12:26:35,499 - DEBUG - return, depth=2
+2024-04-23 12:26:35,499 - DEBUG - return, depth=1
+2024-04-23 12:26:35,499 - DEBUG - return, depth=0
+2024-04-23 12:26:35,499 - DEBUG - answer_complex_question: RESOLVE FAILED
+2024-04-23 12:26:35,499 - DEBUG - ============================>> Contradiction found.
+2024-04-23 12:26:35,499 - DEBUG - resolve_bindings: []
+2024-04-23 12:26:35,499 - DEBUG - Depth reached: 4
+2024-04-23 12:26:35,499 - DEBUG - Width reached: 1
+2024-04-23 12:26:35,499 - DEBUG - ==============================================================================================

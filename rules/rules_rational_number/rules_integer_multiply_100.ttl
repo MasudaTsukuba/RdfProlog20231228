@@ -1,0 +1,213 @@
+# rules_integer_multiply_100.ttl
+# T. Masuda, 2024/2/2
+
+@prefix VAL: <http://value.org/> .
+@prefix VAR: <http://variable.org/> .
+@prefix SOME: <http://some.org/> .
+
+##################################################################
+# facts
+
+##################################################################
+# rules
+
+VAL:rule_integer_multiply_x_1_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAL:1 ;
+        VAL:variable_z VAR:_x ] .
+
+VAL:rule_integer_multiply_1_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAL:1 ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_y ] .
+
+VAL:rule_integer_multiply_x_sy_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_next ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ] ;
+        VAL:id "1" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_u ;
+            VAL:variable_z VAR:_v ] ;
+        VAL:id "2" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_add ;
+            VAL:variable_x VAR:_x ;
+            VAL:variable_y VAR:_v ;
+            VAL:variable_z VAR:_z ] ;
+        VAL:id "3" ] .
+
+VAL:rule_integer_multiply_sx_y_z
+    VAL:type VAL:rule ;
+    VAL:left_side [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_next ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_x ] ;
+        VAL:id "1" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_multiply ;
+            VAL:variable_x VAR:_u ;
+            VAL:variable_y VAR:_y ;
+            VAL:variable_z VAR:_v ] ;
+        VAL:id "2" ] ;
+    VAL:right_side [
+        VAL:child [
+            VAL:operation VAL:integer_add ;
+            VAL:variable_x VAR:_y ;
+            VAL:variable_y VAR:_v ;
+            VAL:variable_z VAR:_z ] ;
+        VAL:id "3" ] .
+
+##################################################################
+# controls
+
+VAL:control_integer_multiply_x_1_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_integer_multiply_x_1_z ;
+    VAL:left_side [
+        ] ;
+    VAL:right_side [ ] .
+
+VAL:control_integer_multiply_1_y_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_integer_multiply_1_y_z ;
+    VAL:left_side [
+        ] ;
+   VAL:right_side [
+        ] .
+
+VAL:control_integer_multiply_sx_sy_z
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_integer_multiply_x_sy_z ;
+    VAL:left_side [
+        VAL:variable_x "some" ;
+        VAL:variable_y "some" ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "3" ] .
+
+VAL:control_integer_multiply_sx_y_sz
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_integer_multiply_x_sy_z ;
+    VAL:left_side [
+        VAL:variable_x "some" ;
+        VAL:variable_z "some" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "3" ] .
+
+VAL:control_integer_multiply_x_sy_sz
+    VAL:type VAL:control ;
+    VAL:rule VAL:rule_integer_multiply_sx_y_z ;
+    VAL:left_side [
+        VAL:variable_y "some" ;
+        VAL:variable_z "some" ] ;
+    VAL:right_side [
+        VAL:id "3" ;
+        VAL:priority "1" ] ;
+    VAL:right_side [
+        VAL:id "2" ;
+        VAL:priority "2" ] ;
+    VAL:right_side [
+        VAL:id "1" ;
+        VAL:priority "3" ] .
+
+##################################################################
+# applications
+
+VAL:application_integer_multiply_sx_sy_z
+   VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+        VAL:operation VAL:integer_multiply ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z VAR:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_integer_multiply_1_y_z ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_integer_multiply_x_1_z ;
+        VAL:priority "2" ] ;
+   VAL:use [
+        VAL:control VAL:control_integer_multiply_sx_sy_z ;
+        VAL:priority "3" ] ;
+    VAL:priority "1".
+
+VAL:application_integer_multiply_sx_y_sz
+   VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+       VAL:operation VAL:integer_multiply ;
+        VAL:variable_x SOME:_x ;
+        VAL:variable_y VAR:_y ;
+        VAL:variable_z SOME:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_integer_multiply_1_y_z ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_integer_multiply_x_1_z ;
+        VAL:priority "2" ] ;
+   VAL:use [
+        VAL:control VAL:control_integer_multiply_sx_y_sz ;
+        VAL:priority "3" ] ;
+    VAL:priority "1".
+
+VAL:application_integer_multiply_x_sy_sz
+   VAL:type VAL:application ;
+    VAL:program VAL:true ;
+    VAL:pattern [
+       VAL:operation VAL:integer_multiply ;
+        VAL:variable_x VAR:_x ;
+        VAL:variable_y SOME:_y ;
+        VAL:variable_z SOME:_z ] ;
+    VAL:use [
+        VAL:control VAL:control_integer_multiply_1_y_z ;
+        VAL:priority "1" ] ;
+    VAL:use [
+        VAL:control VAL:control_integer_multiply_x_1_z ;
+        VAL:priority "2" ] ;
+   VAL:use [
+        VAL:control VAL:control_integer_multiply_x_sy_sz ;
+        VAL:priority "3" ] ;
+    VAL:priority "1".
+
+##################################################################
+# inferences
